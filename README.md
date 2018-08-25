@@ -1,6 +1,6 @@
-# PriceDB Pull
+# PriceDB Get
 
-Pull historical prices for use in [GnuCash](https://www.gnucash.org/) and
+Get historical prices for use in [GnuCash](https://www.gnucash.org/) and
 [Ledger CLI](https://www.ledger-cli.org/).
 
 ## Purpose
