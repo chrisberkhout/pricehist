@@ -4,4 +4,4 @@ help: ## List make targets
 
 .PHONY: test
 test: ## Run tests
-	pipenv run pytest
+	poetry run pytest

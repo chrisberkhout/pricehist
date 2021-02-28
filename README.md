@@ -1,7 +1,9 @@
-# PriceDB Get
+# pricehist
 
-Get historical prices for use in [GnuCash](https://www.gnucash.org/) and
-[Ledger CLI](https://www.ledger-cli.org/).
+Fetch and process historical price data, including for use with:
+
+* [GnuCash](https://www.gnucash.org/)
+* [Ledger CLI](https://www.ledger-cli.org/)
 
 ## Purpose
 
@@ -18,4 +20,12 @@ into an SQL-based GnuCash file.
 
 ## Usage
 
+## Related projects
 
+* market-prices: [barrucadu/hledger-scripts: Helpful scripts to do things with your hledger data.](https://github.com/barrucadu/hledger-scripts#market-prices)
+* bean-price: [Fetching Prices in Beancount - Beancount Documentation](https://beancount.github.io/docs/fetching_prices_in_beancount.html#the-bean-price-tool)
+* [nathankot/ledger-get-prices](https://github.com/nathankot/ledger-get-prices)
+* [adchari/LedgerStockUpdate](https://github.com/adchari/LedgerStockUpdate)
+* [finance-quote/finance-quote: Finance::Quote module for Perl](https://github.com/finance-quote/finance-quote)
+  (not historical)
+* pricedb: [alensiljak/price-database](https://gitlab.com/alensiljak/price-database)

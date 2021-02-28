@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "pricehist"
+version = "0.1.0"
+description = "Fetch and process historical price data"
+authors = ["Chris Berkhout <chris@chrisberkhout.com>"]
+license = "MIT"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+requests = "^2.25.1"
+lxml = "^4.6.2"
+
+[tool.poetry.dev-dependencies]
+pytest = "^6.2.2"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
