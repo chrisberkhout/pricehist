@@ -16,3 +16,6 @@ pytest = "^6.2.2"
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+pricehist = "pricehist.cli:cli"
