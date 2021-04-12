@@ -6,4 +6,14 @@ class CoinMarketCap():
 
     @staticmethod
     def name():
-        return 'CoinMarketCap.com'
+        return 'CoinMarketCap'
+
+    @staticmethod
+    def description():
+        return 'CoinMarketCap historical price data'
+
+    @staticmethod
+    def source_url():
+        return 'https://coinmarketcap.com/'
+
+

@@ -22,8 +22,10 @@ def cmd_sources(args):
 
 def cmd_source(args):
     source = sources.by_id[args.identifier]
-    print(f'ID   : {source.id()}')
-    print(f'Name : {source.name()}')
+    print(f'ID          : {source.id()}')
+    print(f'Name        : {source.name()}')
+    print(f'Description : {source.description()}')
+    print(f'URL         : {source.source_url()}')
     pass
 
 def build_parser():
