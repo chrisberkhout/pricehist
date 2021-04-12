@@ -26,6 +26,8 @@ def cmd_source(args):
     print(f'Name        : {source.name()}')
     print(f'Description : {source.description()}')
     print(f'URL         : {source.source_url()}')
+    print(f'Bases       : {", ".join(source.bases())}')
+    print(f'Quotes      : {", ".join(source.quotes())}')
     pass
 
 def build_parser():

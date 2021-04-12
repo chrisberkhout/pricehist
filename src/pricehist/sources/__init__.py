@@ -1,7 +1,7 @@
-from .CoinMarketCap import CoinMarketCap
+from .CoinDesk import CoinDesk
 from .ECB import ECB
 
 by_id = {
-    CoinMarketCap.id(): CoinMarketCap,
+    CoinDesk.id(): CoinDesk,
     ECB.id(): ECB
 }
