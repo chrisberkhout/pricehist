@@ -1,6 +1,6 @@
 import argparse
 import sys
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from pricehist import sources
 
@@ -12,6 +12,8 @@ def cli(args=None):
         cmd_sources(args)
     elif (args.command == 'source'):
         cmd_source(args)
+    elif (args.command == 'fetch'):
+        cmd_fetch(args)
     else:
         parser.print_help()
 
@@ -28,7 +30,13 @@ def cmd_source(args):
     print(f'URL         : {source.source_url()}')
     print(f'Bases       : {", ".join(source.bases())}')
     print(f'Quotes      : {", ".join(source.quotes())}')
-    pass
+
+def cmd_fetch(args):
+    source = sources.by_id[args.source]
+    start = args.start or args.after
+    print(f'source name = {source.name()}')
+    print(f'start = {args.start}')
+    print(f'end = {args.end}')
 
 def build_parser():
     def valid_date(s):
@@ -41,6 +49,9 @@ def build_parser():
             msg = "Not a valid date: '{0}'.".format(s)
             raise argparse.ArgumentTypeError(msg)
 
+    def following_valid_date(s):
+        return str(datetime.strptime(valid_date(s), "%Y-%m-%d").date() + timedelta(days=1))
+
     def today():
         return str(datetime.now().date())
 
@@ -51,17 +62,22 @@ def build_parser():
     sources_parser = subparsers.add_parser('sources', help='list sources')
 
     source_parser = subparsers.add_parser('source', help='show source details')
-    source_parser.add_argument('identifier', metavar='ID', type=str,
+    source_parser.add_argument('identifier', metavar='id', type=str,
             choices=sources.by_id.keys(),
             help='the source identifier')
 
-    # parser.add_argument('--start', dest='start', type=valid_date,
-    #                     default='2009-01-03',
-    #                     help='start date (default: 2009-01-03)')
-
-    # parser.add_argument('--end', dest='end', type=valid_date,
-    #                     default=today(),
-    #                     help='end date (default: today)')
+    fetch_parser = subparsers.add_parser('fetch', help='fetch prices')
+    fetch_parser.add_argument('source', metavar='source_id', type=str,
+            choices=sources.by_id.keys(),
+            help='the source identifier')
+    fetch_start_group = fetch_parser.add_mutually_exclusive_group(required=True)
+    fetch_start_group.add_argument('-s', '--start', dest='start', type=valid_date,
+            help='start date (inclusive)')
+    fetch_start_group.add_argument('-sx', '--startx', dest='start', type=following_valid_date,
+            help='start date (exclusive)')
+    fetch_parser.add_argument('-e', '--end', dest='end', type=valid_date,
+            default=today(),
+            help='end date (inclusive, default: today)')
 
     # parser.add_argument('--csv', dest='csv', action='store_true',
     #                     help='print full data as csv (instead of Ledger pricedb format)')
