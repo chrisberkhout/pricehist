@@ -37,6 +37,7 @@ def cmd_fetch(args):
     print(f'source name = {source.name()}')
     print(f'start = {args.start}')
     print(f'end = {args.end}')
+    print(f'pair = {args.pair}')
 
 def build_parser():
     def valid_date(s):
@@ -62,25 +63,27 @@ def build_parser():
     sources_parser = subparsers.add_parser('sources', help='list sources')
 
     source_parser = subparsers.add_parser('source', help='show source details')
-    source_parser.add_argument('identifier', metavar='id', type=str,
+    source_parser.add_argument('identifier', metavar='ID', type=str,
             choices=sources.by_id.keys(),
             help='the source identifier')
 
-    fetch_parser = subparsers.add_parser('fetch', help='fetch prices')
-    fetch_parser.add_argument('source', metavar='source_id', type=str,
+    fetch_parser = subparsers.add_parser('fetch', help='fetch prices',
+            usage='pricehist fetch ID [-h] -p PAIR (-s START | -sx START) [-e END]')
+    fetch_parser.add_argument('source', metavar='ID', type=str,
             choices=sources.by_id.keys(),
             help='the source identifier')
+    fetch_parser.add_argument('-p', '--pair', dest='pair', type=str, required=True,
+            help='pair, usually BASE/QUOTE, e.g. BTC/USD')
     fetch_start_group = fetch_parser.add_mutually_exclusive_group(required=True)
     fetch_start_group.add_argument('-s', '--start', dest='start', type=valid_date,
-            help='start date (inclusive)')
+            help='start date, inclusive')
     fetch_start_group.add_argument('-sx', '--startx', dest='start', type=following_valid_date,
-            help='start date (exclusive)')
+            help='start date, exclusive')
     fetch_parser.add_argument('-e', '--end', dest='end', type=valid_date,
             default=today(),
-            help='end date (inclusive, default: today)')
+            help='end date, inclusive (default: today)')
 
     # parser.add_argument('--csv', dest='csv', action='store_true',
     #                     help='print full data as csv (instead of Ledger pricedb format)')
 
     return parser
-
