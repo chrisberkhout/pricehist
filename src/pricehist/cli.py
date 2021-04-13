@@ -32,12 +32,13 @@ def cmd_source(args):
     print(f'Quotes      : {", ".join(source.quotes())}')
 
 def cmd_fetch(args):
-    source = sources.by_id[args.source]
+    source = sources.by_id[args.source]()
     start = args.start or args.after
     print(f'source name = {source.name()}')
     print(f'start = {args.start}')
     print(f'end = {args.end}')
     print(f'pair = {args.pair}')
+    print(str(source.fetch(args.pair, args.start, args.end)))
 
 def build_parser():
     def valid_date(s):
