@@ -3,6 +3,7 @@ import sys
 from datetime import datetime, timedelta
 
 from pricehist import sources
+from pricehist import outputs
 
 def cli(args=None):
     parser = build_parser()
@@ -34,11 +35,9 @@ def cmd_source(args):
 def cmd_fetch(args):
     source = sources.by_id[args.source]()
     start = args.start or args.after
-    print(f'source name = {source.name()}')
-    print(f'start = {args.start}')
-    print(f'end = {args.end}')
-    print(f'pair = {args.pair}')
-    print(str(source.fetch(args.pair, args.start, args.end)))
+    output = outputs.by_type[args.output]()
+    prices = source.fetch(args.pair, args.start, args.end)
+    print(output.format(prices))
 
 def build_parser():
     def valid_date(s):
@@ -83,6 +82,10 @@ def build_parser():
     fetch_parser.add_argument('-e', '--end', dest='end', type=valid_date,
             default=today(),
             help='end date, inclusive (default: today)')
+    fetch_parser.add_argument('-o', '--output', dest='output', metavar='FORMAT', type=str,
+            choices=outputs.by_type.keys(),
+            default=next(iter(outputs.by_type)),
+            help=f'output format (default: {next(iter(outputs.by_type))})')
 
     # parser.add_argument('--csv', dest='csv', action='store_true',
     #                     help='print full data as csv (instead of Ledger pricedb format)')
