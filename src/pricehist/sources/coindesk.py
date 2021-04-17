@@ -1,5 +1,8 @@
+from decimal import Decimal
 import json
 import requests
+
+from pricehist.price import Price
 
 class CoinDesk():
 
@@ -45,6 +48,8 @@ class CoinDesk():
         url = f'https://api.coindesk.com/v1/bpi/historical/close.json?currency={quote}&start={start}&end={end}'
         response = requests.get(url)
         data = json.loads(response.content)
-        bpi = data['bpi']
+        prices = []
+        for (d, v) in data['bpi'].items():
+            prices.append(Price(base, quote, d, Decimal(str(v))))
 
-        return bpi
+        return prices

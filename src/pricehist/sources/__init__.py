@@ -1,5 +1,5 @@
-from .CoinDesk import CoinDesk
-from .ECB import ECB
+from .coindesk import CoinDesk
+from .ecb import ECB
 
 by_id = {
     CoinDesk.id(): CoinDesk,

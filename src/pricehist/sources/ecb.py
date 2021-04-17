@@ -4,6 +4,8 @@ import json
 import requests
 from xml.etree import ElementTree
 
+from pricehist.price import Price
+
 class ECB():
 
     @staticmethod
@@ -66,6 +68,6 @@ class ECB():
             # TODO what if it's not found for that day? (some quotes aren't in the earliest data)
             rate = Decimal(day.find(rate_xpath).attrib['rate'])
             all_rows.insert(0, (date, rate))
-        selected = [ (d, r) for d, r in all_rows if d >= start and d <= end ]
+        selected = [ Price(base, quote, d, r) for d, r in all_rows if d >= start and d <= end ]
 
         return selected
