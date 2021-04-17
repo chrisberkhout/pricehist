@@ -68,26 +68,23 @@ def build_parser():
             help='the source identifier')
 
     fetch_parser = subparsers.add_parser('fetch', help='fetch prices',
-            usage='pricehist fetch ID [-h] -p PAIR (-s START | -sx START) [-e END]')
+            usage='pricehist fetch ID [-h] -p PAIR (-s DATE | -sx DATE) [-e DATE] [-o FMT]')
     fetch_parser.add_argument('source', metavar='ID', type=str,
             choices=sources.by_id.keys(),
             help='the source identifier')
     fetch_parser.add_argument('-p', '--pair', dest='pair', type=str, required=True,
             help='pair, usually BASE/QUOTE, e.g. BTC/USD')
     fetch_start_group = fetch_parser.add_mutually_exclusive_group(required=True)
-    fetch_start_group.add_argument('-s', '--start', dest='start', type=valid_date,
+    fetch_start_group.add_argument('-s', '--start', dest='start', metavar='DATE', type=valid_date,
             help='start date, inclusive')
-    fetch_start_group.add_argument('-sx', '--startx', dest='start', type=following_valid_date,
+    fetch_start_group.add_argument('-sx', '--startx', dest='start', metavar='DATE', type=following_valid_date,
             help='start date, exclusive')
-    fetch_parser.add_argument('-e', '--end', dest='end', type=valid_date,
+    fetch_parser.add_argument('-e', '--end', dest='end', metavar='DATE', type=valid_date,
             default=today(),
             help='end date, inclusive (default: today)')
-    fetch_parser.add_argument('-o', '--output', dest='output', metavar='FORMAT', type=str,
+    fetch_parser.add_argument('-o', '--output', dest='output', metavar='FMT', type=str,
             choices=outputs.by_type.keys(),
-            default=next(iter(outputs.by_type)),
-            help=f'output format (default: {next(iter(outputs.by_type))})')
-
-    # parser.add_argument('--csv', dest='csv', action='store_true',
-    #                     help='print full data as csv (instead of Ledger pricedb format)')
+            default=outputs.default,
+            help=f'output format (default: {outputs.default})')
 
     return parser
