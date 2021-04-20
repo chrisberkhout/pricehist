@@ -21,7 +21,18 @@ class GnuCashSQL:
             guid = m.hexdigest()[0:32]
             value_num = str(price.amount).replace(".", "")
             value_denom = 10 ** len(f"{price.amount}.".split(".")[1])
-            v = f"('{guid}', '{date}', '{price.base}', '{price.quote}', '{source}', '{typ}', {value_num}, {value_denom})"
+            v = (
+                "("
+                f"'{guid}', "
+                f"'{date}', "
+                f"'{price.base}', "
+                f"'{price.quote}', "
+                f"'{source}', "
+                f"'{typ}', "
+                f"{value_num}, "
+                f"{value_denom}"
+                ")"
+            )
             values.append(v)
 
         comma_newline = ",\n"

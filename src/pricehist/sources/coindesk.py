@@ -17,7 +17,10 @@ class CoinDesk:
 
     @staticmethod
     def description():
-        return "An average of bitcoin prices across leading global exchanges. Powered by CoinDesk, https://www.coindesk.com/price/bitcoin"
+        return (
+            "An average of bitcoin prices across leading global exchanges. "
+            "Powered by CoinDesk, https://www.coindesk.com/price/bitcoin"
+        )
 
     @staticmethod
     def source_url():
@@ -45,11 +48,17 @@ class CoinDesk:
         min_start = "2010-07-17"
         if start < min_start:
             exit(
-                f"start {start} too early. The CoinDesk BPI only covers data from {min_start} onwards."
+                f"start {start} too early. The CoinDesk BPI only covers data"
+                f"from {min_start} onwards."
             )
 
-        url = f"https://api.coindesk.com/v1/bpi/historical/close.json?currency={quote}&start={start}&end={end}"
-        response = requests.get(url)
+        url = "https://api.coindesk.com/v1/bpi/historical/close.json"
+        params = {
+            "currency": quote,
+            "start": start,
+            "end": end,
+        }
+        response = requests.get(url, params=params)
         data = json.loads(response.content)
         prices = []
         for (d, v) in data["bpi"].items():

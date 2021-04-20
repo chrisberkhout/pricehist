@@ -1,4 +1,3 @@
-import json
 from datetime import datetime, timedelta
 from decimal import Decimal
 from xml.etree import ElementTree
@@ -78,10 +77,11 @@ class ECB:
             exit(f"start {start} too early. Minimum is {min_start}")
 
         almost_90_days_ago = str(datetime.now().date() - timedelta(days=85))
+        url_base = "https://www.ecb.europa.eu/stats/eurofxref"
         if start > almost_90_days_ago:
-            source_url = "https://www.ecb.europa.eu/stats/eurofxref/eurofxref-hist-90d.xml"  # last 90 days
+            source_url = f"{url_base}/eurofxref-hist-90d.xml"  # last 90 days
         else:
-            source_url = "https://www.ecb.europa.eu/stats/eurofxref/eurofxref-hist.xml"  # since 1999
+            source_url = f"{url_base}/eurofxref-hist.xml"  # since 1999
 
         response = requests.get(source_url)
         data = response.content
@@ -96,7 +96,8 @@ class ECB:
         for day in root.find("default:Cube", namespaces):
             date = day.attrib["time"]
             rate_xpath = f"./*[@currency='{quote}']"
-            # TODO what if it's not found for that day? (some quotes aren't in the earliest data)
+            # TODO what if it's not found for that day?
+            # (some quotes aren't in the earliest data)
             rate = Decimal(day.find(rate_xpath).attrib["rate"])
             all_rows.insert(0, (date, rate))
         selected = [

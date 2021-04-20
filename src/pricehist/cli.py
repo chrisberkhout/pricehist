@@ -1,5 +1,4 @@
 import argparse
-import sys
 from datetime import datetime, timedelta
 
 from pricehist import outputs, sources
@@ -37,7 +36,6 @@ def cmd_source(args):
 
 def cmd_fetch(args):
     source = sources.by_id[args.source]()
-    start = args.start or args.after
     output = outputs.by_type[args.output]()
     prices = source.fetch(args.pair, args.start, args.end)
     print(output.format(prices))
@@ -66,7 +64,7 @@ def build_parser():
 
     subparsers = parser.add_subparsers(title="commands", dest="command")
 
-    sources_parser = subparsers.add_parser("sources", help="list sources")
+    subparsers.add_parser("sources", help="list sources")
 
     source_parser = subparsers.add_parser("source", help="show source details")
     source_parser.add_argument(

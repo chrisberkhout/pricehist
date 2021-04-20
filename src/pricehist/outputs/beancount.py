@@ -2,7 +2,6 @@ class Beancount:
     def format(self, prices):
         lines = []
         for price in prices:
-            date = str(price.date).translate(str.maketrans("-", "/"))
             lines.append(
                 f"{price.date} price {price.base} {price.amount} {price.quote}"
             )

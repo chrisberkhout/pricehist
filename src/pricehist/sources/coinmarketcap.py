@@ -1,7 +1,6 @@
 import json
-from datetime import datetime, timedelta
+from datetime import datetime
 from decimal import Decimal
-from xml.etree import ElementTree
 
 import requests
 
@@ -25,9 +24,10 @@ class CoinMarketCap:
     def source_url():
         return "https://coinmarketcap.com/"
 
-    # # currency metadata - these may max out at 5k items (crypto data is currently 4720 items)
-    # curl 'https://web-api.coinmarketcap.com/v1/fiat/map?include_metals=true' | jq . | tee fiat-map.json
-    # curl 'https://web-api.coinmarketcap.com/v1/cryptocurrency/map' | jq . | tee cryptocurrency-map.json
+    # # currency metadata - these may max out at 5k items
+    # #   (crypto data is currently 4720 items)
+    # curl '.../v1/fiat/map?include_metals=true' | jq . | tee fiat-map.json
+    # curl '.../v1/cryptocurrency/map' | jq . | tee cryptocurrency-map.json
 
     @staticmethod
     def bases():
@@ -40,13 +40,14 @@ class CoinMarketCap:
     def fetch(self, pair, start, end):
         base, quote = pair.split("/")
 
-        url = f"https://web-api.coinmarketcap.com/v1/cryptocurrency/ohlcv/historical"
+        url = "https://web-api.coinmarketcap.com/v1/cryptocurrency/ohlcv/historical"
         params = {
             "symbol": base,
             "convert": quote,
             "time_start": int(datetime.strptime(start, "%Y-%m-%d").timestamp()),
-            "time_end": int(datetime.strptime(end, "%Y-%m-%d").timestamp())
-            + 24 * 60 * 60,  # round up to include the last day
+            "time_end": (
+                int(datetime.strptime(end, "%Y-%m-%d").timestamp()) + 24 * 60 * 60
+            ),  # round up to include the last day
         }
 
         response = requests.get(url, params=params)
