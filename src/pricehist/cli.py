@@ -2,8 +2,7 @@ import argparse
 import sys
 from datetime import datetime, timedelta
 
-from pricehist import sources
-from pricehist import outputs
+from pricehist import outputs, sources
 
 
 def cli(args=None):

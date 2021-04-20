@@ -1,5 +1,6 @@
-from decimal import Decimal
 import json
+from decimal import Decimal
+
 import requests
 
 from pricehist.price import Price

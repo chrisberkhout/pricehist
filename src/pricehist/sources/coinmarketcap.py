@@ -1,8 +1,9 @@
+import json
 from datetime import datetime, timedelta
 from decimal import Decimal
-import json
-import requests
 from xml.etree import ElementTree
+
+import requests
 
 from pricehist.price import Price
 

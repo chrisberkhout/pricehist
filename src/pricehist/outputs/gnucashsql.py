@@ -1,5 +1,5 @@
-from datetime import datetime
 import hashlib
+from datetime import datetime
 
 from pricehist import __version__
 
