@@ -1,5 +1,6 @@
 from .beancount import Beancount
 from .csv import CSV
+from .gnucashsql import GnuCashSQL
 from .ledger import Ledger
 
 default = 'ledger'
@@ -7,5 +8,6 @@ default = 'ledger'
 by_type = {
     'beancount': Beancount,
     'csv': CSV,
+    'gnucash-sql': GnuCashSQL,
     'ledger': Ledger
 }
