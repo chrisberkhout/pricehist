@@ -3,25 +3,29 @@ import hashlib
 
 from pricehist import __version__
 
-class GnuCashSQL():
 
+class GnuCashSQL:
     def format(self, prices):
-        source = 'pricehist'
-        typ = 'unknown'
+        source = "pricehist"
+        typ = "unknown"
 
         values = []
         for price in prices:
-            date = f'{price.date} 00:00:00'
+            date = f"{price.date} 00:00:00"
             m = hashlib.sha256()
-            m.update("".join([date, price.base, price.quote, source, typ, str(price.amount)]).encode('utf-8'))
+            m.update(
+                "".join(
+                    [date, price.base, price.quote, source, typ, str(price.amount)]
+                ).encode("utf-8")
+            )
             guid = m.hexdigest()[0:32]
-            value_num = str(price.amount).replace('.', '')
-            value_denom = 10 ** len(f'{price.amount}.'.split('.')[1])
+            value_num = str(price.amount).replace(".", "")
+            value_denom = 10 ** len(f"{price.amount}.".split(".")[1])
             v = f"('{guid}', '{date}', '{price.base}', '{price.quote}', '{source}', '{typ}', {value_num}, {value_denom})"
             values.append(v)
 
         comma_newline = ",\n"
-        sql = f'''\
+        sql = f"""\
 -- Created by pricehist v{__version__} at {datetime.utcnow().isoformat()}Z
 
 BEGIN;
@@ -66,6 +70,6 @@ SELECT * FROM summary;
 SELECT 'final' AS status, p.* FROM prices p WHERE p.guid IN (SELECT guid FROM new_prices) ORDER BY p.date;
 
 COMMIT;
-'''
+"""
 
         return sql

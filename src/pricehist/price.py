@@ -1,3 +1,3 @@
 from collections import namedtuple
 
-Price = namedtuple('Price', ['base', 'quote', 'date', 'amount'])
+Price = namedtuple("Price", ["base", "quote", "date", "amount"])
