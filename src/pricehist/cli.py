@@ -38,7 +38,7 @@ def cmd_fetch(args):
     source = sources.by_id[args.source]()
     output = outputs.by_type[args.output]()
     prices = source.fetch(args.pair, args.start, args.end)
-    print(output.format(prices))
+    print(output.format(prices), end="")
 
 
 def build_parser():
