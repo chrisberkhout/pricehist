@@ -5,7 +5,7 @@ class Beancount:
             lines.append(
                 f"{price.date} price {price.base} {price.amount} {price.quote}"
             )
-        return "\n".join(lines)
+        return "\n".join(lines) + "\n"
 
 
 # https://beancount.github.io/docs/fetching_prices_in_beancount.html

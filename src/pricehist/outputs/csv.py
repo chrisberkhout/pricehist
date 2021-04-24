@@ -4,4 +4,4 @@ class CSV:
         for price in prices:
             line = ",".join([price.date, price.base, price.quote, str(price.amount)])
             lines.append(line)
-        return "\n".join(lines)
+        return "\n".join(lines) + "\n"
