@@ -1,31 +1,120 @@
 # pricehist
 
-Fetch and process historical price data, including for use with:
-
-* [GnuCash](https://www.gnucash.org/)
-* [Ledger CLI](https://www.ledger-cli.org/)
-
-## Purpose
-
-This tool can fetch historical price data from multiple sources, for specific
-time ranges. It focuses on low-resolution data: just a single price per day,
-per commodity pair.
-
-The time range can be specified manually or be deduced from the prices in an
-existing file. It can format the fetched prices for Ledger CLI, or insert them
-into an SQL-based GnuCash file.
+A command-line tool for fetching and formatting historical price data, with
+support for multiple data sources and output formats.
 
 ## Installation
 
+Install via [pip](https://packaging.python.org/tutorials/installing-packages/#use-pip-for-installing):
 
-## Usage
+```bash
+pip install pricehist
+```
 
-## Related projects
+## Sources
 
-* market-prices: [barrucadu/hledger-scripts: Helpful scripts to do things with your hledger data.](https://github.com/barrucadu/hledger-scripts#market-prices)
-* bean-price: [Fetching Prices in Beancount - Beancount Documentation](https://beancount.github.io/docs/fetching_prices_in_beancount.html#the-bean-price-tool)
-* [nathankot/ledger-get-prices](https://github.com/nathankot/ledger-get-prices)
-* [adchari/LedgerStockUpdate](https://github.com/adchari/LedgerStockUpdate)
-* [finance-quote/finance-quote: Finance::Quote module for Perl](https://github.com/finance-quote/finance-quote)
-  (not historical)
-* pricedb: [alensiljak/price-database](https://gitlab.com/alensiljak/price-database)
+- **`coindesk`**: [CoinDesk Bitcoin Price Index](https://www.coindesk.com/coindesk-api)
+- **`coinmarketcap`**: [CoinMarketCap](https://coinmarketcap.com/)
+- **`ecb`**: [European Central Bank Euro foreign exchange reference rates](https://www.ecb.europa.eu/stats/exchange/eurofxref/html/index.en.html)
+
+## Output formats
+
+- **`csv`**: [Comma-separated values](https://en.wikipedia.org/wiki/Comma-separated_values)
+- **`ledger`**: [Ledger](https://www.ledger-cli.org/) and [hledger](https://hledger.org/)
+- **`beancount`**: [Beancount](http://furius.ca/beancount/)
+- **`gnucash-sql`**: [GnuCash](https://www.gnucash.org/) SQL
+
+## Examples
+
+Show usage information:
+
+```bash
+pricehist -h
+```
+```
+usage: pricehist [-h] {sources,source,fetch} ...
+
+Fetch historical price data
+
+optional arguments:
+  -h, --help            show this help message and exit
+
+commands:
+  {sources,source,fetch}
+    sources             list sources
+    source              show source details
+    fetch               fetch prices
+```
+
+Fetch prices after 2021-01-04, ending 2020-01-15, as CSV:
+
+```bash
+pricehist fetch ecb -p EUR/AUD -sx 2021-01-04 -e 2021-01-15 -o csv
+```
+```
+date,base,quote,amount
+2021-01-05,EUR,AUD,1.5927
+2021-01-06,EUR,AUD,1.5824
+2021-01-07,EUR,AUD,1.5836
+2021-01-08,EUR,AUD,1.5758
+2021-01-11,EUR,AUD,1.5783
+2021-01-12,EUR,AUD,1.5742
+2021-01-13,EUR,AUD,1.5734
+2021-01-14,EUR,AUD,1.5642
+2021-01-15,EUR,AUD,1.568
+```
+
+In Ledger format:
+
+```bash
+pricehist fetch ecb -p EUR/AUD -s 2021-01-01 -o ledger | head
+```
+```
+P 2021/01/04 00:00:00 EUR 1.5928 AUD
+P 2021/01/05 00:00:00 EUR 1.5927 AUD
+P 2021/01/06 00:00:00 EUR 1.5824 AUD
+P 2021/01/07 00:00:00 EUR 1.5836 AUD
+P 2021/01/08 00:00:00 EUR 1.5758 AUD
+P 2021/01/11 00:00:00 EUR 1.5783 AUD
+P 2021/01/12 00:00:00 EUR 1.5742 AUD
+P 2021/01/13 00:00:00 EUR 1.5734 AUD
+P 2021/01/14 00:00:00 EUR 1.5642 AUD
+P 2021/01/15 00:00:00 EUR 1.568 AUD
+```
+
+Generate SQL for a GnuCash database and apply it immediately:
+
+```bash
+pricehist fetch ecb -p EUR/AUD -s 2021-01-01 -o gnucash-sql | sqlite3 Accounts.gnucash
+pricehist fetch ecb -p EUR/AUD -s 2021-01-01 -o gnucash-sql | mysql -u username -p -D databasename
+pricehist fetch ecb -p EUR/AUD -s 2021-01-01 -o gnucash-sql | psql -U username -d databasename -v ON_ERROR_STOP=1
+```
+
+## Design choices
+
+To keep things simple, `pricehist` provides only univariate time series of
+daily historical prices. It doesn't provide other types of market, financial or
+economic data, real-time prices, or other temporal resolutions. Multiple or
+multivariate series require multiple invocations.
+
+## Alternatives
+
+Beancount's [`bean-price`](https://beancount.github.io/docs/fetching_prices_in_beancount.html)
+tool fetches historical prices and addresses other workflow concerns in a
+Beancount-specific manner.
+
+The GnuCash wiki documents [wrapper scripts](https://wiki.gnucash.org/wiki/Stocks/get_prices)
+for the [Finance::QuoteHist](https://metacpan.org/pod/Finance::QuoteHist) Perl
+module.
+
+Some other projects with related goals include:
+* [`hledger-stockquotes`](https://github.com/prikhi/hledger-stockquotes):
+  Generate an HLedger journal containing daily stock quotes for your commodities.
+* [`ledger_get_prices`](https://github.com/nathankot/ledger-get-prices):
+  Uses Yahoo finance to intelligently generate a ledger price database based on your current ledger commodities and time period.
+* [LedgerStockUpdate](https://github.com/adchari/LedgerStockUpdate):
+  Locates any stocks you have in your ledger-cli file, then generates a price database of those stocks.
+* [`market-prices`](https://github.com/barrucadu/hledger-scripts#market-prices):
+  Downloads market values of commodities from a few different sources.
+* [price-database](https://gitlab.com/alensiljak/price-database):
+  A Python library and a CLI for storage of prices.
