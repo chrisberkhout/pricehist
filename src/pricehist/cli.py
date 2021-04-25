@@ -44,8 +44,20 @@ def cmd_source(args):
 def cmd_fetch(args):
     source = sources.by_id[args.source]()
     output = outputs.by_type[args.output]()
+
     prices = source.fetch(args.pair, args.start, args.end)
-    print(output.format(prices), end="")
+
+    if args.renamebase or args.renamequote:
+        prices = [
+            p._replace(
+                base=(args.renamebase or p.base),
+                quote=(args.renamequote or p.quote),
+            )
+            for p in prices
+        ]
+
+    time = args.renametime or "00:00:00"
+    print(output.format(prices, time=time), end="")
 
 
 def build_parser():
@@ -94,7 +106,8 @@ def build_parser():
         help="fetch prices",
         usage=(
             "pricehist fetch SOURCE PAIR "
-            "[-h] (-s DATE | -sx DATE) [-e DATE] [-o FMT]"
+            "[-h] (-s DATE | -sx DATE) [-e DATE] [-o FMT] "
+            "[--rename-base SYM] [--rename-quote SYM] [--rename-time TIME]"
         ),
     )
     fetch_parser.add_argument(
@@ -145,6 +158,27 @@ def build_parser():
         choices=outputs.by_type.keys(),
         default=outputs.default,
         help=f"output format (default: {outputs.default})",
+    )
+    fetch_parser.add_argument(
+        "--rename-base",
+        dest="renamebase",
+        metavar="SYM",
+        type=str,
+        help="rename base symbol",
+    )
+    fetch_parser.add_argument(
+        "--rename-quote",
+        dest="renamequote",
+        metavar="SYM",
+        type=str,
+        help="rename quote symbol",
+    )
+    fetch_parser.add_argument(
+        "--rename-time",
+        dest="renametime",
+        metavar="TIME",
+        type=str,
+        help="set a particular time of day, e.g. 23:59:59",
     )
 
     return parser

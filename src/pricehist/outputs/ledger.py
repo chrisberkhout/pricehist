@@ -1,9 +1,9 @@
 class Ledger:
-    def format(self, prices):
+    def format(self, prices, time=None):
         lines = []
         for price in prices:
             date = str(price.date).translate(str.maketrans("-", "/"))
-            lines.append(f"P {date} 00:00:00 {price.base} {price.amount} {price.quote}")
+            lines.append(f"P {date} {time} {price.base} {price.amount} {price.quote}")
         return "\n".join(lines) + "\n"
 
     # TODO support additional details of the format:

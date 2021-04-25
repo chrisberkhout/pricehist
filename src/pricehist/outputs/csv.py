@@ -1,5 +1,5 @@
 class CSV:
-    def format(self, prices):
+    def format(self, prices, time=None):
         lines = ["date,base,quote,amount"]
         for price in prices:
             line = ",".join([price.date, price.base, price.quote, str(price.amount)])

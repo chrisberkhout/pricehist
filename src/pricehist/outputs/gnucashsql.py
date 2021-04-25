@@ -6,13 +6,13 @@ from pricehist import __version__
 
 
 class GnuCashSQL:
-    def format(self, prices):
+    def format(self, prices, time=None):
         source = "pricehist"
         typ = "unknown"
 
         values_parts = []
         for price in prices:
-            date = f"{price.date} 00:00:00"
+            date = f"{price.date} {time}"
             m = hashlib.sha256()
             m.update(
                 "".join(

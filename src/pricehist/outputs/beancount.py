@@ -1,5 +1,5 @@
 class Beancount:
-    def format(self, prices):
+    def format(self, prices, time=None):
         lines = []
         for price in prices:
             lines.append(
