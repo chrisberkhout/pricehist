@@ -55,6 +55,11 @@ def cmd_fetch(args):
             )
             for p in prices
         ]
+    if args.invert:
+        prices = [
+            p._replace(base=p.quote, quote=p.base, amount=(1 / p.amount))
+            for p in prices
+        ]
 
     time = args.renametime or "00:00:00"
     print(output.format(prices, time=time), end="")
@@ -158,6 +163,11 @@ def build_parser():
         choices=outputs.by_type.keys(),
         default=outputs.default,
         help=f"output format (default: {outputs.default})",
+    )
+    fetch_parser.add_argument(
+        "--invert",
+        action="store_true",
+        help="invert the price, swapping base and quote",
     )
     fetch_parser.add_argument(
         "--rename-base",
