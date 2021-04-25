@@ -78,21 +78,22 @@ def build_parser():
     fetch_parser = subparsers.add_parser(
         "fetch",
         help="fetch prices",
-        usage="pricehist fetch ID [-h] -p PAIR (-s DATE | -sx DATE) [-e DATE] [-o FMT]",
+        usage=(
+            "pricehist fetch SOURCE PAIR "
+            "[-h] (-s DATE | -sx DATE) [-e DATE] [-o FMT]"
+        ),
     )
     fetch_parser.add_argument(
         "source",
-        metavar="ID",
+        metavar="SOURCE",
         type=str,
         choices=sources.by_id.keys(),
         help="the source identifier",
     )
     fetch_parser.add_argument(
-        "-p",
-        "--pair",
-        dest="pair",
+        "pair",
+        metavar="PAIR",
         type=str,
-        required=True,
         help="pair, usually BASE/QUOTE, e.g. BTC/USD",
     )
     fetch_start_group = fetch_parser.add_mutually_exclusive_group(required=True)
