@@ -2,13 +2,16 @@ import argparse
 from datetime import datetime, timedelta
 
 from pricehist import outputs, sources
+from pricehist import __version__
 
 
 def cli(args=None):
     parser = build_parser()
     args = parser.parse_args()
 
-    if args.command == "sources":
+    if args.version:
+        cmd_version()
+    elif args.command == "sources":
         cmd_sources(args)
     elif args.command == "source":
         cmd_source(args)
@@ -16,6 +19,10 @@ def cli(args=None):
         cmd_fetch(args)
     else:
         parser.print_help()
+
+
+def cmd_version():
+    print(f"pricehist v{__version__}")
 
 
 def cmd_sources(args):
@@ -62,6 +69,13 @@ def build_parser():
 
     parser = argparse.ArgumentParser(description="Fetch historical price data")
 
+    parser.add_argument(
+        "-v",
+        "--version",
+        action="store_true",
+        help="show version information",
+    )
+
     subparsers = parser.add_subparsers(title="commands", dest="command")
 
     subparsers.add_parser("sources", help="list sources")
@@ -69,7 +83,7 @@ def build_parser():
     source_parser = subparsers.add_parser("source", help="show source details")
     source_parser.add_argument(
         "identifier",
-        metavar="ID",
+        metavar="SOURCE",
         type=str,
         choices=sources.by_id.keys(),
         help="the source identifier",
