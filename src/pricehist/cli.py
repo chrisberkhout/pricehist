@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 
 from pricehist import outputs, sources
 from pricehist import __version__
-from pricehist.formatinfo import FormatInfo
+from pricehist.format import Format
 
 
 def cli(args=None):
@@ -62,17 +62,24 @@ def cmd_fetch(args):
             for p in prices
         ]
 
-    default = FormatInfo()
+    default = Format()
 
-    fi = FormatInfo(
-        time=(args.renametime or default.time),
-        decimal=(args.formatdecimal or default.decimal),
-        thousands=(args.formatthousands or default.thousands),
-        symbol=(args.formatsymbol or default.symbol),
-        datesep=(args.formatdatesep or default.datesep),
+    def if_not_none(value, default):
+        if value is None:
+            return default
+        else:
+            return value
+
+    fmt = Format(
+        time=if_not_none(args.renametime, default.time),
+        decimal=if_not_none(args.formatdecimal, default.decimal),
+        thousands=if_not_none(args.formatthousands, default.thousands),
+        symbol=if_not_none(args.formatsymbol, default.symbol),
+        datesep=if_not_none(args.formatdatesep, default.datesep),
+        decimal_places=if_not_none(args.quantize, default.decimal_places),
     )
 
-    print(output.format(prices, format_info=fi), end="")
+    print(output.format(prices, fmt=fmt), end="")
 
 
 def build_parser():
@@ -122,7 +129,10 @@ def build_parser():
         usage=(
             "pricehist fetch SOURCE PAIR "
             "[-h] (-s DATE | -sx DATE) [-e DATE] [-o FMT] "
-            "[--rename-base SYM] [--rename-quote SYM] [--rename-time TIME]"
+            "[--rename-base SYM] [--rename-quote SYM] [--rename-time TIME] "
+            "[--format-decimal CHAR] [--format-thousands CHAR] "
+            "[--format-symbol rightspace|right|leftspace|left] [--format-datesep CHAR] "
+            "[--quantize INT]"
         ),
     )
     fetch_parser.add_argument(
@@ -228,6 +238,13 @@ def build_parser():
         metavar="CHAR",
         type=str,
         help="date separator",
+    )
+    fetch_parser.add_argument(
+        "--quantize",
+        dest="quantize",
+        metavar="INT",
+        type=int,
+        help="quantize to given number of decimal places",
     )
 
     return parser

@@ -3,27 +3,27 @@ from datetime import datetime
 from importlib.resources import read_text
 
 from pricehist import __version__
-from pricehist.formatinfo import FormatInfo
+from pricehist.format import Format
 
 
 class GnuCashSQL:
-    def format(self, prices, format_info=FormatInfo()):
-        fi = format_info
+    def format(self, prices, fmt=Format()):
         source = "pricehist"
         typ = "unknown"
 
         values_parts = []
         for price in prices:
-            date = f"{price.date} {fi.time}"
+            date = f"{price.date} {fmt.time}"
+            amount = fmt.quantize(price.amount)
             m = hashlib.sha256()
             m.update(
                 "".join(
-                    [date, price.base, price.quote, source, typ, str(price.amount)]
+                    [date, price.base, price.quote, source, typ, str(amount)]
                 ).encode("utf-8")
             )
             guid = m.hexdigest()[0:32]
-            value_num = str(price.amount).replace(".", "")
-            value_denom = 10 ** len(f"{price.amount}.".split(".")[1])
+            value_num = str(amount).replace(".", "")
+            value_denom = 10 ** len(f"{amount}.".split(".")[1])
             v = (
                 "("
                 f"'{guid}', "
