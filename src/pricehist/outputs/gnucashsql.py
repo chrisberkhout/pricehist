@@ -3,16 +3,18 @@ from datetime import datetime
 from importlib.resources import read_text
 
 from pricehist import __version__
+from pricehist.formatinfo import FormatInfo
 
 
 class GnuCashSQL:
-    def format(self, prices, time=None):
+    def format(self, prices, format_info=FormatInfo()):
+        fi = format_info
         source = "pricehist"
         typ = "unknown"
 
         values_parts = []
         for price in prices:
-            date = f"{price.date} {time}"
+            date = f"{price.date} {fi.time}"
             m = hashlib.sha256()
             m.update(
                 "".join(

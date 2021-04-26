@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 
 from pricehist import outputs, sources
 from pricehist import __version__
+from pricehist.formatinfo import FormatInfo
 
 
 def cli(args=None):
@@ -61,8 +62,17 @@ def cmd_fetch(args):
             for p in prices
         ]
 
-    time = args.renametime or "00:00:00"
-    print(output.format(prices, time=time), end="")
+    default = FormatInfo()
+
+    fi = FormatInfo(
+        time=(args.renametime or default.time),
+        decimal=(args.formatdecimal or default.decimal),
+        thousands=(args.formatthousands or default.thousands),
+        symbol=(args.formatsymbol or default.symbol),
+        datesep=(args.formatdatesep or default.datesep),
+    )
+
+    print(output.format(prices, format_info=fi), end="")
 
 
 def build_parser():
@@ -189,6 +199,35 @@ def build_parser():
         metavar="TIME",
         type=str,
         help="set a particular time of day, e.g. 23:59:59",
+    )
+    fetch_parser.add_argument(
+        "--format-decimal",
+        dest="formatdecimal",
+        metavar="CHAR",
+        type=str,
+        help="decimal point",
+    )
+    fetch_parser.add_argument(
+        "--format-thousands",
+        dest="formatthousands",
+        metavar="CHAR",
+        type=str,
+        help="thousands separator",
+    )
+    fetch_parser.add_argument(
+        "--format-symbol",
+        dest="formatsymbol",
+        metavar="CHAR",
+        type=str,
+        choices=["rightspace", "right", "leftspace", "left"],
+        help="placement of the quote's commodity symbol relative to its amount",
+    )
+    fetch_parser.add_argument(
+        "--format-datesep",
+        dest="formatdatesep",
+        metavar="CHAR",
+        type=str,
+        help="date separator",
     )
 
     return parser
