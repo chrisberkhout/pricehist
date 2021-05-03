@@ -93,6 +93,11 @@ def build_parser():
             msg = "Not a valid date: '{0}'.".format(s)
             raise argparse.ArgumentTypeError(msg)
 
+    def previous_valid_date(s):
+        return str(
+            datetime.strptime(valid_date(s), "%Y-%m-%d").date() - timedelta(days=1)
+        )
+
     def following_valid_date(s):
         return str(
             datetime.strptime(valid_date(s), "%Y-%m-%d").date() + timedelta(days=1)
@@ -101,7 +106,14 @@ def build_parser():
     def today():
         return str(datetime.now().date())
 
-    parser = argparse.ArgumentParser(description="Fetch historical price data")
+    def formatter(prog):
+        return argparse.HelpFormatter(prog, max_help_position=50)
+
+    parser = argparse.ArgumentParser(
+        prog="pricehist",
+        description="Fetch historical price data",
+        formatter_class=formatter,
+    )
 
     parser.add_argument(
         "-v",
@@ -112,9 +124,17 @@ def build_parser():
 
     subparsers = parser.add_subparsers(title="commands", dest="command")
 
-    subparsers.add_parser("sources", help="list sources")
+    subparsers.add_parser(
+        "sources",
+        help="list sources",
+        formatter_class=formatter,
+    )
 
-    source_parser = subparsers.add_parser("source", help="show source details")
+    source_parser = subparsers.add_parser(
+        "source",
+        help="show source details",
+        formatter_class=formatter,
+    )
     source_parser.add_argument(
         "identifier",
         metavar="SOURCE",
@@ -127,13 +147,14 @@ def build_parser():
         "fetch",
         help="fetch prices",
         usage=(
-            "pricehist fetch SOURCE PAIR "
-            "[-h] (-s DATE | -sx DATE) [-e DATE] [-o FMT] "
+            "pricehist fetch SOURCE PAIR [-h] "
+            "[--type TYPE] (-s DATE | -sx DATE) [-e DATE | -ex DATE] [-o FMT] "
+            "[--invert] [--quantize INT] "
             "[--rename-base SYM] [--rename-quote SYM] [--rename-time TIME] "
             "[--format-decimal CHAR] [--format-thousands CHAR] "
-            "[--format-symbol rightspace|right|leftspace|left] [--format-datesep CHAR] "
-            "[--quantize INT]"
+            "[--format-symbol rightspace|right|leftspace|left] [--format-datesep CHAR]"
         ),
+        formatter_class=formatter,
     )
     fetch_parser.add_argument(
         "source",
@@ -147,6 +168,14 @@ def build_parser():
         metavar="PAIR",
         type=str,
         help="pair, usually BASE/QUOTE, e.g. BTC/USD",
+    )
+    fetch_parser.add_argument(
+        "-t",
+        "--type",
+        dest="type",
+        metavar="TYPE",
+        type=str,
+        help="price type, e.g. close",
     )
     fetch_start_group = fetch_parser.add_mutually_exclusive_group(required=True)
     fetch_start_group.add_argument(
@@ -165,7 +194,9 @@ def build_parser():
         type=following_valid_date,
         help="start date, exclusive",
     )
-    fetch_parser.add_argument(
+
+    fetch_end_group = fetch_parser.add_mutually_exclusive_group(required=False)
+    fetch_end_group.add_argument(
         "-e",
         "--end",
         dest="end",
@@ -174,6 +205,16 @@ def build_parser():
         default=today(),
         help="end date, inclusive (default: today)",
     )
+    fetch_end_group.add_argument(
+        "-ex",
+        "--endx",
+        dest="end",
+        metavar="DATE",
+        type=previous_valid_date,
+        default=today(),
+        help="end date, exclusive",
+    )
+
     fetch_parser.add_argument(
         "-o",
         "--output",
@@ -188,6 +229,13 @@ def build_parser():
         "--invert",
         action="store_true",
         help="invert the price, swapping base and quote",
+    )
+    fetch_parser.add_argument(
+        "--quantize",
+        dest="quantize",
+        metavar="INT",
+        type=int,
+        help="quantize to the given number of decimal places",
     )
     fetch_parser.add_argument(
         "--rename-base",
@@ -208,43 +256,36 @@ def build_parser():
         dest="renametime",
         metavar="TIME",
         type=str,
-        help="set a particular time of day, e.g. 23:59:59",
+        help="set a particular time of day (default: 00:00:00)",
     )
     fetch_parser.add_argument(
         "--format-decimal",
         dest="formatdecimal",
         metavar="CHAR",
         type=str,
-        help="decimal point",
+        help="decimal point (default: '.')",
     )
     fetch_parser.add_argument(
         "--format-thousands",
         dest="formatthousands",
         metavar="CHAR",
         type=str,
-        help="thousands separator",
+        help="thousands separator (default: '')",
     )
     fetch_parser.add_argument(
         "--format-symbol",
         dest="formatsymbol",
-        metavar="CHAR",
+        metavar="LOC",
         type=str,
         choices=["rightspace", "right", "leftspace", "left"],
-        help="placement of the quote's commodity symbol relative to its amount",
+        help="commodity symbol placement (default: rightspace)",
     )
     fetch_parser.add_argument(
         "--format-datesep",
         dest="formatdatesep",
         metavar="CHAR",
         type=str,
-        help="date separator",
-    )
-    fetch_parser.add_argument(
-        "--quantize",
-        dest="quantize",
-        metavar="INT",
-        type=int,
-        help="quantize to given number of decimal places",
+        help="date separator (default: '-')",
     )
 
     return parser
