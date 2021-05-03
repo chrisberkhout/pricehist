@@ -38,7 +38,7 @@ class CoinDesk:
         symbols = sorted([item["currency"] for item in data])
         return symbols
 
-    def fetch(self, pair, start, end):
+    def fetch(self, pair, type, start, end):
         base, quote = pair.split("/")
         if base not in self.bases():
             exit(f"Invalid base {base}")

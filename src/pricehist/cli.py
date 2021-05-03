@@ -46,7 +46,7 @@ def cmd_fetch(args):
     source = sources.by_id[args.source]()
     output = outputs.by_type[args.output]()
 
-    prices = source.fetch(args.pair, args.start, args.end)
+    prices = source.fetch(args.pair, args.type, args.start, args.end)
 
     if args.renamebase or args.renamequote:
         prices = [

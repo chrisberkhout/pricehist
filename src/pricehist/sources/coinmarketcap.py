@@ -37,7 +37,7 @@ class CoinMarketCap:
     def quotes():
         return []
 
-    def fetch(self, pair, start, end):
+    def fetch(self, pair, type, start, end):
         base, quote = pair.split("/")
 
         url = "https://web-api.coinmarketcap.com/v1/cryptocurrency/ohlcv/historical"
@@ -56,9 +56,15 @@ class CoinMarketCap:
         prices = []
         for item in data["data"]["quotes"]:
             d = item["time_open"][0:10]
-            high = Decimal(str(item["quote"][quote]["high"]))
-            low = Decimal(str(item["quote"][quote]["low"]))
-            mid = sum([high, low]) / 2
-            prices.append(Price(base, quote, d, mid))
+            amount = self._amount(item["quote"][quote], type)
+            prices.append(Price(base, quote, d, amount))
 
         return prices
+
+    def _amount(self, data, type):
+        if type == "mid":
+            high = Decimal(str(data["high"]))
+            low = Decimal(str(data["low"]))
+            return sum([high, low]) / 2
+        else:
+            return Decimal(str(data[type]))
