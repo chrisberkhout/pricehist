@@ -25,6 +25,10 @@ class ECB:
         return "https://www.ecb.europa.eu/stats/exchange/eurofxref/html/index.en.html"
 
     @staticmethod
+    def notes():
+        return ""
+
+    @staticmethod
     def bases():
         return ["EUR"]
 

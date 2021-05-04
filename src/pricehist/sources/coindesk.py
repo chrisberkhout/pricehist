@@ -18,13 +18,17 @@ class CoinDesk:
     @staticmethod
     def description():
         return (
-            "An average of bitcoin prices across leading global exchanges. "
+            "An average of bitcoin prices across leading global exchanges. \n"
             "Powered by CoinDesk, https://www.coindesk.com/price/bitcoin"
         )
 
     @staticmethod
     def source_url():
         return "https://www.coindesk.com/coindesk-api"
+
+    @staticmethod
+    def notes():
+        return ""
 
     @staticmethod
     def bases():

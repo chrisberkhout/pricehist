@@ -1,5 +1,7 @@
 import argparse
 from datetime import datetime, timedelta
+from textwrap import TextWrapper
+import shutil
 
 from pricehist import outputs, sources
 from pricehist import __version__
@@ -33,13 +35,35 @@ def cmd_sources(args):
 
 
 def cmd_source(args):
+    def print_field(key, value, key_width, output_width, force=True):
+        separator = " : "
+        initial_indent = key + (" " * (key_width - len(key))) + separator
+        subsequent_indent = " " * len(initial_indent)
+        wrapper = TextWrapper(
+            width=output_width,
+            drop_whitespace=True,
+            initial_indent=initial_indent,
+            subsequent_indent=subsequent_indent,
+            break_long_words=force,
+        )
+        first, *rest = value.split("\n")
+        first_output = wrapper.wrap(first)
+        wrapper.initial_indent = subsequent_indent
+        rest_output = sum([wrapper.wrap(line) for line in rest], [])
+        # TODO use str.splitlines()?
+        print("\n".join(first_output + rest_output))
+
     source = sources.by_id[args.identifier]
-    print(f"ID          : {source.id()}")
-    print(f"Name        : {source.name()}")
-    print(f"Description : {source.description()}")
-    print(f"URL         : {source.source_url()}")
-    print(f'Bases       : {", ".join(source.bases())}')
-    print(f'Quotes      : {", ".join(source.quotes())}')
+    key_width = 11
+    output_width = shutil.get_terminal_size().columns
+
+    print_field("ID", source.id(), key_width, output_width)
+    print_field("Name", source.name(), key_width, output_width)
+    print_field("Description", source.description(), key_width, output_width)
+    print_field("URL", source.source_url(), key_width, output_width, force=False)
+    print_field("Notes", source.notes(), key_width, output_width)
+    print_field("Bases", ", ".join(source.bases()), key_width, output_width)
+    print_field("Quotes", ", ".join(source.quotes()), key_width, output_width)
 
 
 def cmd_fetch(args):

@@ -30,6 +30,10 @@ class CoinMarketCap:
     # curl '.../v1/cryptocurrency/map' | jq . | tee cryptocurrency-map.json
 
     @staticmethod
+    def notes():
+        return ""
+
+    @staticmethod
     def bases():
         return []
 
