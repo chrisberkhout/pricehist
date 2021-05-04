@@ -1,7 +1,6 @@
 from datetime import datetime, timedelta
 from decimal import Decimal
 from lxml import etree
-from lxml.cssselect import CSSSelector
 
 import requests
 
@@ -92,14 +91,13 @@ class ECB:
         data = response.content
 
         root = etree.fromstring(data)
-        ns = {"default": "http://www.ecb.int/vocabulary/2002-08-01/eurofxref"}
 
         all_rows = []
-        for day in CSSSelector("default|Cube[time]", ns)(root):
+        for day in root.cssselect("[time]"):
             date = day.attrib["time"]
             # TODO what if it's not found for that day?
             # (some quotes aren't in the earliest data)
-            for row in CSSSelector(f"default|Cube[currency='{quote}']", ns)(day):
+            for row in day.cssselect(f"[currency='{quote}']"):
                 rate = Decimal(row.attrib["rate"])
                 all_rows.insert(0, (date, rate))
         selected = [
