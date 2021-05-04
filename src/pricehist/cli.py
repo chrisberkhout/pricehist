@@ -50,20 +50,23 @@ def cmd_source(args):
         first_output = wrapper.wrap(first)
         wrapper.initial_indent = subsequent_indent
         rest_output = sum([wrapper.wrap(line) for line in rest], [])
-        # TODO use str.splitlines()?
-        print("\n".join(first_output + rest_output))
+        output = "\n".join(first_output + rest_output)
+        if output != "":
+            print(output)
 
-    source = sources.by_id[args.identifier]
-    key_width = 11
-    output_width = shutil.get_terminal_size().columns
+    source = sources.by_id[args.identifier]()
 
-    print_field("ID", source.id(), key_width, output_width)
-    print_field("Name", source.name(), key_width, output_width)
-    print_field("Description", source.description(), key_width, output_width)
-    print_field("URL", source.source_url(), key_width, output_width, force=False)
-    print_field("Notes", source.notes(), key_width, output_width)
-    print_field("Bases", ", ".join(source.bases()), key_width, output_width)
-    print_field("Quotes", ", ".join(source.quotes()), key_width, output_width)
+    if args.symbols:
+        print("\n".join(source.symbols()))
+    else:
+        key_width = 11
+        output_width = shutil.get_terminal_size().columns
+
+        print_field("ID", source.id(), key_width, output_width)
+        print_field("Name", source.name(), key_width, output_width)
+        print_field("Description", source.description(), key_width, output_width)
+        print_field("URL", source.source_url(), key_width, output_width, force=False)
+        print_field("Notes", source.notes(), key_width, output_width)
 
 
 def cmd_fetch(args):
@@ -157,6 +160,7 @@ def build_parser():
     source_parser = subparsers.add_parser(
         "source",
         help="show source details",
+        usage="pricehist source SOURCE [-h] [-s]",
         formatter_class=formatter,
     )
     source_parser.add_argument(
@@ -165,6 +169,12 @@ def build_parser():
         type=str,
         choices=sources.by_id.keys(),
         help="the source identifier",
+    )
+    source_parser.add_argument(
+        "-s",
+        "--symbols",
+        action="store_true",
+        help="list available symbols",
     )
 
     fetch_parser = subparsers.add_parser(

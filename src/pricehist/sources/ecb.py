@@ -28,68 +28,23 @@ class ECB:
     def notes():
         return ""
 
-    @staticmethod
-    def bases():
-        return ["EUR"]
-
-    @staticmethod
-    def quotes():
-        return [
-            "AUD",
-            "BGN",
-            "BRL",
-            "CAD",
-            "CHF",
-            "CNY",
-            "CZK",
-            "DKK",
-            "GBP",
-            "HKD",
-            "HRK",
-            "HUF",
-            "IDR",
-            "ILS",
-            "INR",
-            "ISK",
-            "JPY",
-            "KRW",
-            "MXN",
-            "MYR",
-            "NOK",
-            "NZD",
-            "PHP",
-            "PLN",
-            "RON",
-            "RUB",
-            "SEK",
-            "SGD",
-            "THB",
-            "TRY",
-            "USD",
-            "ZAR",
-        ]
+    def symbols(self):
+        data = self._raw_data(more_than_90_days=True)
+        root = etree.fromstring(data)
+        nodes = root.cssselect("[currency]")
+        currencies = sorted(set([n.attrib["currency"] for n in nodes]))
+        pairs = [f"EUR/{c}" for c in currencies]
+        return pairs
 
     def fetch(self, pair, type, start, end):
         base, quote = pair.split("/")
-        if base not in self.bases():
-            exit(f"Invalid base {base}")
-        if quote not in self.quotes():
-            exit(f"Invalid quote {quote}")
 
         min_start = "1999-01-04"
         if start < min_start:
             exit(f"start {start} too early. Minimum is {min_start}")
 
         almost_90_days_ago = str(datetime.now().date() - timedelta(days=85))
-        url_base = "https://www.ecb.europa.eu/stats/eurofxref"
-        if start > almost_90_days_ago:
-            source_url = f"{url_base}/eurofxref-hist-90d.xml"  # last 90 days
-        else:
-            source_url = f"{url_base}/eurofxref-hist.xml"  # since 1999
-
-        response = requests.get(source_url)
-        data = response.content
-
+        data = self._raw_data(start > almost_90_days_ago)
         root = etree.fromstring(data)
 
         all_rows = []
@@ -105,3 +60,13 @@ class ECB:
         ]
 
         return selected
+
+    def _raw_data(self, more_than_90_days=False):
+        url_base = "https://www.ecb.europa.eu/stats/eurofxref"
+        if more_than_90_days:
+            source_url = f"{url_base}/eurofxref-hist.xml"  # since 1999
+        else:
+            source_url = f"{url_base}/eurofxref-hist-90d.xml"  # last 90 days
+
+        response = requests.get(source_url)
+        return response.content
