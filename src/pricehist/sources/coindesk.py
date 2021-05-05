@@ -30,24 +30,18 @@ class CoinDesk:
     def notes():
         return ""
 
-    @staticmethod
-    def bases():
-        return ["BTC"]
-
-    @staticmethod
-    def quotes():
+    def symbols(self):
         url = "https://api.coindesk.com/v1/bpi/supported-currencies.json"
         response = requests.get(url)
         data = json.loads(response.content)
-        symbols = sorted([item["currency"] for item in data])
+        relevant = [i for i in data if i["currency"] not in ["XBT", "BTC"]]
+        symbols = sorted(
+            [f"BTC/{i['currency']}    Bitcoin against {i['country']}" for i in relevant]
+        )
         return symbols
 
     def fetch(self, pair, type, start, end):
         base, quote = pair.split("/")
-        if base not in self.bases():
-            exit(f"Invalid base {base}")
-        if quote not in self.quotes():
-            exit(f"Invalid quote {quote}")
 
         min_start = "2010-07-17"
         if start < min_start:
