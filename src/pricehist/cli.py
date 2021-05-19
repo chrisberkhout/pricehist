@@ -49,7 +49,7 @@ def cmd_source(args):
         first, *rest = value.split("\n")
         first_output = wrapper.wrap(first)
         wrapper.initial_indent = subsequent_indent
-        rest_output = sum([wrapper.wrap(line) for line in rest], [])
+        rest_output = sum([wrapper.wrap(line) if line else ["\n"] for line in rest], [])
         output = "\n".join(first_output + rest_output)
         if output != "":
             print(output)

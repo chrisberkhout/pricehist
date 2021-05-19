@@ -24,35 +24,57 @@ class CoinMarketCap:
     def source_url():
         return "https://coinmarketcap.com/"
 
-    # # currency metadata - these may max out at 5k items
-    # #   (crypto data is currently 4720 items)
-    # curl '.../v1/fiat/map?include_metals=true' | jq . | tee fiat-map.json
-    # curl '.../v1/cryptocurrency/map' | jq . | tee cryptocurrency-map.json
-
     @staticmethod
     def notes():
-        return ""
+        return (
+            "This source makes unoffical use of endpoints that power CoinMarketCap's "
+            "public web interface. The price data comes from a public equivalent of "
+            "the OHLCV Historical endpoint found in CoinMarketCap's official API.\n"
+            "CoinMarketCap currency symbols are not necessarily unique, so it "
+            "is recommended that you use IDs, which can be listed via the "
+            "--symbols option. For example, 'ETH/BTC' is 'id=1027/id=1'. The "
+            "corresponding symbols will be used in output."
+        )
 
-    @staticmethod
-    def bases():
-        return []
-
-    @staticmethod
-    def quotes():
-        return []
+    def symbols(self):
+        data = self._symbol_data()
+        ids = [f"id={i['id']}" for i in data]
+        id_width = max([len(id) for id in ids])
+        descriptions = [f"{i['symbol'] or i['code']} {i['name']}".strip() for i in data]
+        rows = [i.ljust(id_width + 4) + d for i, d in zip(ids, descriptions)]
+        return rows
 
     def fetch(self, pair, type, start, end):
         base, quote = pair.split("/")
 
         url = "https://web-api.coinmarketcap.com/v1/cryptocurrency/ohlcv/historical"
-        params = {
-            "symbol": base,
-            "convert": quote,
-            "time_start": int(datetime.strptime(start, "%Y-%m-%d").timestamp()),
-            "time_end": (
-                int(datetime.strptime(end, "%Y-%m-%d").timestamp()) + 24 * 60 * 60
-            ),  # round up to include the last day
-        }
+
+        params = {}
+        if base.startswith("id=") or quote.startswith("id="):
+            symbols = {}
+            for i in self._symbol_data():
+                symbols[str(i["id"])] = i["symbol"] or i["code"]
+
+        if base.startswith("id="):
+            params["id"] = base[3:]
+            output_base = symbols[base[3:]]
+        else:
+            params["symbol"] = base
+            output_base = base
+
+        if quote.startswith("id="):
+            params["convert_id"] = quote[3:]
+            quote_key = quote[3:]
+            output_quote = symbols[quote[3:]]
+        else:
+            params["convert"] = quote
+            quote_key = quote
+            output_quote = quote
+
+        params["time_start"] = int(datetime.strptime(start, "%Y-%m-%d").timestamp())
+        params["time_end"] = (
+            int(datetime.strptime(end, "%Y-%m-%d").timestamp()) + 24 * 60 * 60
+        )  # round up to include the last day
 
         response = requests.get(url, params=params)
         data = json.loads(response.content)
@@ -60,13 +82,24 @@ class CoinMarketCap:
         prices = []
         for item in data["data"]["quotes"]:
             d = item["time_open"][0:10]
-            amount = self._amount(item["quote"][quote], type)
-            prices.append(Price(base, quote, d, amount))
+            amount = self._amount(item["quote"][quote_key], type)
+            prices.append(Price(output_base, output_quote, d, amount))
 
         return prices
 
+    def _symbol_data(self):
+        fiat_url = "https://web-api.coinmarketcap.com/v1/fiat/map?include_metals=true"
+        fiat_res = requests.get(fiat_url)
+        fiat = json.loads(fiat_res.content)
+        crypto_url = (
+            "https://web-api.coinmarketcap.com/v1/cryptocurrency/map?sort=cmc_rank"
+        )
+        crypto_res = requests.get(crypto_url)
+        crypto = json.loads(crypto_res.content)
+        return crypto["data"] + fiat["data"]
+
     def _amount(self, data, type):
-        if type == "mid":
+        if type in [None, "mid"]:
             high = Decimal(str(data["high"]))
             low = Decimal(str(data["low"]))
             return sum([high, low]) / 2
