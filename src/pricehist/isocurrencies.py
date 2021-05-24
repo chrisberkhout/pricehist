@@ -41,39 +41,24 @@ class ISOCurrency:
 
 
 def current_data_date():
-    if not _current_data_date:
-        _readall()
-    return _current_data_date
+    one = etree.fromstring(read_binary("pricehist.resources", "list_one.xml"))
+    return one.cssselect("ISO_4217")[0].attrib["Pblshd"]
 
 
 def historical_data_date():
-    if not _historical_data_date:
-        _readall()
-    return _historical_data_date
+    three = etree.fromstring(read_binary("pricehist.resources", "list_three.xml"))
+    return three.cssselect("ISO_4217")[0].attrib["Pblshd"]
 
 
 def bycode():
-    if not _bycode:
-        _readall()
-    return _bycode
+    result = {}
 
-
-_current_data_date = None
-_historical_data_date = None
-_bycode = {}
-
-
-def _readall():
     one = etree.fromstring(read_binary("pricehist.resources", "list_one.xml"))
     three = etree.fromstring(read_binary("pricehist.resources", "list_three.xml"))
 
-    _current_data_date = one.cssselect("ISO_4217")[0].attrib["Pblshd"]
-    _historical_data_date = three.cssselect("ISO_4217")[0].attrib["Pblshd"]
-    (_current_data_date, _historical_data_date)  # No-op
-
     for entry in three.cssselect("HstrcCcyNtry") + one.cssselect("CcyNtry"):
         if currency := _parse(entry):
-            if existing := _bycode.get(currency.code):
+            if existing := result.get(currency.code):
                 existing.code = currency.code
                 existing.number = currency.number
                 existing.minor_units = currency.minor_units
@@ -83,7 +68,9 @@ def _readall():
                 existing.historical = currency.historical
                 existing.withdrawal_date = currency.withdrawal_date
             else:
-                _bycode[currency.code] = currency
+                result[currency.code] = currency
+
+    return result
 
 
 def _parse(entry):
