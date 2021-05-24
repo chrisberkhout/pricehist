@@ -73,8 +73,9 @@ def cmd_source(args):
 def cmd_fetch(args):
     source = sources.by_id[args.source]()
     output = outputs.by_type[args.output]()
+    start = args.start or source.start()
 
-    prices = source.fetch(args.pair, args.type, args.start, args.end)
+    prices = source.fetch(args.pair, args.type, start, args.end)
 
     if args.renamebase or args.renamequote:
         prices = [
@@ -183,7 +184,7 @@ def build_parser():
         help="fetch prices",
         usage=(
             "pricehist fetch SOURCE PAIR [-h] "
-            "[--type TYPE] (-s DATE | -sx DATE) [-e DATE | -ex DATE] [-o FMT] "
+            "[--type TYPE] [-s DATE | -sx DATE] [-e DATE | -ex DATE] [-o FMT] "
             "[--invert] [--quantize INT] "
             "[--rename-base SYM] [--rename-quote SYM] [--rename-time TIME] "
             "[--format-decimal CHAR] [--format-thousands CHAR] "
@@ -212,14 +213,14 @@ def build_parser():
         type=str,
         help="price type, e.g. close",
     )
-    fetch_start_group = fetch_parser.add_mutually_exclusive_group(required=True)
+    fetch_start_group = fetch_parser.add_mutually_exclusive_group(required=False)
     fetch_start_group.add_argument(
         "-s",
         "--start",
         dest="start",
         metavar="DATE",
         type=valid_date,
-        help="start date, inclusive",
+        help="start date, inclusive (default: source start)",
     )
     fetch_start_group.add_argument(
         "-sx",
@@ -246,7 +247,6 @@ def build_parser():
         dest="end",
         metavar="DATE",
         type=previous_valid_date,
-        default=today(),
         help="end date, exclusive",
     )
 
