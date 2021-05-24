@@ -26,6 +26,14 @@ class ECB:
         return "https://www.ecb.europa.eu/stats/exchange/eurofxref/html/index.en.html"
 
     @staticmethod
+    def start():
+        return "1999-01-04"
+
+    @staticmethod
+    def types():
+        return []
+
+    @staticmethod
     def notes():
         return ""
 
@@ -41,7 +49,7 @@ class ECB:
     def fetch(self, pair, type, start, end):
         base, quote = pair.split("/")
 
-        min_start = "1999-01-04"
+        min_start = self.start()
         if start < min_start:
             exit(f"start {start} too early. Minimum is {min_start}")
 

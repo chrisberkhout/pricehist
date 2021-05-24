@@ -25,6 +25,14 @@ class CoinMarketCap:
         return "https://coinmarketcap.com/"
 
     @staticmethod
+    def start():
+        return "2013-04-28"
+
+    @staticmethod
+    def types():
+        return ["mid", "open", "high", "low", "close"]
+
+    @staticmethod
     def notes():
         return (
             "This source makes unoffical use of endpoints that power CoinMarketCap's "

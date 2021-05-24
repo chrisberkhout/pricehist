@@ -27,6 +27,14 @@ class CoinDesk:
         return "https://www.coindesk.com/coindesk-api"
 
     @staticmethod
+    def start():
+        return "2010-07-17"
+
+    @staticmethod
+    def types():
+        return []
+
+    @staticmethod
     def notes():
         return ""
 
@@ -43,7 +51,7 @@ class CoinDesk:
     def fetch(self, pair, type, start, end):
         base, quote = pair.split("/")
 
-        min_start = "2010-07-17"
+        min_start = self.start()
         if start < min_start:
             exit(
                 f"start {start} too early. The CoinDesk BPI only covers data"

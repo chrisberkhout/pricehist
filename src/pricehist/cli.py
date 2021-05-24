@@ -65,6 +65,8 @@ def cmd_source(args):
         print_field("Name", source.name(), key_width, output_width)
         print_field("Description", source.description(), key_width, output_width)
         print_field("URL", source.source_url(), key_width, output_width, force=False)
+        print_field("Start", source.start(), key_width, output_width)
+        print_field("Types", ", ".join(source.types()), key_width, output_width)
         print_field("Notes", source.notes(), key_width, output_width)
 
 
