@@ -1,9 +1,10 @@
 from datetime import datetime, timedelta
 from decimal import Decimal
-from lxml import etree
 
 import requests
+from lxml import etree
 
+from pricehist import isocurrencies
 from pricehist.price import Price
 
 
@@ -33,7 +34,8 @@ class ECB:
         root = etree.fromstring(data)
         nodes = root.cssselect("[currency]")
         currencies = sorted(set([n.attrib["currency"] for n in nodes]))
-        pairs = [f"EUR/{c}" for c in currencies]
+        iso = isocurrencies.bycode()
+        pairs = [f"EUR/{c}    Euro against {iso[c].name}" for c in currencies]
         return pairs
 
     def fetch(self, pair, type, start, end):
