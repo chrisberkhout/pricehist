@@ -1,10 +1,9 @@
 import argparse
+import shutil
 from datetime import datetime, timedelta
 from textwrap import TextWrapper
-import shutil
 
-from pricehist import outputs, sources
-from pricehist import __version__
+from pricehist import __version__, outputs, sources
 from pricehist.format import Format
 
 
