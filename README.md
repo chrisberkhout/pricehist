@@ -32,62 +32,66 @@ Show usage information:
 pricehist -h
 ```
 ```
-usage: pricehist [-h] {sources,source,fetch} ...
+usage: pricehist [-h] [--version] [--verbose | --debug]
+                 {sources,source,fetch} ...
 
 Fetch historical price data
 
 optional arguments:
-  -h, --help            show this help message and exit
+  -h, --help              show this help message and exit
+  --version               show version information
+  --verbose               show INFO messages
+  --debug                 show INFO and DEBUG messages
 
 commands:
   {sources,source,fetch}
-    sources             list sources
-    source              show source details
-    fetch               fetch prices
+    sources               list sources
+    source                show source details
+    fetch                 fetch prices
 ```
 
 Fetch prices after 2021-01-04, ending 2020-01-15, as CSV:
 
 ```bash
-pricehist fetch ecb -p EUR/AUD -sx 2021-01-04 -e 2021-01-15 -o csv
+pricehist fetch ecb EUR/AUD -sx 2021-01-04 -e 2021-01-15 -o csv
 ```
 ```
-date,base,quote,amount
-2021-01-05,EUR,AUD,1.5927
-2021-01-06,EUR,AUD,1.5824
-2021-01-07,EUR,AUD,1.5836
-2021-01-08,EUR,AUD,1.5758
-2021-01-11,EUR,AUD,1.5783
-2021-01-12,EUR,AUD,1.5742
-2021-01-13,EUR,AUD,1.5734
-2021-01-14,EUR,AUD,1.5642
-2021-01-15,EUR,AUD,1.568
+date,base,quote,amount,source,type
+2021-01-05,EUR,AUD,1.5927,ecb,reference
+2021-01-06,EUR,AUD,1.5824,ecb,reference
+2021-01-07,EUR,AUD,1.5836,ecb,reference
+2021-01-08,EUR,AUD,1.5758,ecb,reference
+2021-01-11,EUR,AUD,1.5783,ecb,reference
+2021-01-12,EUR,AUD,1.5742,ecb,reference
+2021-01-13,EUR,AUD,1.5734,ecb,reference
+2021-01-14,EUR,AUD,1.5642,ecb,reference
+2021-01-15,EUR,AUD,1.568,ecb,reference
 ```
 
 In Ledger format:
 
 ```bash
-pricehist fetch ecb -p EUR/AUD -s 2021-01-01 -o ledger | head
+pricehist fetch ecb EUR/AUD -s 2021-01-01 -o ledger | head
 ```
 ```
-P 2021/01/04 00:00:00 EUR 1.5928 AUD
-P 2021/01/05 00:00:00 EUR 1.5927 AUD
-P 2021/01/06 00:00:00 EUR 1.5824 AUD
-P 2021/01/07 00:00:00 EUR 1.5836 AUD
-P 2021/01/08 00:00:00 EUR 1.5758 AUD
-P 2021/01/11 00:00:00 EUR 1.5783 AUD
-P 2021/01/12 00:00:00 EUR 1.5742 AUD
-P 2021/01/13 00:00:00 EUR 1.5734 AUD
-P 2021/01/14 00:00:00 EUR 1.5642 AUD
-P 2021/01/15 00:00:00 EUR 1.568 AUD
+P 2021-01-04 00:00:00 EUR 1.5928 AUD
+P 2021-01-05 00:00:00 EUR 1.5927 AUD
+P 2021-01-06 00:00:00 EUR 1.5824 AUD
+P 2021-01-07 00:00:00 EUR 1.5836 AUD
+P 2021-01-08 00:00:00 EUR 1.5758 AUD
+P 2021-01-11 00:00:00 EUR 1.5783 AUD
+P 2021-01-12 00:00:00 EUR 1.5742 AUD
+P 2021-01-13 00:00:00 EUR 1.5734 AUD
+P 2021-01-14 00:00:00 EUR 1.5642 AUD
+P 2021-01-15 00:00:00 EUR 1.568 AUD
 ```
 
 Generate SQL for a GnuCash database and apply it immediately:
 
 ```bash
-pricehist fetch ecb -p EUR/AUD -s 2021-01-01 -o gnucash-sql | sqlite3 Accounts.gnucash
-pricehist fetch ecb -p EUR/AUD -s 2021-01-01 -o gnucash-sql | mysql -u username -p -D databasename
-pricehist fetch ecb -p EUR/AUD -s 2021-01-01 -o gnucash-sql | psql -U username -d databasename -v ON_ERROR_STOP=1
+pricehist fetch ecb EUR/AUD -s 2021-01-01 -o gnucash-sql | sqlite3 Accounts.gnucash
+pricehist fetch ecb EUR/AUD -s 2021-01-01 -o gnucash-sql | mysql -u username -p -D databasename
+pricehist fetch ecb EUR/AUD -s 2021-01-01 -o gnucash-sql | psql -U username -d databasename -v ON_ERROR_STOP=1
 ```
 
 ## Design choices
