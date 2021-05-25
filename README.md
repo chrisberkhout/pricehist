@@ -19,10 +19,10 @@ pip install pricehist
 
 ## Output formats
 
-- **`csv`**: [Comma-separated values](https://en.wikipedia.org/wiki/Comma-separated_values)
-- **`ledger`**: [Ledger](https://www.ledger-cli.org/) and [hledger](https://hledger.org/)
 - **`beancount`**: [Beancount](http://furius.ca/beancount/)
+- **`csv`**: [Comma-separated values](https://en.wikipedia.org/wiki/Comma-separated_values)
 - **`gnucash-sql`**: [GnuCash](https://www.gnucash.org/) SQL
+- **`ledger`**: [Ledger](https://www.ledger-cli.org/) and [hledger](https://hledger.org/)
 
 ## Examples
 
@@ -71,7 +71,7 @@ date,base,quote,amount,source,type
 In Ledger format:
 
 ```bash
-pricehist fetch ecb EUR/AUD -s 2021-01-01 -o ledger | head
+pricehist fetch ecb EUR/AUD -s 2021-01-01 -o ledger
 ```
 ```
 P 2021-01-04 00:00:00 EUR 1.5928 AUD
