@@ -32,7 +32,7 @@ class CoinDesk:
 
     @staticmethod
     def types():
-        return []
+        return ["close"]
 
     @staticmethod
     def notes():

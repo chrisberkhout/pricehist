@@ -31,7 +31,7 @@ class ECB:
 
     @staticmethod
     def types():
-        return []
+        return ["reference"]
 
     @staticmethod
     def notes():
