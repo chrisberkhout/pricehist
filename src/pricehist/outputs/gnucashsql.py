@@ -7,9 +7,8 @@ from pricehist.format import Format
 
 
 class GnuCashSQL:
-    def format(self, prices, fmt=Format()):
-        source = "pricehist"
-        typ = "unknown"
+    def format(self, prices, source=None, type=None, fmt=Format()):
+        src = f"pricehist:{source.id()}"
 
         values_parts = []
         for price in prices:
@@ -17,9 +16,9 @@ class GnuCashSQL:
             amount = fmt.quantize(price.amount)
             m = hashlib.sha256()
             m.update(
-                "".join(
-                    [date, price.base, price.quote, source, typ, str(amount)]
-                ).encode("utf-8")
+                "".join([date, price.base, price.quote, src, type, str(amount)]).encode(
+                    "utf-8"
+                )
             )
             guid = m.hexdigest()[0:32]
             value_num = str(amount).replace(".", "")
@@ -30,8 +29,8 @@ class GnuCashSQL:
                 f"'{date}', "
                 f"'{price.base}', "
                 f"'{price.quote}', "
-                f"'{source}', "
-                f"'{typ}', "
+                f"'{src}', "
+                f"'{type}', "
                 f"{value_num}, "
                 f"{value_denom}"
                 ")"

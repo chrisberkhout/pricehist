@@ -87,6 +87,7 @@ def cmd_fetch(args):
     source = sources.by_id[args.source]()
     output = outputs.by_type[args.output]()
     start = args.start or source.start()
+    type = args.type or (source.types() + ["unknown"])[0]
 
     if start < source.start():
         logging.warn(
@@ -94,7 +95,7 @@ def cmd_fetch(args):
             f"source start date of {source.start()}."
         )
 
-    prices = source.fetch(args.pair, args.type, start, args.end)
+    prices = source.fetch(args.pair, type, start, args.end)
 
     if args.renamebase or args.renamequote:
         prices = [
@@ -127,7 +128,7 @@ def cmd_fetch(args):
         decimal_places=if_not_none(args.quantize, default.decimal_places),
     )
 
-    print(output.format(prices, fmt=fmt), end="")
+    print(output.format(prices, source, type, fmt=fmt), end="")
 
 
 def build_parser():

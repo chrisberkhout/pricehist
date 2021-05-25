@@ -2,7 +2,7 @@ from pricehist.format import Format
 
 
 class Beancount:
-    def format(self, prices, fmt=Format()):
+    def format(self, prices, source=None, type=None, fmt=Format()):
         lines = []
         for price in prices:
 
