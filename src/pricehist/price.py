@@ -1,3 +1,10 @@
-from collections import namedtuple
+from dataclasses import dataclass
+from decimal import Decimal
 
-Price = namedtuple("Price", ["base", "quote", "date", "amount"])
+
+@dataclass(frozen=True)
+class Price:
+    base: str
+    quote: str
+    date: str
+    amount: Decimal
