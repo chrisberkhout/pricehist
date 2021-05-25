@@ -49,10 +49,6 @@ class ECB:
     def fetch(self, pair, type, start, end):
         base, quote = pair.split("/")
 
-        min_start = self.start()
-        if start < min_start:
-            exit(f"start {start} too early. Minimum is {min_start}")
-
         almost_90_days_ago = str(datetime.now().date() - timedelta(days=85))
         data = self._raw_data(start < almost_90_days_ago)
         root = etree.fromstring(data)

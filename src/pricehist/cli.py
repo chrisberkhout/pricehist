@@ -88,6 +88,12 @@ def cmd_fetch(args):
     output = outputs.by_type[args.output]()
     start = args.start or source.start()
 
+    if start < source.start():
+        logging.warn(
+            f"The start date {start} preceeds the {source.name()} "
+            f"source start date of {source.start()}."
+        )
+
     prices = source.fetch(args.pair, args.type, start, args.end)
 
     if args.renamebase or args.renamequote:

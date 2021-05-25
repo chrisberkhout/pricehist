@@ -51,13 +51,6 @@ class CoinDesk:
     def fetch(self, pair, type, start, end):
         base, quote = pair.split("/")
 
-        min_start = self.start()
-        if start < min_start:
-            exit(
-                f"start {start} too early. The CoinDesk BPI only covers data"
-                f"from {min_start} onwards."
-            )
-
         url = "https://api.coindesk.com/v1/bpi/historical/close.json"
         params = {
             "currency": quote,
