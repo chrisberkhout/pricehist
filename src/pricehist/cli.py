@@ -1,4 +1,5 @@
 import argparse
+import logging
 import shutil
 from datetime import datetime, timedelta
 from textwrap import TextWrapper
@@ -8,8 +9,18 @@ from pricehist.format import Format
 
 
 def cli(args=None):
+    start_time = datetime.now()
+    logging.basicConfig(format="%(message)s", level=logging.INFO)
+
     parser = build_parser()
     args = parser.parse_args()
+
+    if args.verbose:
+        logging.getLogger().setLevel(logging.INFO)
+    elif args.debug:
+        logging.getLogger().setLevel(logging.DEBUG)
+
+    logging.debug(f"pricehist started at {start_time}")
 
     if args.version:
         cmd_version()
@@ -21,6 +32,8 @@ def cli(args=None):
         cmd_fetch(args)
     else:
         parser.print_help()
+
+    logging.debug(f"pricehist finished at {datetime.now()}")
 
 
 def cmd_version():
@@ -145,10 +158,21 @@ def build_parser():
     )
 
     parser.add_argument(
-        "-v",
         "--version",
         action="store_true",
         help="show version information",
+    )
+
+    logging_group = parser.add_mutually_exclusive_group(required=False)
+    logging_group.add_argument(
+        "--verbose",
+        action="store_true",
+        help="show INFO messages",
+    )
+    logging_group.add_argument(
+        "--debug",
+        action="store_true",
+        help="show INFO and DEBUG messages",
     )
 
     subparsers = parser.add_subparsers(title="commands", dest="command")
