@@ -7,35 +7,28 @@ from pricehist.price import Price
 
 
 class CoinDesk:
-    @staticmethod
-    def id():
+    def id(self):
         return "coindesk"
 
-    @staticmethod
-    def name():
+    def name(self):
         return "CoinDesk Bitcoin Price Index"
 
-    @staticmethod
-    def description():
+    def description(self):
         return (
             "An average of bitcoin prices across leading global exchanges. \n"
             "Powered by CoinDesk, https://www.coindesk.com/price/bitcoin"
         )
 
-    @staticmethod
-    def source_url():
+    def source_url(self):
         return "https://www.coindesk.com/coindesk-api"
 
-    @staticmethod
-    def start():
+    def start(self):
         return "2010-07-17"
 
-    @staticmethod
-    def types():
+    def types(self):
         return ["close"]
 
-    @staticmethod
-    def notes():
+    def notes(self):
         return ""
 
     def symbols(self):

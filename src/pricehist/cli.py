@@ -66,7 +66,7 @@ def cmd_source(args):
         if output != "":
             print(output)
 
-    source = sources.by_id[args.identifier]()
+    source = sources.by_id[args.identifier]
 
     if args.symbols:
         print("\n".join(source.symbols()))
@@ -84,8 +84,8 @@ def cmd_source(args):
 
 
 def cmd_fetch(args):
-    source = sources.by_id[args.source]()
-    output = outputs.by_type[args.output]()
+    source = sources.by_id[args.source]
+    output = outputs.by_type[args.output]
     start = args.start or source.start()
     type = args.type or (source.types() + ["unknown"])[0]
 

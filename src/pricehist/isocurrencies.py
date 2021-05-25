@@ -18,7 +18,7 @@ Functions:
 
     current_data_date() -> str
     historical_data_date() -> str
-    bycode() -> dict[str, ISOCurrency]
+    by_code() -> dict[str, ISOCurrency]
 
 """
 
@@ -50,7 +50,7 @@ def historical_data_date():
     return three.cssselect("ISO_4217")[0].attrib["Pblshd"]
 
 
-def bycode():
+def by_code():
     result = {}
 
     one = etree.fromstring(read_binary("pricehist.resources", "list_one.xml"))

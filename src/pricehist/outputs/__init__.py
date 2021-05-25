@@ -6,8 +6,8 @@ from .ledger import Ledger
 default = "ledger"
 
 by_type = {
-    "beancount": Beancount,
-    "csv": CSV,
-    "gnucash-sql": GnuCashSQL,
-    "ledger": Ledger,
+    "beancount": Beancount(),
+    "csv": CSV(),
+    "gnucash-sql": GnuCashSQL(),
+    "ledger": Ledger(),
 }

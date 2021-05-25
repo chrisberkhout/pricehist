@@ -9,32 +9,25 @@ from pricehist.price import Price
 
 
 class ECB:
-    @staticmethod
-    def id():
+    def id(self):
         return "ecb"
 
-    @staticmethod
-    def name():
+    def name(self):
         return "European Central Bank"
 
-    @staticmethod
-    def description():
+    def description(self):
         return "European Central Bank Euro foreign exchange reference rates"
 
-    @staticmethod
-    def source_url():
+    def source_url(self):
         return "https://www.ecb.europa.eu/stats/exchange/eurofxref/html/index.en.html"
 
-    @staticmethod
-    def start():
+    def start(self):
         return "1999-01-04"
 
-    @staticmethod
-    def types():
+    def types(self):
         return ["reference"]
 
-    @staticmethod
-    def notes():
+    def notes(self):
         return ""
 
     def symbols(self):
@@ -42,7 +35,7 @@ class ECB:
         root = etree.fromstring(data)
         nodes = root.cssselect("[currency]")
         currencies = sorted(set([n.attrib["currency"] for n in nodes]))
-        iso = isocurrencies.bycode()
+        iso = isocurrencies.by_code()
         pairs = [f"EUR/{c}    Euro against {iso[c].name}" for c in currencies]
         return pairs
 
