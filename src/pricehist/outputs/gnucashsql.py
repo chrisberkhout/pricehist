@@ -15,16 +15,22 @@ class GnuCashSQL(BaseOutput):
         values_parts = []
         for price in series.prices:
             date = f"{price.date} {fmt.time}"
-            amount = fmt.quantize(price.amount)
             m = hashlib.sha256()
             m.update(
                 "".join(
-                    [date, series.base, series.quote, src, series.type, str(amount)]
+                    [
+                        date,
+                        series.base,
+                        series.quote,
+                        src,
+                        series.type,
+                        str(price.amount),
+                    ]
                 ).encode("utf-8")
             )
             guid = m.hexdigest()[0:32]
-            value_num = str(amount).replace(".", "")
-            value_denom = 10 ** len(f"{amount}.".split(".")[1])
+            value_num = str(price.amount).replace(".", "")
+            value_denom = 10 ** len(f"{price.amount}.".split(".")[1])
             v = (
                 "("
                 f"'{guid}', "

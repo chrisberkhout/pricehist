@@ -8,7 +8,7 @@ class Beancount(BaseOutput):
         lines = []
         for price in series.prices:
 
-            amount_parts = f"{fmt.quantize(price.amount):,}".split(".")
+            amount_parts = f"{price.amount:,}".split(".")
             amount_parts[0] = amount_parts[0].replace(",", fmt.thousands)
             amount = ".".join(amount_parts)
 

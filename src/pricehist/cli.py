@@ -101,6 +101,8 @@ def cmd_fetch(args):
 
     if args.invert:
         series = series.invert()
+    if args.quantize is not None:
+        series = series.quantize(args.quantize)
     if args.renamebase:
         series = series.rename_base(args.renamebase)
     if args.renamequote:
@@ -117,7 +119,6 @@ def cmd_fetch(args):
         thousands=if_not_none(args.formatthousands, default.thousands),
         symbol=if_not_none(args.formatsymbol, default.symbol),
         datesep=if_not_none(args.formatdatesep, default.datesep),
-        decimal_places=if_not_none(args.quantize, default.decimal_places),
     )
 
     print(output.format(series, source, fmt=fmt), end="")
