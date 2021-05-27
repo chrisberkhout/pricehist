@@ -34,7 +34,7 @@ def cli(args=None, output_file=sys.stdout):
         elif args.command == "fetch":
             print(cmd_fetch(args), end="", file=output_file)
         else:
-            parser.print_help(file=output_file)
+            parser.print_help(file=sys.stderr)
     except BrokenPipeError:
         logging.debug("The output pipe was closed early.")
 
