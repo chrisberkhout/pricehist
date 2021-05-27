@@ -1,5 +1,4 @@
 import argparse
-import dataclasses
 import logging
 import shutil
 from datetime import datetime, timedelta
@@ -7,7 +6,6 @@ from textwrap import TextWrapper
 
 from pricehist import __version__, outputs, sources
 from pricehist.format import Format
-from pricehist.price import Price
 from pricehist.series import Series
 
 
@@ -102,27 +100,16 @@ def cmd_fetch(args):
     series = source.fetch(Series(base, quote, type, start, args.end))
 
     if args.invert:
-        series = dataclasses.replace(
-            series,
-            base=series.quote,
-            quote=series.base,
-            prices=[Price(date=p.date, amount=(1 / p.amount)) for p in series.prices],
-        )
-
-    if args.renamebase or args.renamequote:
-        series = dataclasses.replace(
-            series,
-            base=(args.renamebase or base),
-            quote=(args.renamequote or quote),
-        )
+        series = series.invert()
+    if args.renamebase:
+        series = series.rename_base(args.renamebase)
+    if args.renamequote:
+        series = series.rename_quote(args.renamequote)
 
     default = Format()
 
     def if_not_none(value, default):
-        if value is None:
-            return default
-        else:
-            return value
+        return default if value is None else value
 
     fmt = Format(
         time=if_not_none(args.renametime, default.time),
