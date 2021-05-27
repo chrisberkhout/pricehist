@@ -7,16 +7,9 @@ class Beancount(BaseOutput):
     def format(self, series, source=None, fmt=Format()):
         lines = []
         for price in series.prices:
-
-            amount = fmt.format_num(price.amount)
-            # TODO warn if fmt settings make an invalid number
-
-            qa_parts = [amount]
-            if fmt.symbol == "right":
-                qa_parts = qa_parts + [series.quote]
-            else:
-                qa_parts = qa_parts + [" ", series.quote]
-            quote_amount = "".join(qa_parts)
+            quote_amount = fmt.format_quote_amount(series.quote, price.amount)
+            # TODO warn if fmt settings make an invalid number (not . for decimal)
+            # TODO warn if fmt settings make an invalid quote (not right/rightspace)
 
             date = str(price.date).replace("-", fmt.datesep)
             lines.append(f"{date} price {series.base} {quote_amount}")

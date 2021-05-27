@@ -8,20 +8,7 @@ class Ledger(BaseOutput):
         lines = []
         for price in series.prices:
             date = str(price.date).replace("-", fmt.datesep)
-
-            amount = fmt.format_num(price.amount)
-
-            qa_parts = [amount]
-            if fmt.symbol == "left":
-                qa_parts = [series.quote] + qa_parts
-            elif fmt.symbol == "leftspace":
-                qa_parts = [series.quote, " "] + qa_parts
-            elif fmt.symbol == "right":
-                qa_parts = qa_parts + [series.quote]
-            else:
-                qa_parts = qa_parts + [" ", series.quote]
-            quote_amount = "".join(qa_parts)
-
+            quote_amount = fmt.format_quote_amount(series.quote, price.amount)
             lines.append(f"P {date} {fmt.time} {series.base} {quote_amount}")
         return "\n".join(lines) + "\n"
 
