@@ -6,8 +6,10 @@ import requests
 
 from pricehist.price import Price
 
+from .basesource import BaseSource
 
-class CoinDesk:
+
+class CoinDesk(BaseSource):
     def id(self):
         return "coindesk"
 

@@ -5,8 +5,10 @@ from importlib.resources import read_text
 from pricehist import __version__
 from pricehist.format import Format
 
+from .baseoutput import BaseOutput
 
-class GnuCashSQL:
+
+class GnuCashSQL(BaseOutput):
     def format(self, series, source=None, fmt=Format()):
         src = f"pricehist:{source.id()}"
 

@@ -1,7 +1,9 @@
 from pricehist.format import Format
 
+from .baseoutput import BaseOutput
 
-class Beancount:
+
+class Beancount(BaseOutput):
     def format(self, series, source=None, fmt=Format()):
         lines = []
         for price in series.prices:
