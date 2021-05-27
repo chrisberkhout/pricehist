@@ -41,13 +41,14 @@ def cli(args=None, output_file=sys.stdout):
     logging.debug(f"Finished pricehist run at {datetime.now()}.")
 
 
+def _format_pairs(pairs, gap=4):
+    width = max([len(a) for a, b in pairs])
+    lines = [a.ljust(width + gap) + b for a, b in pairs]
+    return "\n".join(lines)
+
+
 def cmd_sources(args):
-    width = max([len(identifier) for identifier in sources.by_id.keys()])
-    source_lines = [
-        f"{identifier.ljust(width)}  {source.name()}"
-        for identifier, source in sources.by_id.items()
-    ]
-    return "\n".join(source_lines)
+    return _format_pairs([(s.id(), s.name()) for k, s in sorted(sources.by_id.items())])
 
 
 def cmd_source(args):
@@ -75,7 +76,7 @@ def cmd_source(args):
     source = sources.by_id[args.identifier]
 
     if args.symbols:
-        return "\n".join(source.symbols())
+        return _format_pairs(source.symbols())
     else:
         k_width = 11
         total_width = shutil.get_terminal_size().columns

@@ -43,10 +43,8 @@ class CoinMarketCap(BaseSource):
     def symbols(self):
         data = self._symbol_data()
         ids = [f"id={i['id']}" for i in data]
-        id_width = max([len(id) for id in ids])
         descriptions = [f"{i['symbol'] or i['code']} {i['name']}".strip() for i in data]
-        rows = [i.ljust(id_width + 4) + d for i, d in zip(ids, descriptions)]
-        return rows
+        return list(zip(ids, descriptions))
 
     def fetch(self, series):
         data = self._data(series)

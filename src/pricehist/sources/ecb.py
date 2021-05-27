@@ -38,8 +38,7 @@ class ECB(BaseSource):
         nodes = root.cssselect("[currency]")
         currencies = sorted(set([n.attrib["currency"] for n in nodes]))
         iso = isocurrencies.by_code()
-        pairs = [f"EUR/{c}    Euro against {iso[c].name}" for c in currencies]
-        return pairs
+        return [(f"EUR/{c}", f"Euro against {iso[c].name}") for c in currencies]
 
     def fetch(self, series):
         almost_90_days_ago = str(datetime.now().date() - timedelta(days=85))

@@ -36,7 +36,7 @@ class BaseSource(ABC):
         pass
 
     @abstractmethod
-    def symbols(self) -> list[str]:
+    def symbols(self) -> list[(str, str)]:
         pass
 
     @abstractmethod

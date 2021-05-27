@@ -39,10 +39,10 @@ class CoinDesk(BaseSource):
         response = self.log_curl(requests.get(url))
         data = json.loads(response.content)
         relevant = [i for i in data if i["currency"] not in ["XBT", "BTC"]]
-        symbols = sorted(
-            [f"BTC/{i['currency']}    Bitcoin against {i['country']}" for i in relevant]
-        )
-        return symbols
+        return [
+            (f"BTC/{i['currency']}", f"Bitcoin against {i['country']}")
+            for i in sorted(relevant, key=lambda i: i["currency"])
+        ]
 
     def fetch(self, series):
         data = self._data(series)
