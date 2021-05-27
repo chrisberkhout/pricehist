@@ -21,7 +21,7 @@ def cli(args=None):
     elif args.debug:
         logging.getLogger().setLevel(logging.DEBUG)
 
-    logging.debug(f"pricehist started at {start_time}")
+    logging.debug(f"Started pricehist run at {start_time}.")
 
     if args.version:
         cmd_version()
@@ -34,7 +34,7 @@ def cli(args=None):
     else:
         parser.print_help()
 
-    logging.debug(f"pricehist finished at {datetime.now()}")
+    logging.debug(f"Finished pricehist run at {datetime.now()}.")
 
 
 def cmd_version():
@@ -121,7 +121,10 @@ def cmd_fetch(args):
         datesep=if_not_none(args.formatdatesep, default.datesep),
     )
 
-    print(output.format(series, source, fmt=fmt), end="")
+    try:
+        print(output.format(series, source, fmt=fmt), end="")
+    except BrokenPipeError:
+        logging.debug("The output pipe was closed early.")
 
 
 def build_parser():
