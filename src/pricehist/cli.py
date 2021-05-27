@@ -309,26 +309,27 @@ def build_parser():
         type=str,
         help="rename quote symbol",
     )
+    default_fmt = Format()
     fetch_parser.add_argument(
         "--rename-time",
         dest="renametime",
         metavar="TIME",
         type=str,
-        help="set a particular time of day (default: 00:00:00)",
+        help=f"set a particular time of day (default: {default_fmt.time})",
     )
     fetch_parser.add_argument(
         "--format-decimal",
         dest="formatdecimal",
         metavar="CHAR",
         type=str,
-        help="decimal point (default: '.')",
+        help=f"decimal point (default: '{default_fmt.decimal}')",
     )
     fetch_parser.add_argument(
         "--format-thousands",
         dest="formatthousands",
         metavar="CHAR",
         type=str,
-        help="thousands separator (default: '')",
+        help=f"thousands separator (default: '{default_fmt.thousands}')",
     )
     fetch_parser.add_argument(
         "--format-symbol",
@@ -336,14 +337,14 @@ def build_parser():
         metavar="LOC",
         type=str,
         choices=["rightspace", "right", "leftspace", "left"],
-        help="commodity symbol placement (default: rightspace)",
+        help=f"commodity symbol placement (default: {default_fmt.symbol})",
     )
     fetch_parser.add_argument(
         "--format-datesep",
         dest="formatdatesep",
         metavar="CHAR",
         type=str,
-        help="date separator (default: '-')",
+        help=f"date separator (default: '{default_fmt.datesep}')",
     )
 
     return parser
