@@ -29,6 +29,7 @@ class GnuCashSQL(BaseOutput):
                 ).encode("utf-8")
             )
             guid = m.hexdigest()[0:32]
+            # TODO extract this logic to a helper method
             value_num = str(price.amount).replace(".", "")
             value_denom = 10 ** len(f"{price.amount}.".split(".")[1])
             v = (

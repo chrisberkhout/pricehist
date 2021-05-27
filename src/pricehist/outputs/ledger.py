@@ -9,9 +9,7 @@ class Ledger(BaseOutput):
         for price in series.prices:
             date = str(price.date).replace("-", fmt.datesep)
 
-            amount_parts = f"{price.amount:,}".split(".")
-            amount_parts[0] = amount_parts[0].replace(",", fmt.thousands)
-            amount = fmt.decimal.join(amount_parts)
+            amount = fmt.format_num(price.amount)
 
             qa_parts = [amount]
             if fmt.symbol == "left":

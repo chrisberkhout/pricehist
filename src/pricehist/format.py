@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-from decimal import Decimal, getcontext
 
 
 @dataclass(frozen=True)
@@ -9,3 +8,9 @@ class Format:
     thousands: str = ""
     symbol: str = "rightspace"
     datesep: str = "-"
+
+    def format_num(self, num):
+        parts = f"{num:,}".split(".")
+        parts[0] = parts[0].replace(",", self.thousands)
+        result = self.decimal.join(parts)
+        return result
