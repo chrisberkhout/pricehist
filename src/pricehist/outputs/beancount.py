@@ -11,7 +11,7 @@ class Beancount(BaseOutput):
             # TODO warn if fmt settings make an invalid number (not . for decimal)
             # TODO warn if fmt settings make an invalid quote (not right/rightspace)
 
-            date = str(price.date).replace("-", fmt.datesep)
+            date = fmt.format_date(price.date)
             lines.append(f"{date} price {series.base} {quote_amount}")
         return "\n".join(lines) + "\n"
 

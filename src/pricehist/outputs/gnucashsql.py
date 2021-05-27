@@ -14,7 +14,7 @@ class GnuCashSQL(BaseOutput):
 
         values_parts = []
         for price in series.prices:
-            date = f"{price.date} {fmt.time}"
+            date = f"{fmt.format_date(price.date)} {fmt.time}"
             m = hashlib.sha256()
             m.update(
                 "".join(

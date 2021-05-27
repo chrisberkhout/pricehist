@@ -9,6 +9,9 @@ class Format:
     symbol: str = "rightspace"
     datesep: str = "-"
 
+    def format_date(self, date):
+        return str(date).replace("-", self.datesep)
+
     def format_quote_amount(self, quote, amount):
         formatted_amount = self.format_num(amount)
 

@@ -7,7 +7,7 @@ class Ledger(BaseOutput):
     def format(self, series, source=None, fmt=Format()):
         lines = []
         for price in series.prices:
-            date = str(price.date).replace("-", fmt.datesep)
+            date = fmt.format_date(price.date)
             quote_amount = fmt.format_quote_amount(series.quote, price.amount)
             lines.append(f"P {date} {fmt.time} {series.base} {quote_amount}")
         return "\n".join(lines) + "\n"
