@@ -8,8 +8,10 @@ from lxml import etree
 from pricehist import isocurrencies
 from pricehist.price import Price
 
+from .basesource import BaseSource
 
-class ECB:
+
+class ECB(BaseSource):
     def id(self):
         return "ecb"
 
@@ -32,8 +34,7 @@ class ECB:
         return ""
 
     def symbols(self):
-        data = self._raw_data(more_than_90_days=True)
-        root = etree.fromstring(data)
+        root = self._data(more_than_90_days=True)
         nodes = root.cssselect("[currency]")
         currencies = sorted(set([n.attrib["currency"] for n in nodes]))
         iso = isocurrencies.by_code()
@@ -65,6 +66,6 @@ class ECB:
         else:
             source_url = f"{url_base}/eurofxref-hist-90d.xml"  # last 90 days
 
-        response = requests.get(source_url)
+        response = self.log_curl(requests.get(source_url))
         root = etree.fromstring(response.content)
         return root

@@ -7,8 +7,10 @@ import requests
 
 from pricehist.price import Price
 
+from .basesource import BaseSource
 
-class CoinMarketCap:
+
+class CoinMarketCap(BaseSource):
     def id(self):
         return "coinmarketcap"
 
@@ -83,7 +85,7 @@ class CoinMarketCap:
             int(datetime.strptime(series.end, "%Y-%m-%d").timestamp()) + 24 * 60 * 60
         )  # round up to include the last day
 
-        response = requests.get(url, params=params)
+        response = self.log_curl(requests.get(url, params=params))
 
         return json.loads(response.content)
 
@@ -106,11 +108,11 @@ class CoinMarketCap:
 
     def _symbol_data(self):
         fiat_url = "https://web-api.coinmarketcap.com/v1/fiat/map?include_metals=true"
-        fiat_res = requests.get(fiat_url)
+        fiat_res = self.log_curl(requests.get(fiat_url))
         fiat = json.loads(fiat_res.content)
         crypto_url = (
             "https://web-api.coinmarketcap.com/v1/cryptocurrency/map?sort=cmc_rank"
         )
-        crypto_res = requests.get(crypto_url)
+        crypto_res = self.log_curl(requests.get(crypto_url))
         crypto = json.loads(crypto_res.content)
         return crypto["data"] + fiat["data"]

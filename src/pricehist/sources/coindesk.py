@@ -36,7 +36,7 @@ class CoinDesk(BaseSource):
 
     def symbols(self):
         url = "https://api.coindesk.com/v1/bpi/supported-currencies.json"
-        response = requests.get(url)
+        response = self.log_curl(requests.get(url))
         data = json.loads(response.content)
         relevant = [i for i in data if i["currency"] not in ["XBT", "BTC"]]
         symbols = sorted(
@@ -58,5 +58,5 @@ class CoinDesk(BaseSource):
             "start": series.start,
             "end": series.end,
         }
-        response = requests.get(url, params=params)
+        response = self.log_curl(requests.get(url, params=params))
         return json.loads(response.content)
