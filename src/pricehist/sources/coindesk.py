@@ -1,3 +1,4 @@
+import dataclasses
 import json
 from decimal import Decimal
 
@@ -41,19 +42,17 @@ class CoinDesk:
         )
         return symbols
 
-    def fetch(self, pair, type, start, end):
-        base, quote = pair.split("/")
-
+    def fetch(self, series):
         url = "https://api.coindesk.com/v1/bpi/historical/close.json"
         params = {
-            "currency": quote,
-            "start": start,
-            "end": end,
+            "currency": series.quote,
+            "start": series.start,
+            "end": series.end,
         }
         response = requests.get(url, params=params)
         data = json.loads(response.content)
         prices = []
         for (d, v) in data["bpi"].items():
-            prices.append(Price(base, quote, d, Decimal(str(v))))
+            prices.append(Price(d, Decimal(str(v))))
 
-        return prices
+        return dataclasses.replace(series, prices=prices)

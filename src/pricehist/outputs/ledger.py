@@ -2,9 +2,9 @@ from pricehist.format import Format
 
 
 class Ledger:
-    def format(self, prices, source=None, type=None, fmt=Format()):
+    def format(self, series, source=None, fmt=Format()):
         lines = []
-        for price in prices:
+        for price in series.prices:
             date = str(price.date).replace("-", fmt.datesep)
 
             amount_parts = f"{fmt.quantize(price.amount):,}".split(".")
@@ -13,16 +13,16 @@ class Ledger:
 
             qa_parts = [amount]
             if fmt.symbol == "left":
-                qa_parts = [price.quote] + qa_parts
+                qa_parts = [series.quote] + qa_parts
             elif fmt.symbol == "leftspace":
-                qa_parts = [price.quote, " "] + qa_parts
+                qa_parts = [series.quote, " "] + qa_parts
             elif fmt.symbol == "right":
-                qa_parts = qa_parts + [price.quote]
+                qa_parts = qa_parts + [series.quote]
             else:
-                qa_parts = qa_parts + [" ", price.quote]
+                qa_parts = qa_parts + [" ", series.quote]
             quote_amount = "".join(qa_parts)
 
-            lines.append(f"P {date} {fmt.time} {price.base} {quote_amount}")
+            lines.append(f"P {date} {fmt.time} {series.base} {quote_amount}")
         return "\n".join(lines) + "\n"
 
     # TODO support additional details of the format:

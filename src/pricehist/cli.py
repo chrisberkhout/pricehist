@@ -1,4 +1,5 @@
 import argparse
+import dataclasses
 import logging
 import shutil
 from datetime import datetime, timedelta
@@ -6,6 +7,8 @@ from textwrap import TextWrapper
 
 from pricehist import __version__, outputs, sources
 from pricehist.format import Format
+from pricehist.price import Price
+from pricehist.series import Series
 
 
 def cli(args=None):
@@ -95,21 +98,23 @@ def cmd_fetch(args):
             f"source start date of {source.start()}."
         )
 
-    prices = source.fetch(args.pair, type, start, args.end)
+    base, quote = args.pair.split("/")
+    series = source.fetch(Series(base, quote, type, start, args.end))
+
+    if args.invert:
+        series = dataclasses.replace(
+            series,
+            base=series.quote,
+            quote=series.base,
+            prices=[Price(date=p.date, amount=(1 / p.amount)) for p in series.prices],
+        )
 
     if args.renamebase or args.renamequote:
-        prices = [
-            p._replace(
-                base=(args.renamebase or p.base),
-                quote=(args.renamequote or p.quote),
-            )
-            for p in prices
-        ]
-    if args.invert:
-        prices = [
-            p._replace(base=p.quote, quote=p.base, amount=(1 / p.amount))
-            for p in prices
-        ]
+        series = dataclasses.replace(
+            series,
+            base=(args.renamebase or base),
+            quote=(args.renamequote or quote),
+        )
 
     default = Format()
 
@@ -128,7 +133,7 @@ def cmd_fetch(args):
         decimal_places=if_not_none(args.quantize, default.decimal_places),
     )
 
-    print(output.format(prices, source, type, fmt=fmt), end="")
+    print(output.format(series, source, fmt=fmt), end="")
 
 
 def build_parser():

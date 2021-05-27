@@ -1,3 +1,4 @@
+import dataclasses
 import json
 from datetime import datetime
 from decimal import Decimal
@@ -8,32 +9,25 @@ from pricehist.price import Price
 
 
 class CoinMarketCap:
-    @staticmethod
-    def id():
+    def id(self):
         return "coinmarketcap"
 
-    @staticmethod
-    def name():
+    def name(self):
         return "CoinMarketCap"
 
-    @staticmethod
-    def description():
+    def description(self):
         return "The world's most-referenced price-tracking website for cryptoassets"
 
-    @staticmethod
-    def source_url():
+    def source_url(self):
         return "https://coinmarketcap.com/"
 
-    @staticmethod
-    def start():
+    def start(self):
         return "2013-04-28"
 
-    @staticmethod
-    def types():
+    def types(self):
         return ["mid", "open", "high", "low", "close"]
 
-    @staticmethod
-    def notes():
+    def notes(self):
         return (
             "This source makes unoffical use of endpoints that power CoinMarketCap's "
             "public web interface. The price data comes from a public equivalent of "
@@ -52,36 +46,36 @@ class CoinMarketCap:
         rows = [i.ljust(id_width + 4) + d for i, d in zip(ids, descriptions)]
         return rows
 
-    def fetch(self, pair, type, start, end):
-        base, quote = pair.split("/")
-
+    def fetch(self, series):
         url = "https://web-api.coinmarketcap.com/v1/cryptocurrency/ohlcv/historical"
 
         params = {}
-        if base.startswith("id=") or quote.startswith("id="):
+        if series.base.startswith("id=") or series.quote.startswith("id="):
             symbols = {}
             for i in self._symbol_data():
                 symbols[str(i["id"])] = i["symbol"] or i["code"]
 
-        if base.startswith("id="):
-            params["id"] = base[3:]
-            output_base = symbols[base[3:]]
+        if series.base.startswith("id="):
+            params["id"] = series.base[3:]
+            output_base = symbols[series.base[3:]]
         else:
-            params["symbol"] = base
-            output_base = base
+            params["symbol"] = series.base
+            output_base = series.base
 
-        if quote.startswith("id="):
-            params["convert_id"] = quote[3:]
-            quote_key = quote[3:]
-            output_quote = symbols[quote[3:]]
+        if series.quote.startswith("id="):
+            params["convert_id"] = series.quote[3:]
+            quote_key = series.quote[3:]
+            output_quote = symbols[series.quote[3:]]
         else:
-            params["convert"] = quote
-            quote_key = quote
-            output_quote = quote
+            params["convert"] = series.quote
+            quote_key = series.quote
+            output_quote = series.quote
 
-        params["time_start"] = int(datetime.strptime(start, "%Y-%m-%d").timestamp())
+        params["time_start"] = int(
+            datetime.strptime(series.start, "%Y-%m-%d").timestamp()
+        )
         params["time_end"] = (
-            int(datetime.strptime(end, "%Y-%m-%d").timestamp()) + 24 * 60 * 60
+            int(datetime.strptime(series.end, "%Y-%m-%d").timestamp()) + 24 * 60 * 60
         )  # round up to include the last day
 
         response = requests.get(url, params=params)
@@ -90,10 +84,12 @@ class CoinMarketCap:
         prices = []
         for item in data["data"]["quotes"]:
             d = item["time_open"][0:10]
-            amount = self._amount(item["quote"][quote_key], type)
-            prices.append(Price(output_base, output_quote, d, amount))
+            amount = self._amount(item["quote"][quote_key], series.type)
+            prices.append(Price(d, amount))
 
-        return prices
+        return dataclasses.replace(
+            series, base=output_base, quote=output_quote, prices=prices
+        )
 
     def _symbol_data(self):
         fiat_url = "https://web-api.coinmarketcap.com/v1/fiat/map?include_metals=true"

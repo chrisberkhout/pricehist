@@ -1,3 +1,4 @@
+import dataclasses
 from datetime import datetime, timedelta
 from decimal import Decimal
 
@@ -39,11 +40,9 @@ class ECB:
         pairs = [f"EUR/{c}    Euro against {iso[c].name}" for c in currencies]
         return pairs
 
-    def fetch(self, pair, type, start, end):
-        base, quote = pair.split("/")
-
+    def fetch(self, series):
         almost_90_days_ago = str(datetime.now().date() - timedelta(days=85))
-        data = self._raw_data(start < almost_90_days_ago)
+        data = self._raw_data(series.start < almost_90_days_ago)
         root = etree.fromstring(data)
 
         all_rows = []
@@ -51,14 +50,14 @@ class ECB:
             date = day.attrib["time"]
             # TODO what if it's not found for that day?
             # (some quotes aren't in the earliest data)
-            for row in day.cssselect(f"[currency='{quote}']"):
+            for row in day.cssselect(f"[currency='{series.quote}']"):
                 rate = Decimal(row.attrib["rate"])
                 all_rows.insert(0, (date, rate))
         selected = [
-            Price(base, quote, d, r) for d, r in all_rows if d >= start and d <= end
+            Price(d, r) for d, r in all_rows if d >= series.start and d <= series.end
         ]
 
-        return selected
+        return dataclasses.replace(series, prices=selected)
 
     def _raw_data(self, more_than_90_days=False):
         url_base = "https://www.ecb.europa.eu/stats/eurofxref"

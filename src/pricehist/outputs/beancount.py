@@ -2,9 +2,9 @@ from pricehist.format import Format
 
 
 class Beancount:
-    def format(self, prices, source=None, type=None, fmt=Format()):
+    def format(self, series, source=None, fmt=Format()):
         lines = []
-        for price in prices:
+        for price in series.prices:
 
             amount_parts = f"{fmt.quantize(price.amount):,}".split(".")
             amount_parts[0] = amount_parts[0].replace(",", fmt.thousands)
@@ -12,13 +12,13 @@ class Beancount:
 
             qa_parts = [amount]
             if fmt.symbol == "right":
-                qa_parts = qa_parts + [price.quote]
+                qa_parts = qa_parts + [series.quote]
             else:
-                qa_parts = qa_parts + [" ", price.quote]
+                qa_parts = qa_parts + [" ", series.quote]
             quote_amount = "".join(qa_parts)
 
             date = str(price.date).replace("-", fmt.datesep)
-            lines.append(f"{date} price {price.base} {quote_amount}")
+            lines.append(f"{date} price {series.base} {quote_amount}")
         return "\n".join(lines) + "\n"
 
 
