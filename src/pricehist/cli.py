@@ -1,6 +1,7 @@
 import argparse
 import logging
 import shutil
+import sys
 from datetime import datetime, timedelta
 from textwrap import TextWrapper
 
@@ -9,7 +10,7 @@ from pricehist.format import Format
 from pricehist.series import Series
 
 
-def cli(args=None):
+def cli(args=None, output_file=sys.stdout):
     start_time = datetime.now()
     logging.basicConfig(format="%(message)s", level=logging.INFO)
 
@@ -23,37 +24,39 @@ def cli(args=None):
 
     logging.debug(f"Started pricehist run at {start_time}.")
 
-    if args.version:
-        cmd_version()
-    elif args.command == "sources":
-        cmd_sources(args)
-    elif args.command == "source":
-        cmd_source(args)
-    elif args.command == "fetch":
-        cmd_fetch(args)
-    else:
-        parser.print_help()
+    try:
+        if args.version:
+            print(f"pricehist v{__version__}", file=output_file)
+        elif args.command == "sources":
+            print(cmd_sources(args), file=output_file)
+        elif args.command == "source":
+            print(cmd_source(args), file=output_file)
+        elif args.command == "fetch":
+            print(cmd_fetch(args), end="", file=output_file)
+        else:
+            parser.print_help(file=output_file)
+    except BrokenPipeError:
+        logging.debug("The output pipe was closed early.")
 
     logging.debug(f"Finished pricehist run at {datetime.now()}.")
 
 
-def cmd_version():
-    print(f"pricehist v{__version__}")
-
-
 def cmd_sources(args):
     width = max([len(identifier) for identifier in sources.by_id.keys()])
-    for identifier, source in sources.by_id.items():
-        print(f"{identifier.ljust(width)}  {source.name()}")
+    source_lines = [
+        f"{identifier.ljust(width)}  {source.name()}"
+        for identifier, source in sources.by_id.items()
+    ]
+    return "\n".join(source_lines)
 
 
 def cmd_source(args):
-    def print_field(key, value, key_width, output_width, force=True):
+    def fmt_field(key, value, key_width, total_width, force=True):
         separator = " : "
         initial_indent = key + (" " * (key_width - len(key))) + separator
         subsequent_indent = " " * len(initial_indent)
         wrapper = TextWrapper(
-            width=output_width,
+            width=total_width,
             drop_whitespace=True,
             initial_indent=initial_indent,
             subsequent_indent=subsequent_indent,
@@ -65,28 +68,31 @@ def cmd_source(args):
         rest_output = sum([wrapper.wrap(line) if line else ["\n"] for line in rest], [])
         output = "\n".join(first_output + rest_output)
         if output != "":
-            print(output)
+            return output
+        else:
+            return None
 
     source = sources.by_id[args.identifier]
 
     if args.symbols:
-        print("\n".join(source.symbols()))
+        return "\n".join(source.symbols())
     else:
-        key_width = 11
-        output_width = shutil.get_terminal_size().columns
-
-        print_field("ID", source.id(), key_width, output_width)
-        print_field("Name", source.name(), key_width, output_width)
-        print_field("Description", source.description(), key_width, output_width)
-        print_field("URL", source.source_url(), key_width, output_width, force=False)
-        print_field("Start", source.start(), key_width, output_width)
-        print_field("Types", ", ".join(source.types()), key_width, output_width)
-        print_field("Notes", source.notes(), key_width, output_width)
+        k_width = 11
+        total_width = shutil.get_terminal_size().columns
+        parts = [
+            fmt_field("ID", source.id(), k_width, total_width),
+            fmt_field("Name", source.name(), k_width, total_width),
+            fmt_field("Description", source.description(), k_width, total_width),
+            fmt_field("URL", source.source_url(), k_width, total_width, force=False),
+            fmt_field("Start", source.start(), k_width, total_width),
+            fmt_field("Types", ", ".join(source.types()), k_width, total_width),
+            fmt_field("Notes", source.notes(), k_width, total_width),
+        ]
+        return "\n".join(filter(None, parts))
 
 
 def cmd_fetch(args):
     source = sources.by_id[args.source]
-    output = outputs.by_type[args.output]
     start = args.start or source.start()
     type = args.type or (source.types() + ["unknown"])[0]
 
@@ -108,11 +114,10 @@ def cmd_fetch(args):
     if args.renamequote:
         series = series.rename_quote(args.renamequote)
 
-    default = Format()
-
     def if_not_none(value, default):
         return default if value is None else value
 
+    default = Format()
     fmt = Format(
         time=if_not_none(args.renametime, default.time),
         decimal=if_not_none(args.formatdecimal, default.decimal),
@@ -121,10 +126,8 @@ def cmd_fetch(args):
         datesep=if_not_none(args.formatdatesep, default.datesep),
     )
 
-    try:
-        print(output.format(series, source, fmt=fmt), end="")
-    except BrokenPipeError:
-        logging.debug("The output pipe was closed early.")
+    output = outputs.by_type[args.output]
+    return output.format(series, source, fmt=fmt)
 
 
 def build_parser():
