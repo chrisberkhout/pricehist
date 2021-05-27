@@ -47,29 +47,34 @@ class CoinMarketCap:
         return rows
 
     def fetch(self, series):
+        data = self._data(series)
+
+        prices = []
+        for item in data["data"]["quotes"]:
+            d = item["time_open"][0:10]
+            amount = self._amount(next(iter(item["quote"].values())), series.type)
+            prices.append(Price(d, amount))
+
+        output_base, output_quote = self._output_pair(series.base, series.quote)
+
+        return dataclasses.replace(
+            series, base=output_base, quote=output_quote, prices=prices
+        )
+
+    def _data(self, series):
         url = "https://web-api.coinmarketcap.com/v1/cryptocurrency/ohlcv/historical"
 
         params = {}
-        if series.base.startswith("id=") or series.quote.startswith("id="):
-            symbols = {}
-            for i in self._symbol_data():
-                symbols[str(i["id"])] = i["symbol"] or i["code"]
 
         if series.base.startswith("id="):
             params["id"] = series.base[3:]
-            output_base = symbols[series.base[3:]]
         else:
             params["symbol"] = series.base
-            output_base = series.base
 
         if series.quote.startswith("id="):
             params["convert_id"] = series.quote[3:]
-            quote_key = series.quote[3:]
-            output_quote = symbols[series.quote[3:]]
         else:
             params["convert"] = series.quote
-            quote_key = series.quote
-            output_quote = series.quote
 
         params["time_start"] = int(
             datetime.strptime(series.start, "%Y-%m-%d").timestamp()
@@ -79,17 +84,25 @@ class CoinMarketCap:
         )  # round up to include the last day
 
         response = requests.get(url, params=params)
-        data = json.loads(response.content)
 
-        prices = []
-        for item in data["data"]["quotes"]:
-            d = item["time_open"][0:10]
-            amount = self._amount(item["quote"][quote_key], series.type)
-            prices.append(Price(d, amount))
+        return json.loads(response.content)
 
-        return dataclasses.replace(
-            series, base=output_base, quote=output_quote, prices=prices
-        )
+    def _amount(self, data, type):
+        if type in [None, "mid"]:
+            high = Decimal(str(data["high"]))
+            low = Decimal(str(data["low"]))
+            return sum([high, low]) / 2
+        else:
+            return Decimal(str(data[type]))
+
+    def _output_pair(self, base, quote):
+        if base.startswith("id=") or quote.startswith("id="):
+            symbols = {i["id"]: (i["symbol"] or i["code"]) for i in self._symbol_data()}
+
+        output_base = symbols[int(base[3:])] if base.startswith("id=") else base
+        output_quote = symbols[int(quote[3:])] if quote.startswith("id=") else quote
+
+        return (output_base, output_quote)
 
     def _symbol_data(self):
         fiat_url = "https://web-api.coinmarketcap.com/v1/fiat/map?include_metals=true"
@@ -101,11 +114,3 @@ class CoinMarketCap:
         crypto_res = requests.get(crypto_url)
         crypto = json.loads(crypto_res.content)
         return crypto["data"] + fiat["data"]
-
-    def _amount(self, data, type):
-        if type in [None, "mid"]:
-            high = Decimal(str(data["high"]))
-            low = Decimal(str(data["low"]))
-            return sum([high, low]) / 2
-        else:
-            return Decimal(str(data[type]))

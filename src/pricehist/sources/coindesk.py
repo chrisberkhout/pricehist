@@ -45,6 +45,13 @@ class CoinDesk(BaseSource):
         return symbols
 
     def fetch(self, series):
+        data = self._data(series)
+        prices = []
+        for (d, v) in data["bpi"].items():
+            prices.append(Price(d, Decimal(str(v))))
+        return dataclasses.replace(series, prices=prices)
+
+    def _data(self, series):
         url = "https://api.coindesk.com/v1/bpi/historical/close.json"
         params = {
             "currency": series.quote,
@@ -52,9 +59,4 @@ class CoinDesk(BaseSource):
             "end": series.end,
         }
         response = requests.get(url, params=params)
-        data = json.loads(response.content)
-        prices = []
-        for (d, v) in data["bpi"].items():
-            prices.append(Price(d, Decimal(str(v))))
-
-        return dataclasses.replace(series, prices=prices)
+        return json.loads(response.content)

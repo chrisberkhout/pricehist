@@ -42,8 +42,7 @@ class ECB:
 
     def fetch(self, series):
         almost_90_days_ago = str(datetime.now().date() - timedelta(days=85))
-        data = self._raw_data(series.start < almost_90_days_ago)
-        root = etree.fromstring(data)
+        root = self._data(series.start < almost_90_days_ago)
 
         all_rows = []
         for day in root.cssselect("[time]"):
@@ -59,7 +58,7 @@ class ECB:
 
         return dataclasses.replace(series, prices=selected)
 
-    def _raw_data(self, more_than_90_days=False):
+    def _data(self, more_than_90_days=False):
         url_base = "https://www.ecb.europa.eu/stats/eurofxref"
         if more_than_90_days:
             source_url = f"{url_base}/eurofxref-hist.xml"  # since 1999
@@ -67,4 +66,5 @@ class ECB:
             source_url = f"{url_base}/eurofxref-hist-90d.xml"  # last 90 days
 
         response = requests.get(source_url)
-        return response.content
+        root = etree.fromstring(response.content)
+        return root
