@@ -41,8 +41,8 @@ def cli(args=None, output_file=sys.stdout):
             source = sources.by_id[args.source]
             output = outputs.by_type[args.output]
             series = Series(
-                base=args.pair.split("/")[0],
-                quote=args.pair.split("/")[1],
+                base=args.pair[0],
+                quote=args.pair[1],
                 type=args.type or (source.types() + ["(none)"])[0],
                 start=args.start or source.start(),
                 end=args.end,
@@ -65,6 +65,16 @@ def cli(args=None, output_file=sys.stdout):
 
 
 def build_parser():
+    def valid_pair(s):
+        base, quote = (s + "/").split("/")[0:2]
+        if base == "":
+            msg = f"No base found in the requested pair '{s}'."
+            raise argparse.ArgumentTypeError(msg)
+        if quote == "":
+            msg = f"No quote found in the requested pair '{s}'."
+            raise argparse.ArgumentTypeError(msg)
+        return (base, quote)
+
     def valid_date(s):
         if s == "today":
             return today()
@@ -72,7 +82,7 @@ def build_parser():
             datetime.strptime(s, "%Y-%m-%d")
             return s
         except ValueError:
-            msg = "Not a valid YYYY-MM-DD date: '{0}'.".format(s)
+            msg = f"Not a valid YYYY-MM-DD date: '{s}'."
             raise argparse.ArgumentTypeError(msg)
 
     def previous_valid_date(s):
@@ -169,8 +179,8 @@ def build_parser():
     fetch_parser.add_argument(
         "pair",
         metavar="PAIR",
-        type=str,
-        help="symbols in the form BASE/QUOTE, e.g. BTC/USD",
+        type=valid_pair,
+        help="pair, usually BASE/QUOTE, e.g. BTC/USD",
     )
     fetch_parser.add_argument(
         "-t",
