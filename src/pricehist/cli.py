@@ -66,7 +66,7 @@ def build_parser():
             datetime.strptime(s, "%Y-%m-%d")
             return s
         except ValueError:
-            msg = "Not a valid date: '{0}'.".format(s)
+            msg = "Not a valid YYYY-MM-DD date: '{0}'.".format(s)
             raise argparse.ArgumentTypeError(msg)
 
     def previous_valid_date(s):

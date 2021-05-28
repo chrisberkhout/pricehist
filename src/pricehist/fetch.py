@@ -8,6 +8,8 @@ def fetch(series, source, output, invert: bool, quantize: int, fmt) -> str:
             f"source start date of {source.start()}."
         )
 
+    # TODO warn if start date is today or later
+
     series = source.fetch(series)
 
     if invert:
