@@ -79,8 +79,7 @@ def build_parser():
         if s == "today":
             return today()
         try:
-            datetime.strptime(s, "%Y-%m-%d")
-            return s
+            return datetime.strptime(s, "%Y-%m-%d").date().isoformat()
         except ValueError:
             msg = f"Not a valid YYYY-MM-DD date: '{s}'."
             raise argparse.ArgumentTypeError(msg)
