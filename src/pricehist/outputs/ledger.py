@@ -8,8 +8,10 @@ class Ledger(BaseOutput):
         lines = []
         for price in series.prices:
             date = fmt.format_date(price.date)
-            quote_amount = fmt.format_quote_amount(series.quote, price.amount)
-            lines.append(f"P {date} {fmt.time} {series.base} {quote_amount}")
+            base = fmt.base or series.base
+            quote = fmt.quote or series.quote
+            quote_amount = fmt.format_quote_amount(quote, price.amount)
+            lines.append(f"P {date} {fmt.time} {base} {quote_amount}")
         return "\n".join(lines) + "\n"
 
     # TODO support additional details of the format:

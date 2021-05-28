@@ -3,11 +3,29 @@ from dataclasses import dataclass
 
 @dataclass(frozen=True)
 class Format:
+    base: str = None
+    quote: str = None
     time: str = "00:00:00"
     decimal: str = "."
     thousands: str = ""
     symbol: str = "rightspace"
     datesep: str = "-"
+
+    @classmethod
+    def generate(cls, args):
+        def if_not_none(value, default):
+            return default if value is None else value
+
+        default = cls()
+        return cls(
+            base=if_not_none(args.formatbase, default.base),
+            quote=if_not_none(args.formatquote, default.quote),
+            time=if_not_none(args.formattime, default.time),
+            decimal=if_not_none(args.formatdecimal, default.decimal),
+            thousands=if_not_none(args.formatthousands, default.thousands),
+            symbol=if_not_none(args.formatsymbol, default.symbol),
+            datesep=if_not_none(args.formatdatesep, default.datesep),
+        )
 
     def format_date(self, date):
         return str(date).replace("-", self.datesep)

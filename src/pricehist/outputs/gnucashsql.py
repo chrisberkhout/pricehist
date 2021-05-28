@@ -10,6 +10,8 @@ from .baseoutput import BaseOutput
 
 class GnuCashSQL(BaseOutput):
     def format(self, series, source=None, fmt=Format()):
+        base = fmt.base or series.base
+        quote = fmt.quote or series.quote
         src = f"pricehist:{source.id()}"
 
         values_parts = []
@@ -20,8 +22,8 @@ class GnuCashSQL(BaseOutput):
                 "".join(
                     [
                         date,
-                        series.base,
-                        series.quote,
+                        base,
+                        quote,
                         src,
                         series.type,
                         str(price.amount),
@@ -36,8 +38,8 @@ class GnuCashSQL(BaseOutput):
                 "("
                 f"'{guid}', "
                 f"'{date}', "
-                f"'{series.base}', "
-                f"'{series.quote}', "
+                f"'{base}', "
+                f"'{quote}', "
                 f"'{src}', "
                 f"'{series.type}', "
                 f"{value_num}, "
@@ -50,8 +52,8 @@ class GnuCashSQL(BaseOutput):
         sql = read_text("pricehist.resources", "gnucash.sql").format(
             version=__version__,
             timestamp=datetime.utcnow().isoformat() + "Z",
-            base=series.base,
-            quote=series.quote,
+            base=base,
+            quote=quote,
             values=values,
         )
 

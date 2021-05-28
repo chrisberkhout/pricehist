@@ -6,6 +6,7 @@ from datetime import datetime, timedelta
 from textwrap import TextWrapper
 
 from pricehist import __version__, outputs, sources
+from pricehist.fetch import fetch
 from pricehist.format import Format
 from pricehist.series import Series
 
@@ -17,10 +18,10 @@ def cli(args=None, output_file=sys.stdout):
     parser = build_parser()
     args = parser.parse_args()
 
-    if args.verbose:
-        logging.getLogger().setLevel(logging.INFO)
-    elif args.debug:
+    if args.debug:
         logging.getLogger().setLevel(logging.DEBUG)
+    elif args.verbose:
+        logging.getLogger().setLevel(logging.INFO)
 
     logging.debug(f"Started pricehist run at {start_time}.")
 
@@ -32,7 +33,18 @@ def cli(args=None, output_file=sys.stdout):
         elif args.command == "source":
             print(cmd_source(args), file=output_file)
         elif args.command == "fetch":
-            print(cmd_fetch(args), end="", file=output_file)
+            source = sources.by_id[args.source]
+            output = outputs.by_type[args.output]
+            series = Series(
+                base=args.pair.split("/")[0],
+                quote=args.pair.split("/")[1],
+                type=args.type or (source.types() + ["unknown"])[0],
+                start=args.start or source.start(),
+                end=args.end,
+            )
+            fmt = Format.generate(args)
+            result = fetch(series, source, output, args.invert, args.quantize, fmt)
+            print(result, end="", file=output_file)
         else:
             parser.print_help(file=sys.stderr)
     except BrokenPipeError:
@@ -90,45 +102,6 @@ def cmd_source(args):
             fmt_field("Notes", source.notes(), k_width, total_width),
         ]
         return "\n".join(filter(None, parts))
-
-
-def cmd_fetch(args):
-    source = sources.by_id[args.source]
-    start = args.start or source.start()
-    type = args.type or (source.types() + ["unknown"])[0]
-
-    if start < source.start():
-        logging.warn(
-            f"The start date {start} preceeds the {source.name()} "
-            f"source start date of {source.start()}."
-        )
-
-    base, quote = args.pair.split("/")
-    series = source.fetch(Series(base, quote, type, start, args.end))
-
-    if args.invert:
-        series = series.invert()
-    if args.quantize is not None:
-        series = series.quantize(args.quantize)
-    if args.renamebase:
-        series = series.rename_base(args.renamebase)
-    if args.renamequote:
-        series = series.rename_quote(args.renamequote)
-
-    def if_not_none(value, default):
-        return default if value is None else value
-
-    default = Format()
-    fmt = Format(
-        time=if_not_none(args.renametime, default.time),
-        decimal=if_not_none(args.formatdecimal, default.decimal),
-        thousands=if_not_none(args.formatthousands, default.thousands),
-        symbol=if_not_none(args.formatsymbol, default.symbol),
-        datesep=if_not_none(args.formatdatesep, default.datesep),
-    )
-
-    output = outputs.by_type[args.output]
-    return output.format(series, source, fmt=fmt)
 
 
 def build_parser():
@@ -214,12 +187,15 @@ def build_parser():
         "fetch",
         help="fetch prices",
         usage=(
+            # Set usage manually to have positional arguments before options
+            # and show allowed values where appropriate
             "pricehist fetch SOURCE PAIR [-h] "
-            "[--type TYPE] [-s DATE | -sx DATE] [-e DATE | -ex DATE] [-o FMT] "
+            "[-t TYPE] [-s DATE | -sx DATE] [-e DATE | -ex DATE] "
+            f"[-o {'|'.join(outputs.by_type.keys())}] "
             "[--invert] [--quantize INT] "
-            "[--rename-base SYM] [--rename-quote SYM] [--rename-time TIME] "
-            "[--format-decimal CHAR] [--format-thousands CHAR] "
-            "[--format-symbol rightspace|right|leftspace|left] [--format-datesep CHAR]"
+            "[--fmt-base SYM] [--fmt-quote SYM] [--fmt-time TIME] "
+            "[--fmt-decimal CHAR] [--fmt-thousands CHAR] "
+            "[--fmt-symbol rightspace|right|leftspace|left] [--fmt-datesep CHAR]"
         ),
         formatter_class=formatter,
     )
@@ -234,7 +210,7 @@ def build_parser():
         "pair",
         metavar="PAIR",
         type=str,
-        help="pair, usually BASE/QUOTE, e.g. BTC/USD",
+        help="symbols in the form BASE/QUOTE, e.g. BTC/USD",
     )
     fetch_parser.add_argument(
         "-t",
@@ -301,58 +277,58 @@ def build_parser():
         dest="quantize",
         metavar="INT",
         type=int,
-        help="quantize to the given number of decimal places",
-    )
-    fetch_parser.add_argument(
-        "--rename-base",
-        dest="renamebase",
-        metavar="SYM",
-        type=str,
-        help="rename base symbol",
-    )
-    fetch_parser.add_argument(
-        "--rename-quote",
-        dest="renamequote",
-        metavar="SYM",
-        type=str,
-        help="rename quote symbol",
+        help="round to the given number of decimal places",
     )
     default_fmt = Format()
     fetch_parser.add_argument(
-        "--rename-time",
-        dest="renametime",
-        metavar="TIME",
+        "--fmt-base",
+        dest="formatbase",
+        metavar="SYM",
         type=str,
-        help=f"set a particular time of day (default: {default_fmt.time})",
+        help="rename the base symbol in output",
     )
     fetch_parser.add_argument(
-        "--format-decimal",
+        "--fmt-quote",
+        dest="formatquote",
+        metavar="SYM",
+        type=str,
+        help="rename the quote symbol in output",
+    )
+    fetch_parser.add_argument(
+        "--fmt-time",
+        dest="formattime",
+        metavar="TIME",
+        type=str,
+        help=f"set a particular time of day in output (default: {default_fmt.time})",
+    )
+    fetch_parser.add_argument(
+        "--fmt-decimal",
         dest="formatdecimal",
         metavar="CHAR",
         type=str,
-        help=f"decimal point (default: '{default_fmt.decimal}')",
+        help=f"decimal point in output (default: '{default_fmt.decimal}')",
     )
     fetch_parser.add_argument(
-        "--format-thousands",
+        "--fmt-thousands",
         dest="formatthousands",
         metavar="CHAR",
         type=str,
-        help=f"thousands separator (default: '{default_fmt.thousands}')",
+        help=f"thousands separator in output (default: '{default_fmt.thousands}')",
     )
     fetch_parser.add_argument(
-        "--format-symbol",
+        "--fmt-symbol",
         dest="formatsymbol",
-        metavar="LOC",
+        metavar="LOCATION",
         type=str,
         choices=["rightspace", "right", "leftspace", "left"],
-        help=f"commodity symbol placement (default: {default_fmt.symbol})",
+        help=f"commodity symbol placement in output (default: {default_fmt.symbol})",
     )
     fetch_parser.add_argument(
-        "--format-datesep",
+        "--fmt-datesep",
         dest="formatdatesep",
         metavar="CHAR",
         type=str,
-        help=f"date separator (default: '{default_fmt.datesep}')",
+        help=f"date separator in output (default: '{default_fmt.datesep}')",
     )
 
     return parser
