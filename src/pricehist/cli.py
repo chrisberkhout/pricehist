@@ -22,7 +22,7 @@ def cli(args=None, output_file=sys.stdout):
     elif args.verbose:
         logging.getLogger().setLevel(logging.INFO)
 
-    logging.debug(f"Started pricehist run at {start_time}.")
+    logging.debug(f"Began pricehist run at {start_time}.")
 
     try:
         if args.version:
@@ -43,10 +43,16 @@ def cli(args=None, output_file=sys.stdout):
             series = Series(
                 base=args.pair.split("/")[0],
                 quote=args.pair.split("/")[1],
-                type=args.type or (source.types() + ["unknown"])[0],
+                type=args.type or (source.types() + ["(none)"])[0],
                 start=args.start or source.start(),
                 end=args.end,
             )
+            if series.type not in source.types():
+                logging.critical(
+                    f"ERROR: The requested price type '{series.type}' is not "
+                    f"recognised by the {source.id()} source!"
+                )
+                sys.exit(1)
             fmt = Format.fromargs(args)
             result = fetch(series, source, output, args.invert, args.quantize, fmt)
             print(result, end="", file=output_file)
@@ -54,8 +60,8 @@ def cli(args=None, output_file=sys.stdout):
             parser.print_help(file=sys.stderr)
     except BrokenPipeError:
         logging.debug("The output pipe was closed early.")
-
-    logging.debug(f"Finished pricehist run at {datetime.now()}.")
+    finally:
+        logging.debug(f"Ended pricehist run at {datetime.now()}.")
 
 
 def build_parser():

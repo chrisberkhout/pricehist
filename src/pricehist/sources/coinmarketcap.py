@@ -88,7 +88,7 @@ class CoinMarketCap(BaseSource):
         return json.loads(response.content)
 
     def _amount(self, data, type):
-        if type in [None, "mid"]:
+        if type in ["mid"]:
             high = Decimal(str(data["high"]))
             low = Decimal(str(data["low"]))
             return sum([high, low]) / 2
