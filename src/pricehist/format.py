@@ -12,7 +12,7 @@ class Format:
     datesep: str = "-"
 
     @classmethod
-    def generate(cls, args):
+    def fromargs(cls, args):
         def if_not_none(value, default):
             return default if value is None else value
 

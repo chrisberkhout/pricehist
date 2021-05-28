@@ -47,7 +47,7 @@ def cli(args=None, output_file=sys.stdout):
                 start=args.start or source.start(),
                 end=args.end,
             )
-            fmt = Format.generate(args)
+            fmt = Format.fromargs(args)
             result = fetch(series, source, output, args.invert, args.quantize, fmt)
             print(result, end="", file=output_file)
         else:
