@@ -41,14 +41,12 @@ class ECB(BaseSource):
         return [(f"EUR/{c}", f"Euro against {iso[c].name}") for c in currencies]
 
     def fetch(self, series):
-        almost_90_days_ago = str(datetime.now().date() - timedelta(days=85))
+        almost_90_days_ago = (datetime.now().date() - timedelta(days=85)).isoformat()
         root = self._data(series.start < almost_90_days_ago)
 
         all_rows = []
         for day in root.cssselect("[time]"):
             date = day.attrib["time"]
-            # TODO what if it's not found for that day?
-            # (some quotes aren't in the earliest data)
             for row in day.cssselect(f"[currency='{series.quote}']"):
                 rate = Decimal(row.attrib["rate"])
                 all_rows.insert(0, (date, rate))

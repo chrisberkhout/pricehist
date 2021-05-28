@@ -86,17 +86,17 @@ def build_parser():
             raise argparse.ArgumentTypeError(msg)
 
     def previous_valid_date(s):
-        return str(
+        return (
             datetime.strptime(valid_date(s), "%Y-%m-%d").date() - timedelta(days=1)
-        )
+        ).isoformat()
 
     def following_valid_date(s):
-        return str(
+        return (
             datetime.strptime(valid_date(s), "%Y-%m-%d").date() + timedelta(days=1)
-        )
+        ).isoformat()
 
     def today():
-        return str(datetime.now().date())
+        return datetime.now().date().isoformat()
 
     def formatter(prog):
         return argparse.HelpFormatter(prog, max_help_position=50)
