@@ -3,7 +3,6 @@ import logging
 import shutil
 import sys
 from datetime import datetime, timedelta
-from textwrap import TextWrapper
 
 from pricehist import __version__, outputs, sources
 from pricehist.fetch import fetch
@@ -29,9 +28,15 @@ def cli(args=None, output_file=sys.stdout):
         if args.version:
             print(f"pricehist v{__version__}", file=output_file)
         elif args.command == "sources":
-            print(cmd_sources(args), file=output_file)
+            result = sources.formatted()
+            print(result, file=output_file)
+        elif args.command == "source" and args.symbols:
+            result = sources.by_id[args.source].format_symbols()
+            print(result, file=output_file)
         elif args.command == "source":
-            print(cmd_source(args), file=output_file)
+            total_width = shutil.get_terminal_size().columns
+            result = sources.by_id[args.source].format_info(total_width)
+            print(result, file=output_file)
         elif args.command == "fetch":
             source = sources.by_id[args.source]
             output = outputs.by_type[args.output]
@@ -51,57 +56,6 @@ def cli(args=None, output_file=sys.stdout):
         logging.debug("The output pipe was closed early.")
 
     logging.debug(f"Finished pricehist run at {datetime.now()}.")
-
-
-def _format_pairs(pairs, gap=4):
-    width = max([len(a) for a, b in pairs])
-    lines = [a.ljust(width + gap) + b for a, b in pairs]
-    return "\n".join(lines)
-
-
-def cmd_sources(args):
-    return _format_pairs([(s.id(), s.name()) for k, s in sorted(sources.by_id.items())])
-
-
-def cmd_source(args):
-    def fmt_field(key, value, key_width, total_width, force=True):
-        separator = " : "
-        initial_indent = key + (" " * (key_width - len(key))) + separator
-        subsequent_indent = " " * len(initial_indent)
-        wrapper = TextWrapper(
-            width=total_width,
-            drop_whitespace=True,
-            initial_indent=initial_indent,
-            subsequent_indent=subsequent_indent,
-            break_long_words=force,
-        )
-        first, *rest = value.split("\n")
-        first_output = wrapper.wrap(first)
-        wrapper.initial_indent = subsequent_indent
-        rest_output = sum([wrapper.wrap(line) if line else ["\n"] for line in rest], [])
-        output = "\n".join(first_output + rest_output)
-        if output != "":
-            return output
-        else:
-            return None
-
-    source = sources.by_id[args.identifier]
-
-    if args.symbols:
-        return _format_pairs(source.symbols())
-    else:
-        k_width = 11
-        total_width = shutil.get_terminal_size().columns
-        parts = [
-            fmt_field("ID", source.id(), k_width, total_width),
-            fmt_field("Name", source.name(), k_width, total_width),
-            fmt_field("Description", source.description(), k_width, total_width),
-            fmt_field("URL", source.source_url(), k_width, total_width, force=False),
-            fmt_field("Start", source.start(), k_width, total_width),
-            fmt_field("Types", ", ".join(source.types()), k_width, total_width),
-            fmt_field("Notes", source.notes(), k_width, total_width),
-        ]
-        return "\n".join(filter(None, parts))
 
 
 def build_parser():
@@ -170,7 +124,7 @@ def build_parser():
         formatter_class=formatter,
     )
     source_parser.add_argument(
-        "identifier",
+        "source",
         metavar="SOURCE",
         type=str,
         choices=sources.by_id.keys(),
