@@ -10,6 +10,7 @@ class Format:
     thousands: str = ""
     symbol: str = "rightspace"
     datesep: str = "-"
+    csvdelim: str = ","
 
     @classmethod
     def fromargs(cls, args):
@@ -25,6 +26,7 @@ class Format:
             thousands=if_not_none(args.formatthousands, default.thousands),
             symbol=if_not_none(args.formatsymbol, default.symbol),
             datesep=if_not_none(args.formatdatesep, default.datesep),
+            csvdelim=if_not_none(args.formatcsvdelim, default.csvdelim),
         )
 
     def format_date(self, date):

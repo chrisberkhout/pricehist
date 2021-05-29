@@ -97,6 +97,13 @@ def build_parser():
     def today():
         return datetime.now().date().isoformat()
 
+    def valid_char(s):
+        if len(s) == 1:
+            return s
+        else:
+            msg = f"Not a single character: '{s}'."
+            raise argparse.ArgumentTypeError(msg)
+
     def formatter(prog):
         return argparse.HelpFormatter(prog, max_help_position=50)
 
@@ -164,7 +171,8 @@ def build_parser():
             "[--invert] [--quantize INT] "
             "[--fmt-base SYM] [--fmt-quote SYM] [--fmt-time TIME] "
             "[--fmt-decimal CHAR] [--fmt-thousands CHAR] "
-            "[--fmt-symbol rightspace|right|leftspace|left] [--fmt-datesep CHAR]"
+            "[--fmt-symbol rightspace|right|leftspace|left] [--fmt-datesep CHAR] "
+            "[--fmt-csvdelim CHAR]"
         ),
         formatter_class=formatter,
     )
@@ -298,6 +306,13 @@ def build_parser():
         metavar="CHAR",
         type=str,
         help=f"date separator in output (default: '{default_fmt.datesep}')",
+    )
+    fetch_parser.add_argument(
+        "--fmt-csvdelim",
+        dest="formatcsvdelim",
+        metavar="CHAR",
+        type=valid_char,
+        help=f"field delimiter for CSV output (default: '{default_fmt.csvdelim}')",
     )
 
     return parser
