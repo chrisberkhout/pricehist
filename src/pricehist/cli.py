@@ -107,6 +107,7 @@ def build_parser():
     def formatter(prog):
         return argparse.HelpFormatter(prog, max_help_position=50)
 
+    default_fmt = Format()
     parser = argparse.ArgumentParser(
         prog="pricehist",
         description="Fetch historical price data",
@@ -256,7 +257,6 @@ def build_parser():
         type=int,
         help="round to the given number of decimal places",
     )
-    default_fmt = Format()
     fetch_parser.add_argument(
         "--fmt-base",
         dest="formatbase",

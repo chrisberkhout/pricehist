@@ -2,6 +2,7 @@ import csv
 import io
 
 from pricehist.format import Format
+
 from .baseoutput import BaseOutput
 
 
