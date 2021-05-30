@@ -31,9 +31,7 @@ class GnuCashSQL(BaseOutput):
                 ).encode("utf-8")
             )
             guid = m.hexdigest()[0:32]
-            # TODO extract this logic to a helper method
-            value_num = str(price.amount).replace(".", "")
-            value_denom = 10 ** len(f"{price.amount}.".split(".")[1])
+            value_num, value_denom = self._fractional(price.amount)
             v = (
                 "("
                 f"'{guid}', "
@@ -58,3 +56,8 @@ class GnuCashSQL(BaseOutput):
         )
 
         return sql
+
+    def _fractional(num):
+        num = str(num).replace(".", "")
+        denom = 10 ** len(f"{num}.".split(".")[1])
+        return (num, denom)
