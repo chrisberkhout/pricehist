@@ -41,23 +41,23 @@ def _cov_description(
     start_uncovered = (a1 - r1).days
     end_uncovered = (r2 - a2).days
 
-    def plural(n):
+    def s(n):
         return "" if n == 1 else "s"
 
     if start_uncovered == 0 and end_uncovered > 0:
         return (
             f"starting as requested and ending {end_uncovered} "
-            f"day{plural(end_uncovered)} earlier than requested"
+            f"day{s(end_uncovered)} earlier than requested"
         )
     elif start_uncovered > 0 and end_uncovered == 0:
         return (
-            f"starting {start_uncovered} day{plural(start_uncovered)} later "
+            f"starting {start_uncovered} day{s(start_uncovered)} later "
             "than requested and ending as requested"
         )
     elif start_uncovered > 0 and end_uncovered > 0:
         return (
-            f"starting {start_uncovered} day{plural(start_uncovered)} later "
-            f"and ending {end_uncovered} day{plural(end_uncovered)} earlier "
+            f"starting {start_uncovered} day{s(start_uncovered)} later "
+            f"and ending {end_uncovered} day{s(end_uncovered)} earlier "
             "than requested"
         )
     else:

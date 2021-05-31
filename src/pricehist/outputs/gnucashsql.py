@@ -1,4 +1,6 @@
 import hashlib
+import logging
+import re
 from datetime import datetime
 from importlib.resources import read_text
 
@@ -13,6 +15,16 @@ class GnuCashSQL(BaseOutput):
         base = fmt.base or series.base
         quote = fmt.quote or series.quote
         src = f"pricehist:{source.id()}"
+
+        self._warn_about_backslashes(
+            {
+                "time": fmt.time,
+                "base": base,
+                "quote": quote,
+                "source": src,
+                "price type": series.type,
+            }
+        )
 
         values_parts = []
         for price in series.prices:
@@ -31,18 +43,23 @@ class GnuCashSQL(BaseOutput):
                 ).encode("utf-8")
             )
             guid = m.hexdigest()[0:32]
+
             value_num, value_denom = self._fractional(price.amount)
             v = (
                 "("
-                f"'{guid}', "
-                f"'{date}', "
-                f"'{base}', "
-                f"'{quote}', "
-                f"'{src}', "
-                f"'{series.type}', "
-                f"{value_num}, "
-                f"{value_denom}"
-                ")"
+                + ", ".join(
+                    [
+                        self._sql_str(guid),
+                        self._sql_str(date),
+                        self._sql_str(base),
+                        self._sql_str(quote),
+                        self._sql_str(src),
+                        self._sql_str(series.type),
+                        str(value_num),
+                        str(value_denom),
+                    ]
+                )
+                + ")"
             )
             values_parts.append(v)
         values = ",\n".join(values_parts)
@@ -50,14 +67,43 @@ class GnuCashSQL(BaseOutput):
         sql = read_text("pricehist.resources", "gnucash.sql").format(
             version=__version__,
             timestamp=datetime.utcnow().isoformat() + "Z",
-            base=base,
-            quote=quote,
+            base=self._sql_str(base),
+            quote=self._sql_str(quote),
             values=values,
         )
 
         return sql
 
-    def _fractional(num):
-        num = str(num).replace(".", "")
-        denom = 10 ** len(f"{num}.".split(".")[1])
-        return (num, denom)
+    def _warn_about_backslashes(self, fields):
+        hits = [name for name, value in fields.items() if "\\" in value]
+        if hits:
+            logging.warn(
+                f"Before running this SQL, check the formatting of the "
+                f"{self._english_join(hits)} strings. "
+                f"SQLite treats backslahes in strings as plain characters, but "
+                f"MariaDB/MySQL and PostgreSQL may interpret them as escape "
+                f"codes."
+            )
+
+    def _english_join(self, strings):
+        if len(strings) == 0:
+            return ""
+        elif len(strings) == 1:
+            return str(strings[0])
+        else:
+            return f"{', '.join(strings[0:-1])} and {strings[-1]}"
+
+    def _sql_str(self, s):
+        # Documentation regarding SQL string literals
+        # - https://www.sqlite.org/lang_expr.html#literal_values_constants_
+        # - https://mariadb.com/kb/en/string-literals/
+        # - https://dev.mysql.com/doc/refman/8.0/en/string-literals.html
+        # - https://www.postgresql.org/docs/devel/sql-syntax-lexical.html
+        escaped = re.sub("'", "''", s)
+        quoted = f"'{escaped}'"
+        return quoted
+
+    def _fractional(self, number):
+        numerator = str(number).replace(".", "")
+        denom = 10 ** len(f"{number}.".split(".")[1])
+        return (numerator, denom)

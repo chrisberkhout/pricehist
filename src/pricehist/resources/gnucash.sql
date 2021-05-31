@@ -5,8 +5,8 @@ BEGIN;
 -- The GnuCash database must already have entries for the relevant commodities.
 -- These statements fail and later changes are skipped if that isn't the case.
 CREATE TEMPORARY TABLE guids (mnemonic TEXT NOT NULL, guid TEXT NOT NULL);
-INSERT INTO guids VALUES ('{base}', (SELECT guid FROM commodities WHERE mnemonic = '{base}' LIMIT 1));
-INSERT INTO guids VALUES ('{quote}', (SELECT guid FROM commodities WHERE mnemonic = '{quote}' LIMIT 1));
+INSERT INTO guids VALUES ({base}, (SELECT guid FROM commodities WHERE mnemonic = {base} LIMIT 1));
+INSERT INTO guids VALUES ({quote}, (SELECT guid FROM commodities WHERE mnemonic = {quote} LIMIT 1));
 
 -- Create a staging table for the new price data.
 -- Doing this via a SELECT ensures the correct date type across databases.
