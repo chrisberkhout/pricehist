@@ -5,7 +5,7 @@ from .baseoutput import BaseOutput
 
 class Beancount(BaseOutput):
     def format(self, series, source=None, fmt=Format()):
-        lines = []
+        output = ""
         for price in series.prices:
             # TODO warn if fmt settings make an invalid number (not . for decimal)
             # TODO warn if fmt settings make an invalid quote (not right/rightspace)
@@ -13,8 +13,8 @@ class Beancount(BaseOutput):
             base = fmt.base or series.base
             quote = fmt.quote or series.quote
             quote_amount = fmt.format_quote_amount(quote, price.amount)
-            lines.append(f"{date} price {base} {quote_amount}")
-        return "\n".join(lines) + "\n"
+            output += f"{date} price {base} {quote_amount}\n"
+        return output
 
 
 # NOTE: Beancount always has commodity to the right. It seems to be possible to

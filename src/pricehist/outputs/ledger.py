@@ -5,14 +5,14 @@ from .baseoutput import BaseOutput
 
 class Ledger(BaseOutput):
     def format(self, series, source=None, fmt=Format()):
-        lines = []
+        output = ""
         for price in series.prices:
             date = fmt.format_date(price.date)
             base = fmt.base or series.base
             quote = fmt.quote or series.quote
             quote_amount = fmt.format_quote_amount(quote, price.amount)
-            lines.append(f"P {date} {fmt.time} {base} {quote_amount}")
-        return "\n".join(lines) + "\n"
+            output += f"P {date} {fmt.time} {base} {quote_amount}\n"
+        return output
 
     # https://www.ledger-cli.org/3.0/doc/ledger3.html#Commodities-and-Currencies
     # > The commodity may be any non-numeric string that does not contain a
