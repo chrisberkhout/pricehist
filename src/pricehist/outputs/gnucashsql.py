@@ -3,6 +3,7 @@ import logging
 import re
 from datetime import datetime
 from importlib.resources import read_text
+from decimal import Decimal
 
 from pricehist import __version__
 from pricehist.format import Format
@@ -44,7 +45,7 @@ class GnuCashSQL(BaseOutput):
             )
             guid = m.hexdigest()[0:32]
 
-            value_num, value_denom = self._fractional(price.amount)
+            value_num, value_denom = self._rational(price.amount)
             v = (
                 "("
                 + ", ".join(
@@ -103,7 +104,15 @@ class GnuCashSQL(BaseOutput):
         quoted = f"'{escaped}'"
         return quoted
 
-    def _fractional(self, number):
-        numerator = str(number).replace(".", "")
-        denom = 10 ** len(f"{number}.".split(".")[1])
+    def _rational(self, number: Decimal) -> (str, str):
+        tup = number.as_tuple()
+        sign = "-" if tup.sign == 1 else ""
+        if tup.exponent > 0:
+            numerator = (
+                sign + "".join([str(d) for d in tup.digits]) + ("0" * tup.exponent)
+            )
+            denom = str(1)
+        else:
+            numerator = sign + "".join([str(d) for d in tup.digits])
+            denom = str(10 ** -tup.exponent)
         return (numerator, denom)
