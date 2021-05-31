@@ -16,9 +16,9 @@ FROM prices p, commodities c
 WHERE FALSE;
 
 -- Populate the staging table.
-INSERT INTO new_prices (guid, date, base, quote, source, type, value_num, value_denom) VALUES
-{values}
-;
+{values_comment}INSERT INTO new_prices (guid, date, base, quote, source, type, value_num, value_denom) VALUES
+{values_comment}{values}
+{values_comment};
 
 -- Get some numbers for the summary.
 CREATE TEMPORARY TABLE summary (description TEXT, num INT);

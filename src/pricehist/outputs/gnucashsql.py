@@ -66,6 +66,7 @@ class GnuCashSQL(BaseOutput):
             )
             values_parts.append(v)
         values = ",\n".join(values_parts)
+        values_comment = "" if values_parts else "-- "
 
         if too_big:
             # https://code.gnucash.org/docs/MAINT/group__Numeric.html
@@ -83,6 +84,7 @@ class GnuCashSQL(BaseOutput):
             timestamp=datetime.utcnow().isoformat() + "Z",
             base=self._sql_str(base),
             quote=self._sql_str(quote),
+            values_comment=values_comment,
             values=values,
         )
 
