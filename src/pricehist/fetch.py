@@ -46,19 +46,19 @@ def _cov_description(
 
     if start_uncovered == 0 and end_uncovered > 0:
         return (
-            f"starting as requested and ending {end_uncovered} "
-            f"day{s(end_uncovered)} earlier than requested"
+            f"which ends {end_uncovered} day{s(end_uncovered)} earlier than "
+            f"requested"
         )
     elif start_uncovered > 0 and end_uncovered == 0:
         return (
-            f"starting {start_uncovered} day{s(start_uncovered)} later "
-            "than requested and ending as requested"
+            f"which starts {start_uncovered} day{s(start_uncovered)} later "
+            "than requested"
         )
     elif start_uncovered > 0 and end_uncovered > 0:
         return (
-            f"starting {start_uncovered} day{s(start_uncovered)} later "
-            f"and ending {end_uncovered} day{s(end_uncovered)} earlier "
-            "than requested"
+            f"which starts {start_uncovered} day{s(start_uncovered)} later "
+            f"and ends {end_uncovered} day{s(end_uncovered)} earlier "
+            f"than requested"
         )
     else:
         return "as requested"

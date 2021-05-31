@@ -8,19 +8,21 @@ from pricehist import __version__, outputs, sources
 from pricehist.fetch import fetch
 from pricehist.format import Format
 from pricehist.series import Series
+from pricehist import logger
 
 
 def cli(args=None, output_file=sys.stdout):
     start_time = datetime.now()
-    logging.basicConfig(format="%(message)s", level=logging.INFO)
+
+    logger.init()
 
     parser = build_parser()
     args = parser.parse_args()
 
     if args.debug:
-        logging.getLogger().setLevel(logging.DEBUG)
+        logger.show_debug()
     elif args.verbose:
-        logging.getLogger().setLevel(logging.INFO)
+        logger.show_info()
 
     logging.debug(f"Began pricehist run at {start_time}.")
 
@@ -49,8 +51,8 @@ def cli(args=None, output_file=sys.stdout):
             )
             if series.type not in source.types():
                 logging.critical(
-                    f"ERROR: The requested price type '{series.type}' is not "
-                    f"recognised by the {source.id()} source!"
+                    f"The requested price type '{series.type}' is not "
+                    f"recognized by the {source.id()} source!"
                 )
                 sys.exit(1)
             fmt = Format.fromargs(args)
