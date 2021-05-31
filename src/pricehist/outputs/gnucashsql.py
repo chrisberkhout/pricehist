@@ -27,6 +27,7 @@ class GnuCashSQL(BaseOutput):
             }
         )
 
+        too_big = False
         values_parts = []
         for price in series.prices:
             date = f"{fmt.format_date(price.date)} {fmt.time}"
@@ -45,7 +46,8 @@ class GnuCashSQL(BaseOutput):
             )
             guid = m.hexdigest()[0:32]
 
-            value_num, value_denom = self._rational(price.amount)
+            value_num, value_denom, fit = self._rational(price.amount)
+            too_big |= not fit
             v = (
                 "("
                 + ", ".join(
@@ -64,6 +66,17 @@ class GnuCashSQL(BaseOutput):
             )
             values_parts.append(v)
         values = ",\n".join(values_parts)
+
+        if too_big:
+            # https://code.gnucash.org/docs/MAINT/group__Numeric.html
+            # https://code.gnucash.org/docs/MAINT/structgnc__price__s.html
+            logging.warn(
+                "This SQL contains numbers outside of the int64 range required "
+                "by GnuCash for the numerators and denominators of prices. "
+                "Using the --quantize option to limit the number of decimal "
+                "places will usually reduce the size of the rational form as "
+                "well."
+            )
 
         sql = read_text("pricehist.resources", "gnucash.sql").format(
             version=__version__,
@@ -104,7 +117,7 @@ class GnuCashSQL(BaseOutput):
         quoted = f"'{escaped}'"
         return quoted
 
-    def _rational(self, number: Decimal) -> (str, str):
+    def _rational(self, number: Decimal) -> (str, str, bool):
         tup = number.as_tuple()
         sign = "-" if tup.sign == 1 else ""
         if tup.exponent > 0:
@@ -115,4 +128,8 @@ class GnuCashSQL(BaseOutput):
         else:
             numerator = sign + "".join([str(d) for d in tup.digits])
             denom = str(10 ** -tup.exponent)
-        return (numerator, denom)
+        fit = self._fit_in_int64(Decimal(numerator), Decimal(denom))
+        return (numerator, denom, fit)
+
+    def _fit_in_int64(self, *numbers):
+        return all(n >= -(2 ** 63) and n <= (2 ** 63) - 1 for n in numbers)
