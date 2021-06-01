@@ -15,12 +15,8 @@ def init():
     handler = logging.StreamHandler(sys.stderr)
     handler.setFormatter(Formatter())
     logging.root.addHandler(handler)
-    logging.root.setLevel(logging.WARNING)
+    logging.root.setLevel(logging.INFO)
 
 
 def show_debug():
     logging.root.setLevel(logging.DEBUG)
-
-
-def show_info():
-    logging.root.setLevel(logging.INFO)

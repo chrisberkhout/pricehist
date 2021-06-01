@@ -18,10 +18,8 @@ def cli(args=None, output_file=sys.stdout):
     parser = build_parser()
     args = parser.parse_args()
 
-    if args.debug:
+    if args.verbose:
         logger.show_debug()
-    elif args.verbose:
-        logger.show_info()
 
     logging.debug(f"Began pricehist run at {start_time}.")
 
@@ -118,16 +116,10 @@ def build_parser():
         help="show version information",
     )
 
-    logging_group = parser.add_mutually_exclusive_group(required=False)
-    logging_group.add_argument(
+    parser.add_argument(
         "--verbose",
         action="store_true",
-        help="show INFO messages",
-    )
-    logging_group.add_argument(
-        "--debug",
-        action="store_true",
-        help="show INFO and DEBUG messages",
+        help="show all log messages",
     )
 
     subparsers = parser.add_subparsers(title="commands", dest="command")
