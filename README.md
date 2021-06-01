@@ -41,8 +41,7 @@ Fetch historical price data
 optional arguments:
   -h, --help              show this help message and exit
   --version               show version information
-  --verbose               show INFO messages
-  --debug                 show INFO and DEBUG messages
+  --verbose               show all log messages
 
 commands:
   {sources,source,fetch}
