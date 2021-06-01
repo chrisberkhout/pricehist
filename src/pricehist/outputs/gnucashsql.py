@@ -1,9 +1,8 @@
 import hashlib
 import logging
-import re
 from datetime import datetime
-from importlib.resources import read_text
 from decimal import Decimal
+from importlib.resources import read_text
 
 from pricehist import __version__
 from pricehist.format import Format
@@ -115,7 +114,7 @@ class GnuCashSQL(BaseOutput):
         # - https://mariadb.com/kb/en/string-literals/
         # - https://dev.mysql.com/doc/refman/8.0/en/string-literals.html
         # - https://www.postgresql.org/docs/devel/sql-syntax-lexical.html
-        escaped = re.sub("'", "''", s)
+        escaped = s.replace("'", "''")
         quoted = f"'{escaped}'"
         return quoted
 

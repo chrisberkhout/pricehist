@@ -77,7 +77,7 @@ class CoinMarketCap(BaseSource):
             params["convert"] = series.quote
 
         params["time_start"] = int(
-            datetime.strptime(series.start, "%Y-%m-%d").timestamp()
+            int(datetime.strptime(series.start, "%Y-%m-%d").timestamp())
         )
         params["time_end"] = (
             int(datetime.strptime(series.end, "%Y-%m-%d").timestamp()) + 24 * 60 * 60

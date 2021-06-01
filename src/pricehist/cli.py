@@ -4,11 +4,10 @@ import shutil
 import sys
 from datetime import datetime, timedelta
 
-from pricehist import __version__, outputs, sources
+from pricehist import __version__, logger, outputs, sources
 from pricehist.fetch import fetch
 from pricehist.format import Format
 from pricehist.series import Series
-from pricehist import logger
 
 
 def cli(args=None, output_file=sys.stdout):
@@ -34,7 +33,7 @@ def cli(args=None, output_file=sys.stdout):
             print(result, file=output_file)
         elif args.command == "source" and args.symbols:
             result = sources.by_id[args.source].format_symbols()
-            print(result, file=output_file)
+            print(result, file=output_file, end="")
         elif args.command == "source":
             total_width = shutil.get_terminal_size().columns
             result = sources.by_id[args.source].format_info(total_width)
@@ -71,9 +70,6 @@ def build_parser():
         base, quote = (s + "/").split("/")[0:2]
         if base == "":
             msg = f"No base found in the requested pair '{s}'."
-            raise argparse.ArgumentTypeError(msg)
-        if quote == "":
-            msg = f"No quote found in the requested pair '{s}'."
             raise argparse.ArgumentTypeError(msg)
         return (base, quote)
 

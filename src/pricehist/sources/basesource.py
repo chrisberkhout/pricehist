@@ -51,9 +51,9 @@ class BaseSource(ABC):
 
     def format_symbols(self) -> str:
         symbols = self.symbols()
-        width = max([len(sym) for sym, desc in symbols])
-        lines = [sym.ljust(width + 4) + desc for sym, desc in symbols]
-        return "\n".join(lines)
+        width = max([len(sym) for sym, desc in symbols] + [0])
+        lines = [sym.ljust(width + 4) + desc + "\n" for sym, desc in symbols]
+        return "".join(lines)
 
     def format_info(self, total_width=80) -> str:
         k_width = 11
@@ -82,7 +82,7 @@ class BaseSource(ABC):
         first, *rest = value.split("\n")
         first_output = wrapper.wrap(first)
         wrapper.initial_indent = subsequent_indent
-        rest_output = sum([wrapper.wrap(line) if line else ["\n"] for line in rest], [])
+        rest_output = sum([wrapper.wrap(line) if line else [""] for line in rest], [])
         output = "\n".join(first_output + rest_output)
         if output != "":
             return output
