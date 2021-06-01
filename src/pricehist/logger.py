@@ -4,7 +4,7 @@ import sys
 
 class Formatter(logging.Formatter):
     def format(self, record):
-        message = record.msg % record.args
+        message = record.msg % record.args if record.args else record.msg
         if record.levelno == logging.INFO:
             return message
         else:
