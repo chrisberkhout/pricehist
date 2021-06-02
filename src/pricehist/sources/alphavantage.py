@@ -1,5 +1,6 @@
 import csv
 import dataclasses
+from datetime import datetime, timedelta
 import json
 import logging
 import os
@@ -137,7 +138,7 @@ class AlphaVantage(BaseSource):
         params = {
             "function": "TIME_SERIES_DAILY_ADJUSTED",
             "symbol": series.base,
-            "outputsize": "full",
+            "outputsize": self._outputsize(series.start),
             "apikey": self._apikey(),
         }
         response = self.log_curl(requests.get(self.QUERY_URL, params=params))
@@ -159,7 +160,7 @@ class AlphaVantage(BaseSource):
             "function": "FX_DAILY",
             "from_symbol": series.base,
             "to_symbol": series.quote,
-            "outputsize": "full",
+            "outputsize": self._outputsize(series.start),
             "apikey": self._apikey(),
         }
         response = self.log_curl(requests.get(self.QUERY_URL, params=params))
@@ -169,6 +170,13 @@ class AlphaVantage(BaseSource):
             for day, entries in reversed(data["Time Series FX (Daily)"].items())
         }
         return normalized_data
+
+    def _outputsize(self, start):
+        almost_100_days_ago = (datetime.now().date() - timedelta(days=95)).isoformat()
+        if start < almost_100_days_ago:
+            return "full"
+        else:
+            return "compact"
 
     def _digital_data(self, series):
         params = {
