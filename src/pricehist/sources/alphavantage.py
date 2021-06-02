@@ -47,7 +47,11 @@ class AlphaVantage(BaseSource):
             "will list all digital and physical currency symbols.\n"
             "The PAIR for stocks is the stock symbol only. The quote currency "
             f"will be determined automatically. {self._stock_symbols_message()}\n"
-            "The price type 'adjclose' is only available for stocks."
+            "The price type 'adjclose' is only available for stocks.\n"
+            "Alpha Vantage's standard API call frequency limits is 5 calls per "
+            "minute and 500 per day, so you may need to pause between successive "
+            "commands. Note that retrieving prices for one stock requires two "
+            "calls."
         )
 
     def _stock_symbols_message(self):
