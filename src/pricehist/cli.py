@@ -32,6 +32,9 @@ def cli(args=None, output_file=sys.stdout):
         elif args.command == "source" and args.symbols:
             result = sources.by_id[args.source].format_symbols()
             print(result, file=output_file, end="")
+        elif args.command == "source" and args.search:
+            result = sources.by_id[args.source].format_search(args.search)
+            print(result, file=output_file, end="")
         elif args.command == "source":
             total_width = shutil.get_terminal_size().columns
             result = sources.by_id[args.source].format_info(total_width)
@@ -133,7 +136,7 @@ def build_parser():
     source_parser = subparsers.add_parser(
         "source",
         help="show source details",
-        usage="pricehist source SOURCE [-h] [-s]",
+        usage="pricehist source SOURCE [-h] [-s | --search QUERY]",
         formatter_class=formatter,
     )
     source_parser.add_argument(
@@ -143,11 +146,19 @@ def build_parser():
         choices=sources.by_id.keys(),
         help="the source identifier",
     )
-    source_parser.add_argument(
+
+    source_list_or_search = source_parser.add_mutually_exclusive_group(required=False)
+    source_list_or_search.add_argument(
         "-s",
         "--symbols",
         action="store_true",
         help="list available symbols",
+    )
+    source_list_or_search.add_argument(
+        "--search",
+        metavar="QUERY",
+        type=str,
+        help="search for symbols, if possible",
     )
 
     fetch_parser = subparsers.add_parser(

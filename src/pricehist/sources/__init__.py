@@ -1,10 +1,12 @@
+from .alphavantage import AlphaVantage
 from .coindesk import CoinDesk
 from .coinmarketcap import CoinMarketCap
 from .ecb import ECB
 from .yahoo import Yahoo
 
 by_id = {
-    source.id(): source for source in [CoinDesk(), CoinMarketCap(), ECB(), Yahoo()]
+    source.id(): source
+    for source in [AlphaVantage(), CoinDesk(), CoinMarketCap(), ECB(), Yahoo()]
 }
 
 

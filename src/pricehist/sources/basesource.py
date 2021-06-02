@@ -40,6 +40,9 @@ class BaseSource(ABC):
     def symbols(self) -> list[(str, str)]:
         pass
 
+    def search(self, query) -> list[(str, str)]:
+        pass
+
     @abstractmethod
     def fetch(self, series: Series) -> Series:
         pass
@@ -54,6 +57,15 @@ class BaseSource(ABC):
         width = max([len(sym) for sym, desc in symbols] + [0])
         lines = [sym.ljust(width + 4) + desc + "\n" for sym, desc in symbols]
         return "".join(lines)
+
+    def format_search(self, query) -> str:
+        if (symbols := self.search(query)) is None:
+            logging.error(f"Symbol search is not possible for the {self.id()} source.")
+            exit(1)
+        else:
+            width = max([len(sym) for sym, desc in symbols] + [0])
+            lines = [sym.ljust(width + 4) + desc + "\n" for sym, desc in symbols]
+            return "".join(lines)
 
     def format_info(self, total_width=80) -> str:
         k_width = 11

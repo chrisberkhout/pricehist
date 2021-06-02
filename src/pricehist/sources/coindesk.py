@@ -18,7 +18,7 @@ class CoinDesk(BaseSource):
 
     def description(self):
         return (
-            "An average of bitcoin prices across leading global exchanges. \n"
+            "An average of Bitcoin prices across leading global exchanges. \n"
             "Powered by CoinDesk, https://www.coindesk.com/price/bitcoin"
         )
 
