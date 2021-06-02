@@ -96,10 +96,10 @@ pricehist fetch ecb EUR/AUD -s 2021-01-01 -o gnucash-sql | psql -U username -d d
 
 ## Design choices
 
-To keep things simple, `pricehist` provides only univariate time series of
-daily historical prices. It doesn't provide other types of market, financial or
-economic data, real-time prices, or other temporal resolutions. Multiple or
-multivariate series require multiple invocations.
+To keep things simple, at least for now, `pricehist` provides only univariate
+time series of daily historical prices. It doesn't provide other types of
+market, financial or economic data, real-time prices, or other temporal
+resolutions. Multiple or multivariate series require multiple invocations.
 
 ## Alternatives
 
