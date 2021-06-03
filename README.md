@@ -5,10 +5,10 @@ support for multiple data sources and output formats.
 
 ## Installation
 
-Install via [pip](https://packaging.python.org/tutorials/installing-packages/#use-pip-for-installing):
+Install via [pipx](https://pypa.github.io/pipx/):
 
 ```bash
-pip install pricehist
+pipx install pricehist
 ```
 
 ## Sources
@@ -34,8 +34,7 @@ Show usage information:
 pricehist -h
 ```
 ```
-usage: pricehist [-h] [--version] [--verbose | --debug]
-                 {sources,source,fetch} ...
+usage: pricehist [-h] [--version] [--verbose] {sources,source,fetch} ...
 
 Fetch historical price data
 
@@ -51,7 +50,7 @@ commands:
     fetch                 fetch prices
 ```
 
-Fetch prices after 2021-01-04, ending 2020-01-15, as CSV:
+Fetch prices after 2021-01-04, ending 2021-01-15, as CSV:
 
 ```bash
 pricehist fetch ecb EUR/AUD -sx 2021-01-04 -e 2021-01-15 -o csv
@@ -72,7 +71,7 @@ date,base,quote,amount,source,type
 In Ledger format:
 
 ```bash
-pricehist fetch ecb EUR/AUD -s 2021-01-01 -o ledger
+pricehist fetch ecb EUR/AUD -s 2021-01-01 -o ledger | head
 ```
 ```
 P 2021-01-04 00:00:00 EUR 1.5928 AUD

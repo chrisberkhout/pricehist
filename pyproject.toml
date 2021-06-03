@@ -1,9 +1,16 @@
 [tool.poetry]
 name = "pricehist"
 version = "0.1.0"
-description = "Fetch and process historical price data"
+description = "Fetch and format historical price data"
 authors = ["Chris Berkhout <chris@chrisberkhout.com>"]
 license = "MIT"
+keywords = ["historical", "prices", "plaintext", "accounting", "csv", "gnucash", "ledger", "hledger", "beancount"]
+readme = "README.md"
+homepage = "https://gitlab.com/chrisberkhout/pricehist"
+repository = "https://gitlab.com/chrisberkhout/pricehist"
+include = [
+    "LICENSE",
+]
 
 [tool.poetry.dependencies]
 python = "^3.9"
