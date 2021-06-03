@@ -42,11 +42,16 @@ def cli(args=None, output_file=sys.stdout):
         elif args.command == "fetch":
             source = sources.by_id[args.source]
             output = outputs.by_type[args.output]
+            if args.start:
+                start = args.start
+            else:
+                start = source.start()
+                logging.info(f"Using the source default start date of {start}.")
             series = Series(
                 base=args.pair[0],
                 quote=args.pair[1],
                 type=args.type or (source.types() + ["(none)"])[0],
-                start=args.start or source.start(),
+                start=start,
                 end=args.end,
             )
             if series.type not in source.types():
