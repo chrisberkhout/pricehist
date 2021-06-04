@@ -1,4 +1,4 @@
--- Created by pricehist v{version} at {timestamp}
+-- Created by pricehist {version} at {timestamp}
 
 BEGIN;
 

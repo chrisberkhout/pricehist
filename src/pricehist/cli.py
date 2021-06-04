@@ -25,7 +25,7 @@ def cli(args=None, output_file=sys.stdout):
 
     try:
         if args.version:
-            print(f"pricehist v{__version__}", file=output_file)
+            print(f"pricehist {__version__}", file=output_file)
         elif args.command == "sources":
             result = sources.formatted()
             print(result, file=output_file)
