@@ -1,5 +1,5 @@
 import logging
-from datetime import datetime
+from datetime import datetime, date, timedelta
 
 
 def fetch(series, source, output, invert: bool, quantize: int, fmt) -> str:
@@ -16,11 +16,16 @@ def fetch(series, source, output, invert: bool, quantize: int, fmt) -> str:
     else:
         first = series.prices[0].date
         last = series.prices[-1].date
-        if series.start < first or series.end > last:
-            logging.warn(
+        if first > series.start or last < series.end:
+            message = (
                 f"Available data covers the interval [{first}--{last}], "
                 f"{_cov_description(series.start, series.end, first, last)}."
             )
+            expected_end = _yesterday() if series.end == _today() else series.end
+            if first == series.start and last == expected_end:
+                logging.debug(message)  # Missing today's price is expected
+            else:
+                logging.warn(message)
 
     if invert:
         series = series.invert()
@@ -28,6 +33,14 @@ def fetch(series, source, output, invert: bool, quantize: int, fmt) -> str:
         series = series.quantize(quantize)
 
     return output.format(series, source, fmt=fmt)
+
+
+def _today():
+    return date.today().isoformat()
+
+
+def _yesterday():
+    return (date.today() - timedelta(days=1)).isoformat()
 
 
 def _cov_description(
