@@ -1,3 +1,43 @@
+"""
+GnuCash SQL output
+
+Support for the `GnuCash <https://www.gnucash.org/>`_ accounting program is
+achieved by generating SQL that can later be applied to a GnuCash database.
+
+This allows pricehist to support GnuCash with simple text output rather than by
+depending on GnuCash Python bindings or direct database interaction.
+
+The generated SQL can be run in SQLite, MariaDB/MySQL or PostgreSQL.
+
+Rows in GnuCash's prices table must include GUIDs for the related commodities.
+The generated SQL selects the relevant GUIDs by mnemonic from the commodities
+table and stores them in a temporary table. Another temprary table is populated
+with new price data and the two are joined to produce the new rows that are
+inserted into the prices table.
+
+Users need to ensure that the base and quote of the new prices already have
+commodities with matching mnemonics in the GnuCash database. If this condition
+is not met, the SQL will fail without making changes. The names of the base and
+quote can be adjusted with pricehist formatting options in case the source and
+GnuCash names don't already match. Other formatting options can adjust date
+formatting and the time of day used.
+
+Each row in the prices table has a GUID of its own. These are generated in
+pricehist by hashing the price data, so the same GUID will always be used for a
+given date, base, quote, source, type & amount. Existing GUIDs are skipped
+during the final insert into the prices table, so there's no problem with
+running one SQL file multiple times or running multiple SQL files with
+overlapping data.
+
+Warnings are generated when string escaping or number limit issues are detected
+and it should be easy for users to avoid those issues.
+
+Classes:
+
+    GnuCashSQL
+
+"""
+
 import hashlib
 import logging
 from datetime import datetime
@@ -109,7 +149,7 @@ class GnuCashSQL(BaseOutput):
             return f"{', '.join(strings[0:-1])} and {strings[-1]}"
 
     def _sql_str(self, s):
-        # Documentation regarding SQL string literals
+        # Documentation regarding SQL string literals:
         # - https://www.sqlite.org/lang_expr.html#literal_values_constants_
         # - https://mariadb.com/kb/en/string-literals/
         # - https://dev.mysql.com/doc/refman/8.0/en/string-literals.html
