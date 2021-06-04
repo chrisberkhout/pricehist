@@ -1,4 +1,5 @@
-""" ISO 4217 Currency data
+"""
+ISO 4217 Currency data
 
 Provides `ISO 4217 <https://www.iso.org/iso-4217-currency-codes.html>`_
 currency data in a ready-to-use format, indexed by currency code. Historical

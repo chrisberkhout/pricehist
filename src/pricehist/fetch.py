@@ -1,5 +1,5 @@
 import logging
-from datetime import datetime, date, timedelta
+from datetime import date, datetime, timedelta
 
 
 def fetch(series, source, output, invert: bool, quantize: int, fmt) -> str:
