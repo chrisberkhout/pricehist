@@ -51,10 +51,10 @@ from .baseoutput import BaseOutput
 
 
 class GnuCashSQL(BaseOutput):
-    def format(self, series, source=None, fmt=Format()):
+    def format(self, series, source, fmt=Format()):
         base = fmt.base or series.base
         quote = fmt.quote or series.quote
-        src = f"pricehist:{source.id()}"
+        src = source.id()
 
         self._warn_about_backslashes(
             {
@@ -150,10 +150,10 @@ class GnuCashSQL(BaseOutput):
 
     def _sql_str(self, s):
         # Documentation regarding SQL string literals:
-        # - https://www.sqlite.org/lang_expr.html#literal_values_constants_
-        # - https://mariadb.com/kb/en/string-literals/
-        # - https://dev.mysql.com/doc/refman/8.0/en/string-literals.html
-        # - https://www.postgresql.org/docs/devel/sql-syntax-lexical.html
+        # * https://www.sqlite.org/lang_expr.html#literal_values_constants_
+        # * https://mariadb.com/kb/en/string-literals/
+        # * https://dev.mysql.com/doc/refman/8.0/en/string-literals.html
+        # * https://www.postgresql.org/docs/devel/sql-syntax-lexical.html
         escaped = s.replace("'", "''")
         quoted = f"'{escaped}'"
         return quoted
