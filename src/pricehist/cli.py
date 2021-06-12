@@ -47,6 +47,11 @@ def cli(args=None, output_file=sys.stdout):
             else:
                 start = source.start()
                 logging.info(f"Using the source default start date of {start}.")
+            if args.end < start:
+                logging.critical(
+                    f"The end date '{args.end}' preceeds the start date '{start}'!"
+                )
+                sys.exit(1)
             series = Series(
                 base=args.pair[0],
                 quote=args.pair[1],
