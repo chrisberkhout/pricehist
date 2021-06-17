@@ -36,6 +36,9 @@ class BaseSource(ABC):
     def notes(self) -> str:
         pass
 
+    def normalizesymbol(self, str) -> str:
+        return str.upper()
+
     @abstractmethod
     def symbols(self) -> list[(str, str)]:
         pass

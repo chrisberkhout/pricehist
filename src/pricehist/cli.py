@@ -53,8 +53,8 @@ def cli(args=None, output_file=sys.stdout):
                 )
                 sys.exit(1)
             series = Series(
-                base=args.pair[0],
-                quote=args.pair[1],
+                base=source.normalizesymbol(args.pair[0]),
+                quote=source.normalizesymbol(args.pair[1]),
                 type=args.type or (source.types() + ["(none)"])[0],
                 start=start,
                 end=args.end,

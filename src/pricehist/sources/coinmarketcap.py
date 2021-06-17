@@ -55,7 +55,7 @@ class CoinMarketCap(BaseSource):
             amount = self._amount(next(iter(item["quote"].values())), series.type)
             prices.append(Price(d, amount))
 
-        output_base, output_quote = self._output_pair(series.base, series.quote)
+        output_base, output_quote = self._output_pair(series.base, series.quote, data)
 
         return dataclasses.replace(
             series, base=output_base, quote=output_quote, prices=prices
@@ -66,12 +66,12 @@ class CoinMarketCap(BaseSource):
 
         params = {}
 
-        if series.base.startswith("id="):
+        if series.base.startswith("ID="):
             params["id"] = series.base[3:]
         else:
             params["symbol"] = series.base
 
-        if series.quote.startswith("id="):
+        if series.quote.startswith("ID="):
             params["convert_id"] = series.quote[3:]
         else:
             params["convert"] = series.quote
@@ -95,12 +95,17 @@ class CoinMarketCap(BaseSource):
         else:
             return Decimal(str(data[type]))
 
-    def _output_pair(self, base, quote):
-        if base.startswith("id=") or quote.startswith("id="):
-            symbols = {i["id"]: (i["symbol"] or i["code"]) for i in self._symbol_data()}
+    def _output_pair(self, base, quote, data):
+        data_base = data["data"]["symbol"]
+        data_quote = next(iter(data["data"]["quotes"][0]["quote"].keys()))
 
-        output_base = symbols[int(base[3:])] if base.startswith("id=") else base
-        output_quote = symbols[int(quote[3:])] if quote.startswith("id=") else quote
+        lookup_quote = False
+        if quote.startswith("ID="):
+            symbols = {i["id"]: (i["symbol"] or i["code"]) for i in self._symbol_data()}
+            lookup_quote = symbols[int(quote[3:])]
+
+        output_base = data_base
+        output_quote = lookup_quote or data_quote
 
         return (output_base, output_quote)
 
