@@ -144,19 +144,19 @@ prices and addresses other workflow concerns in a Beancount-specific manner,
 generally requiring a Beancount file as input.
 
 The [Piecash](https://piecash.readthedocs.io/) library is a pythonic interface
-to GnuCash files stored in SQL. It has a
+to GnuCash files stored in SQL which has a
 [`Commodity.update_prices`](https://piecash.readthedocs.io/en/master/api/piecash.core.commodity.html?highlight=update_prices#piecash.core.commodity.Commodity.update_prices)
-method that can fetch historical prices.
-
+method for fetching historical prices.
 The GnuCash wiki documents [wrapper scripts](https://wiki.gnucash.org/wiki/Stocks/get_prices)
 for the [Finance::QuoteHist](https://metacpan.org/pod/Finance::QuoteHist) Perl
 module.
 
 Other projects with related goals include:
+
 * [`hledger-stockquotes`](https://github.com/prikhi/hledger-stockquotes):
-  A CLI addon for hledger that reads a journal file and pulls the historical prices for commodities from AlphaVantage.
+  A CLI addon for hledger that reads a journal file and pulls the historical prices for commodities.
 * [`ledger_get_prices`](https://github.com/nathankot/ledger-get-prices):
-  Uses Yahoo finance to intelligently generate a ledger price database based on your current ledger commodities and time period.
+  Uses Yahoo Finance to generate a price database based on your current Ledger commodities and time period.
 * [LedgerStockUpdate](https://github.com/adchari/LedgerStockUpdate):
   Locates any stocks you have in your ledger-cli file, then generates a price database of those stocks.
 * [`market-prices`](https://github.com/barrucadu/hledger-scripts#market-prices):
