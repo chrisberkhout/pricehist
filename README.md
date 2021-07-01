@@ -57,12 +57,10 @@ Show usage information for the `fetch` command:
 pricehist fetch -h
 ```
 ```
-usage: pricehist fetch SOURCE PAIR [-h] [-t TYPE] [-s DATE | -sx DATE]
-[-e DATE | -ex DATE] [-o beancount|csv|gnucash-sql|ledger] [--invert]
-[--quantize INT] [--fmt-base SYM] [--fmt-quote SYM] [--fmt-time TIME]
-[--fmt-decimal CHAR] [--fmt-thousands CHAR]
-[--fmt-symbol rightspace|right|leftspace|left] [--fmt-datesep CHAR]
-[--fmt-csvdelim CHAR]
+usage: pricehist fetch SOURCE PAIR [-h] [-t TYPE] [-s DATE | -sx DATE] [-e DATE | -ex DATE]
+[-o beancount|csv|gnucash-sql|ledger] [--invert] [--quantize INT]
+[--fmt-base SYM] [--fmt-quote SYM] [--fmt-time TIME] [--fmt-decimal CHAR] [--fmt-thousands CHAR]
+[--fmt-symbol rightspace|right|leftspace|left] [--fmt-datesep CHAR] [--fmt-csvdelim CHAR]
 
 positional arguments:
   SOURCE                   the source identifier
