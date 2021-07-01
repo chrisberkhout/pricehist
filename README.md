@@ -50,6 +50,43 @@ commands:
     fetch                 fetch prices
 ```
 
+Show usage information for the `fetch` command:
+
+```
+pricehist fetch -h
+```
+```
+usage: pricehist fetch SOURCE PAIR [-h] [-t TYPE] [-s DATE | -sx DATE]
+[-e DATE | -ex DATE] [-o beancount|csv|gnucash-sql|ledger] [--invert]
+[--quantize INT] [--fmt-base SYM] [--fmt-quote SYM] [--fmt-time TIME]
+[--fmt-decimal CHAR] [--fmt-thousands CHAR]
+[--fmt-symbol rightspace|right|leftspace|left] [--fmt-datesep CHAR]
+[--fmt-csvdelim CHAR]
+
+positional arguments:
+  SOURCE                   the source identifier
+  PAIR                     pair, usually BASE/QUOTE, e.g. BTC/USD
+
+optional arguments:
+  -h, --help               show this help message and exit
+  -t TYPE, --type TYPE     price type, e.g. close
+  -s DATE, --start DATE    start date, inclusive (default: source start)
+  -sx DATE, --startx DATE  start date, exclusive
+  -e DATE, --end DATE      end date, inclusive (default: today)
+  -ex DATE, --endx DATE    end date, exclusive
+  -o FMT, --output FMT     output format (default: csv)
+  --invert                 invert the price, swapping base and quote
+  --quantize INT           round to the given number of decimal places
+  --fmt-base SYM           rename the base symbol in output
+  --fmt-quote SYM          rename the quote symbol in output
+  --fmt-time TIME          set a particular time of day in output (default: 00:00:00)
+  --fmt-decimal CHAR       decimal point in output (default: '.')
+  --fmt-thousands CHAR     thousands separator in output (default: '')
+  --fmt-symbol LOCATION    commodity symbol placement in output (default: rightspace)
+  --fmt-datesep CHAR       date separator in output (default: '-')
+  --fmt-csvdelim CHAR      field delimiter for CSV output (default: ',')
+```
+
 Fetch prices after 2021-01-04, ending 2021-01-15, as CSV:
 
 ```bash
