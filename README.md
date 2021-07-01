@@ -5,7 +5,8 @@ support for multiple data sources and output formats.
 
 ## Installation
 
-Install via [pipx](https://pypa.github.io/pipx/):
+Install via [pip](https://pip.pypa.io/en/stable/) or
+[pipx](https://pypa.github.io/pipx/):
 
 ```bash
 pipx install pricehist
