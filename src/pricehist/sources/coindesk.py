@@ -1,5 +1,7 @@
 import dataclasses
 import json
+import logging
+import sys
 from decimal import Decimal
 
 import requests
@@ -45,6 +47,13 @@ class CoinDesk(BaseSource):
         ]
 
     def fetch(self, series):
+        if series.base != "BTC" or series.quote == "BTC":
+            # BTC is the only valid base. BTC as the quote will return BTC/USD.
+            logging.critical(
+                f"Invalid pair '{'/'.join([series.base, series.quote])}'. "
+                f"Run 'pricehist source {self.id()} --symbols' to list valid pairs."
+            )
+            sys.exit(1)
         data = self._data(series)
         prices = []
         for (d, v) in data["bpi"].items():

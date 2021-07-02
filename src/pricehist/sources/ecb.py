@@ -1,4 +1,6 @@
 import dataclasses
+import logging
+import sys
 from datetime import datetime, timedelta
 from decimal import Decimal
 
@@ -41,6 +43,12 @@ class ECB(BaseSource):
         return [(f"EUR/{c}", f"Euro against {iso[c].name}") for c in currencies]
 
     def fetch(self, series):
+        if series.base != "EUR":  # EUR is the only valid base.
+            logging.critical(
+                f"Invalid pair '{'/'.join([series.base, series.quote])}'. "
+                f"Run 'pricehist source {self.id()} --symbols' to list valid pairs."
+            )
+            sys.exit(1)
         almost_90_days_ago = (datetime.now().date() - timedelta(days=85)).isoformat()
         root = self._data(series.start < almost_90_days_ago)
 
