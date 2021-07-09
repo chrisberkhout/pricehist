@@ -10,45 +10,45 @@ from pricehist.series import Series
 class BaseSource(ABC):
     @abstractmethod
     def id(self) -> str:
-        pass
+        pass  # pragma: nocover
 
     @abstractmethod
     def name(self) -> str:
-        pass
+        pass  # pragma: nocover
 
     @abstractmethod
     def description(self) -> str:
-        pass
+        pass  # pragma: nocover
 
     @abstractmethod
     def source_url(self) -> str:
-        pass
+        pass  # pragma: nocover
 
     @abstractmethod
     def start(self) -> str:
-        pass
+        pass  # pragma: nocover
 
     @abstractmethod
     def types(self) -> list[str]:
-        pass
+        pass  # pragma: nocover
 
     @abstractmethod
     def notes(self) -> str:
-        pass
+        pass  # pragma: nocover
 
     def normalizesymbol(self, str) -> str:
         return str.upper()
 
     @abstractmethod
     def symbols(self) -> list[(str, str)]:
-        pass
+        pass  # pragma: nocover
 
     def search(self, query) -> list[(str, str)]:
-        pass
+        pass  # pragma: nocover
 
     @abstractmethod
     def fetch(self, series: Series) -> Series:
-        pass
+        pass  # pragma: nocover
 
     def log_curl(self, response):
         curl = curlify.to_curl(response.request, compressed=True)

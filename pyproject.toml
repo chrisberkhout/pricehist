@@ -24,6 +24,8 @@ pytest = "^6.2.2"
 black = "^20.8b1"
 flake8 = "^3.9.1"
 isort = "^5.8.0"
+responses = "^0.13.3"
+coverage = "^5.5"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
@@ -35,3 +37,8 @@ pricehist = "pricehist.cli:cli"
 [tool.isort]
 profile = "black"
 multi_line_output = 3
+
+[tool.pytest.ini_options]
+markers = [
+  "live: makes a live request to a source"
+]

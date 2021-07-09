@@ -10,5 +10,15 @@ format: ## Format source code
 	poetry run black .
 
 .PHONY: test
-test: ## Run tests
-	poetry run pytest
+test: ## Run non-live tests
+	poetry run pytest -m "not live" --color=yes
+
+.PHONY: test-live
+test-live: ## Run live tests
+	poetry run pytest -m live --color=yes
+
+.PHONY: coverage
+coverage: ## Generate and open coverage report
+	poetry run coverage run --source=pricehist -m pytest
+	poetry run coverage html
+	xdg-open htmlcov/index.html
