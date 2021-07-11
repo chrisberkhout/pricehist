@@ -4,11 +4,18 @@ import sys
 
 class Formatter(logging.Formatter):
     def format(self, record):
-        message = record.msg % record.args if record.args else record.msg
-        if record.levelno == logging.INFO:
-            return message
-        else:
-            return f"{record.levelname} {message}"
+        s = record.msg % record.args if record.args else record.msg
+
+        if record.exc_info:
+            record.exc_text = self.formatException(record.exc_info)
+            if s[-1:] != "\n":
+                s = s + "\n"
+            s = s + "\n".join([f"  {line}" for line in record.exc_text.splitlines()])
+
+        if record.levelno != logging.INFO:
+            s = "\n".join([f"{record.levelname} {line}" for line in s.splitlines()])
+
+        return s
 
 
 def init():

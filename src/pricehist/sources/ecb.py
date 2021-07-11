@@ -1,13 +1,11 @@
 import dataclasses
-import logging
-import sys
 from datetime import datetime, timedelta
 from decimal import Decimal
 
 import requests
 from lxml import etree
 
-from pricehist import isocurrencies
+from pricehist import exceptions, isocurrencies
 from pricehist.price import Price
 
 from .basesource import BaseSource
@@ -36,19 +34,17 @@ class ECB(BaseSource):
         return ""
 
     def symbols(self):
-        root = self._data(more_than_90_days=True)
-        nodes = root.cssselect("[currency]")
-        currencies = sorted(set([n.attrib["currency"] for n in nodes]))
+        quotes = self._quotes()
         iso = isocurrencies.by_code()
-        return [(f"EUR/{c}", f"Euro against {iso[c].name}") for c in currencies]
+        return [
+            (f"EUR/{c}", f"Euro against {iso[c].name if c in iso else c}")
+            for c in quotes
+        ]
 
     def fetch(self, series):
-        if series.base != "EUR":  # EUR is the only valid base.
-            logging.critical(
-                f"Invalid pair '{'/'.join([series.base, series.quote])}'. "
-                f"Run 'pricehist source {self.id()} --symbols' to list valid pairs."
-            )
-            sys.exit(1)
+        if series.base != "EUR" or not series.quote:  # EUR is the only valid base.
+            raise exceptions.InvalidPair(series.base, series.quote, self)
+
         almost_90_days_ago = (datetime.now().date() - timedelta(days=85)).isoformat()
         root = self._data(series.start < almost_90_days_ago)
 
@@ -58,11 +54,23 @@ class ECB(BaseSource):
             for row in day.cssselect(f"[currency='{series.quote}']"):
                 rate = Decimal(row.attrib["rate"])
                 all_rows.insert(0, (date, rate))
+
+        if not all_rows and series.quote not in self._quotes():
+            raise exceptions.InvalidPair(series.base, series.quote, self)
+
         selected = [
             Price(d, r) for d, r in all_rows if d >= series.start and d <= series.end
         ]
 
         return dataclasses.replace(series, prices=selected)
+
+    def _quotes(self):
+        root = self._data(more_than_90_days=True)
+        nodes = root.cssselect("[currency]")
+        quotes = sorted(set([n.attrib["currency"] for n in nodes]))
+        if not quotes:
+            raise exceptions.ResponseParsingError("Expected data not found")
+        return quotes
 
     def _data(self, more_than_90_days=False):
         url_base = "https://www.ecb.europa.eu/stats/eurofxref"
@@ -71,6 +79,19 @@ class ECB(BaseSource):
         else:
             source_url = f"{url_base}/eurofxref-hist-90d.xml"  # last 90 days
 
-        response = self.log_curl(requests.get(source_url))
-        root = etree.fromstring(response.content)
+        try:
+            response = self.log_curl(requests.get(source_url))
+        except Exception as e:
+            raise exceptions.RequestError(str(e)) from e
+
+        try:
+            response.raise_for_status()
+        except Exception as e:
+            raise exceptions.BadResponse(str(e)) from e
+
+        try:
+            root = etree.fromstring(response.content)
+        except Exception as e:
+            raise exceptions.ResponseParsingError(str(e)) from e
+
         return root
