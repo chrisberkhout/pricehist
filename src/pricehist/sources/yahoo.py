@@ -8,6 +8,7 @@ from decimal import Decimal
 import requests
 
 from pricehist.price import Price
+from pricehist import __version__
 
 from .basesource import BaseSource
 
@@ -62,6 +63,7 @@ class Yahoo(BaseSource):
         return []
 
     def fetch(self, series):
+        # TODO fail if quote isn't empty - yahoo symbols don't have a slash
         spark, history = self._data(series)
 
         output_quote = spark["spark"]["result"][0]["response"][0]["meta"]["currency"]
@@ -84,6 +86,7 @@ class Yahoo(BaseSource):
 
     def _data(self, series) -> (dict, csv.DictReader):
         base_url = "https://query1.finance.yahoo.com/v7/finance"
+        headers = {"User-Agent": f"pricehist/{__version__}"}
 
         spark_url = f"{base_url}/spark"
         spark_params = {
@@ -94,7 +97,9 @@ class Yahoo(BaseSource):
             "includeTimestamps": "false",
             "includePrePost": "false",
         }
-        spark_response = self.log_curl(requests.get(spark_url, params=spark_params))
+        spark_response = self.log_curl(
+            requests.get(spark_url, params=spark_params, headers=headers)
+        )
         spark = json.loads(spark_response.content)
 
         start_ts = int(datetime.strptime(series.start, "%Y-%m-%d").timestamp())
@@ -111,7 +116,7 @@ class Yahoo(BaseSource):
             "includeAdjustedClose": "true",
         }
         history_response = self.log_curl(
-            requests.get(history_url, params=history_params)
+            requests.get(history_url, params=history_params, headers=headers)
         )
         history_lines = history_response.content.decode("utf-8").splitlines()
         history_lines[0] = history_lines[0].lower().replace(" ", "")
