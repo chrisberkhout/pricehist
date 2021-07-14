@@ -36,6 +36,11 @@ def currencies_url():
 
 
 @pytest.fixture
+def fetch_url():
+    return "https://api.coindesk.com/v1/bpi/historical/close.json"
+
+
+@pytest.fixture
 def currencies_json():
     dir = Path(os.path.splitext(__file__)[0])
     return (dir / "supported-currencies-partial.json").read_text()
@@ -43,54 +48,29 @@ def currencies_json():
 
 @pytest.fixture
 def currencies_response_ok(requests_mock, currencies_url, currencies_json):
-    requests_mock.add(
-        responses.GET,
-        currencies_url,
-        body=currencies_json,
-        status=200,
-    )
+    requests_mock.add(responses.GET, currencies_url, body=currencies_json, status=200)
     yield requests_mock
 
 
 @pytest.fixture
-def recent_json():
-    dir = Path(os.path.splitext(__file__)[0])
-    return (dir / "recent.json").read_text()
-
-
-@pytest.fixture
-def recent_response_ok(requests_mock, recent_json):
-    requests_mock.add(
-        responses.GET,
-        "https://api.coindesk.com/v1/bpi/historical/close.json",
-        body=recent_json,
-        status=200,
-    )
+def recent_response_ok(requests_mock, fetch_url):
+    json = (Path(os.path.splitext(__file__)[0]) / "recent.json").read_text()
+    requests_mock.add(responses.GET, fetch_url, body=json, status=200)
     yield requests_mock
 
 
 @pytest.fixture
-def all_json():
-    dir = Path(os.path.splitext(__file__)[0])
-    return (dir / "all-partial.json").read_text()
-
-
-@pytest.fixture
-def all_response_ok(requests_mock, all_json):
-    requests_mock.add(
-        responses.GET,
-        "https://api.coindesk.com/v1/bpi/historical/close.json",
-        body=all_json,
-        status=200,
-    )
+def all_response_ok(requests_mock, fetch_url):
+    json = (Path(os.path.splitext(__file__)[0]) / "all-partial.json").read_text()
+    requests_mock.add(responses.GET, fetch_url, body=json, status=200)
     yield requests_mock
 
 
 @pytest.fixture
-def not_found_response(requests_mock):
+def not_found_response(requests_mock, fetch_url):
     requests_mock.add(
         responses.GET,
-        "https://api.coindesk.com/v1/bpi/historical/close.json",
+        fetch_url,
         status=404,
         body="Sorry, that currency was not found",
     )
@@ -139,12 +119,7 @@ def test_symbols_requests_logged(src, currencies_response_ok, caplog):
 
 
 def test_symbols_not_found(src, requests_mock, currencies_url):
-    requests_mock.add(
-        responses.GET,
-        currencies_url,
-        body="[]",
-        status=200,
-    )
+    requests_mock.add(responses.GET, currencies_url, body="[]", status=200)
     with pytest.raises(exceptions.ResponseParsingError) as e:
         src.symbols()
     assert "data not found" in str(e.value)
@@ -162,22 +137,14 @@ def test_symbols_network_issue(src, requests_mock, currencies_url):
 
 
 def test_symbols_bad_status(src, requests_mock, currencies_url):
-    requests_mock.add(
-        responses.GET,
-        currencies_url,
-        status=500,
-    )
+    requests_mock.add(responses.GET, currencies_url, status=500)
     with pytest.raises(exceptions.BadResponse) as e:
         src.symbols()
     assert "Server Error" in str(e.value)
 
 
 def test_symbols_parsing_error(src, requests_mock, currencies_url):
-    requests_mock.add(
-        responses.GET,
-        currencies_url,
-        body="NOT JSON",
-    )
+    requests_mock.add(responses.GET, currencies_url, body="NOT JSON")
     with pytest.raises(exceptions.ResponseParsingError) as e:
         src.symbols()
     assert "while parsing data" in str(e.value)
@@ -209,13 +176,9 @@ def test_fetch_long_hist_from_start(src, type, all_response_ok):
     assert len(series.prices) > 13
 
 
-def test_fetch_from_before_start(src, type, requests_mock):
-    requests_mock.add(
-        responses.GET,
-        "https://api.coindesk.com/v1/bpi/historical/close.json",
-        status=404,
-        body="Sorry, the CoinDesk BPI only covers data from 2010-07-17 onwards.",
-    )
+def test_fetch_from_before_start(src, type, requests_mock, fetch_url):
+    body = "Sorry, the CoinDesk BPI only covers data from 2010-07-17 onwards."
+    requests_mock.add(responses.GET, fetch_url, status=404, body=body)
     with pytest.raises(exceptions.BadResponse) as e:
         src.fetch(Series("BTC", "AUD", type, "2010-01-01", "2010-07-24"))
     assert "only covers data from" in str(e.value)
@@ -226,47 +189,31 @@ def test_fetch_to_future(src, type, all_response_ok):
     assert len(series.prices) > 0
 
 
-def test_wrong_dates_order(src, type, requests_mock):
-    requests_mock.add(
-        responses.GET,
-        "https://api.coindesk.com/v1/bpi/historical/close.json",
-        status=404,
-        body="Sorry, but your specified end date is before your start date.",
-    )
+def test_wrong_dates_order(src, type, requests_mock, fetch_url):
+    body = "Sorry, but your specified end date is before your start date."
+    requests_mock.add(responses.GET, fetch_url, status=404, body=body)
     with pytest.raises(exceptions.BadResponse) as e:
         src.fetch(Series("BTC", "AUD", type, "2021-01-07", "2021-01-01"))
     assert "End date is before start date." in str(e.value)
 
 
-def test_fetch_in_future(src, type, requests_mock):
-    requests_mock.add(
-        responses.GET,
-        "https://api.coindesk.com/v1/bpi/historical/close.json",
-        status=404,
-        body="Sorry, but your specified end date is before your start date.",
-    )
+def test_fetch_in_future(src, type, requests_mock, fetch_url):
+    body = "Sorry, but your specified end date is before your start date."
+    requests_mock.add(responses.GET, fetch_url, status=404, body=body)
     with pytest.raises(exceptions.BadResponse) as e:
         src.fetch(Series("BTC", "AUD", type, "2030-01-01", "2030-01-07"))
     assert "start date must be in the past" in str(e.value)
 
 
-def test_fetch_empty(src, type, requests_mock):
-    requests_mock.add(
-        responses.GET,
-        "https://api.coindesk.com/v1/bpi/historical/close.json",
-        body="{}",
-    )
+def test_fetch_empty(src, type, requests_mock, fetch_url):
+    requests_mock.add(responses.GET, fetch_url, body="{}")
     series = src.fetch(Series("BTC", "AUD", type, "2010-07-17", "2010-07-17"))
     assert len(series.prices) == 0
 
 
-def test_fetch_known_pair_no_data(src, type, requests_mock):
-    requests_mock.add(
-        responses.GET,
-        "https://api.coindesk.com/v1/bpi/historical/close.json",
-        status=500,
-        body="No results returned from database",
-    )
+def test_fetch_known_pair_no_data(src, type, requests_mock, fetch_url):
+    body = "No results returned from database"
+    requests_mock.add(responses.GET, fetch_url, status=500, body=body)
     with pytest.raises(exceptions.BadResponse) as e:
         src.fetch(Series("BTC", "CUP", type, "2010-07-17", "2010-07-23"))
     assert "No results returned from database" in str(e.value)
@@ -292,35 +239,23 @@ def test_fetch_unknown_pair(src, type):
         src.fetch(Series("ABC", "XZY", type, "2021-01-01", "2021-01-07"))
 
 
-def test_fetch_network_issue(src, type, requests_mock):
-    requests_mock.add(
-        responses.GET,
-        "https://api.coindesk.com/v1/bpi/historical/close.json",
-        body=requests.exceptions.ConnectionError("Network issue"),
-    )
+def test_fetch_network_issue(src, type, requests_mock, fetch_url):
+    body = requests.exceptions.ConnectionError("Network issue")
+    requests_mock.add(responses.GET, fetch_url, body=body)
     with pytest.raises(exceptions.RequestError) as e:
         src.fetch(Series("BTC", "AUD", type, "2021-01-01", "2021-01-07"))
     assert "Network issue" in str(e.value)
 
 
-def test_fetch_bad_status(src, type, requests_mock):
-    requests_mock.add(
-        responses.GET,
-        "https://api.coindesk.com/v1/bpi/historical/close.json",
-        status=500,
-        body="Some other reason",
-    )
+def test_fetch_bad_status(src, type, requests_mock, fetch_url):
+    requests_mock.add(responses.GET, fetch_url, status=500, body="Some other reason")
     with pytest.raises(exceptions.BadResponse) as e:
         src.fetch(Series("BTC", "AUD", type, "2021-01-01", "2021-01-07"))
     assert "Internal Server Error" in str(e.value)
 
 
-def test_fetch_parsing_error(src, type, requests_mock):
-    requests_mock.add(
-        responses.GET,
-        "https://api.coindesk.com/v1/bpi/historical/close.json",
-        body="NOT JSON",
-    )
+def test_fetch_parsing_error(src, type, requests_mock, fetch_url):
+    requests_mock.add(responses.GET, fetch_url, body="NOT JSON")
     with pytest.raises(exceptions.ResponseParsingError) as e:
         src.fetch(Series("BTC", "AUD", type, "2021-01-01", "2021-01-07"))
     assert "while parsing data" in str(e.value)

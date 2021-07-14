@@ -25,15 +25,19 @@ def type(src):
 
 
 @pytest.fixture
-def xml():
-    dir = Path(os.path.splitext(__file__)[0])
-    return (dir / "eurofxref-hist-partial.xml").read_text()
+def url():
+    return "https://www.ecb.europa.eu/stats/eurofxref/eurofxref-hist.xml"
 
 
 @pytest.fixture
-def empty_xml():
+def url_90d():
+    return "https://www.ecb.europa.eu/stats/eurofxref/eurofxref-hist-90d.xml"
+
+
+@pytest.fixture
+def xml():
     dir = Path(os.path.splitext(__file__)[0])
-    return (dir / "eurofxref-hist-empty.xml").read_text()
+    return (dir / "eurofxref-hist-partial.xml").read_text()
 
 
 @pytest.fixture
@@ -43,35 +47,23 @@ def requests_mock():
 
 
 @pytest.fixture
-def response_ok(requests_mock, xml):
-    requests_mock.add(
-        responses.GET,
-        "https://www.ecb.europa.eu/stats/eurofxref/eurofxref-hist.xml",
-        body=xml,
-        status=200,
-    )
+def response_ok(requests_mock, url, xml):
+    requests_mock.add(responses.GET, url, body=xml, status=200)
     yield requests_mock
 
 
 @pytest.fixture
-def response_ok_90d(requests_mock, xml):
-    requests_mock.add(
-        responses.GET,
-        "https://www.ecb.europa.eu/stats/eurofxref/eurofxref-hist-90d.xml",
-        body=xml,
-        status=200,
-    )
+def response_ok_90d(requests_mock, url_90d, xml):
+    requests_mock.add(responses.GET, url_90d, body=xml, status=200)
     yield requests_mock
 
 
 @pytest.fixture
-def response_empty_xml(requests_mock, empty_xml):
-    requests_mock.add(
-        responses.GET,
-        "https://www.ecb.europa.eu/stats/eurofxref/eurofxref-hist.xml",
-        body=empty_xml,
-        status=200,
-    )
+def response_empty_xml(requests_mock, url):
+    empty_xml = (
+        Path(os.path.splitext(__file__)[0]) / "eurofxref-hist-empty.xml"
+    ).read_text()
+    requests_mock.add(responses.GET, url, body=empty_xml, status=200)
     yield requests_mock
 
 
@@ -198,34 +190,23 @@ def test_fetch_unknown_pair(src, type):
         src.fetch(Series("ABC", "XZY", type, "2021-01-04", "2021-01-08"))
 
 
-def test_fetch_network_issue(src, type, requests_mock):
-    requests_mock.add(
-        responses.GET,
-        "https://www.ecb.europa.eu/stats/eurofxref/eurofxref-hist.xml",
-        body=requests.exceptions.ConnectionError("Network issue"),
-    )
+def test_fetch_network_issue(src, type, requests_mock, url):
+    err = requests.exceptions.ConnectionError("Network issue")
+    requests_mock.add(responses.GET, url, body=err)
     with pytest.raises(exceptions.RequestError) as e:
         src.fetch(Series("EUR", "AUD", type, "2021-01-04", "2021-01-08"))
     assert "Network issue" in str(e.value)
 
 
-def test_fetch_bad_status(src, type, requests_mock):
-    requests_mock.add(
-        responses.GET,
-        "https://www.ecb.europa.eu/stats/eurofxref/eurofxref-hist.xml",
-        status=500,
-    )
+def test_fetch_bad_status(src, type, requests_mock, url):
+    requests_mock.add(responses.GET, url, status=500)
     with pytest.raises(exceptions.BadResponse) as e:
         src.fetch(Series("EUR", "AUD", type, "2021-01-04", "2021-01-08"))
     assert "Server Error" in str(e.value)
 
 
-def test_fetch_parsing_error(src, type, requests_mock):
-    requests_mock.add(
-        responses.GET,
-        "https://www.ecb.europa.eu/stats/eurofxref/eurofxref-hist.xml",
-        body="NOT XML",
-    )
+def test_fetch_parsing_error(src, type, requests_mock, url):
+    requests_mock.add(responses.GET, url, body="NOT XML")
     with pytest.raises(exceptions.ResponseParsingError) as e:
         src.fetch(Series("EUR", "AUD", type, "2021-01-04", "2021-01-08"))
     assert "while parsing data" in str(e.value)
