@@ -7,8 +7,8 @@ from decimal import Decimal
 
 import requests
 
-from pricehist.price import Price
 from pricehist import __version__
+from pricehist.price import Price
 
 from .basesource import BaseSource
 

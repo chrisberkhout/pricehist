@@ -4,8 +4,8 @@ from decimal import Decimal
 
 import requests
 
-from pricehist.price import Price
 from pricehist import exceptions
+from pricehist.price import Price
 
 from .basesource import BaseSource
 
