@@ -14,12 +14,6 @@ from pricehist.series import Series
 from pricehist.sources.ecb import ECB
 
 
-def in_log(caplog, levelname, substr):
-    return any(
-        [levelname == r.levelname and substr in r.message for r in caplog.records]
-    )
-
-
 @pytest.fixture
 def src():
     return ECB()
@@ -115,10 +109,12 @@ def test_symbols(src, response_ok):
     assert len(syms) > 40
 
 
-def test_requests_logged_for_symbols(src, response_ok, caplog):
+def test_symbols_requests_logged_for(src, response_ok, caplog):
     with caplog.at_level(logging.DEBUG):
         src.symbols()
-    assert in_log(caplog, "DEBUG", " curl ")
+    assert any(
+        ["DEBUG" == r.levelname and " curl " in r.message for r in caplog.records]
+    )
 
 
 def test_symbols_not_in_iso_data(src, response_ok, monkeypatch):
@@ -135,20 +131,22 @@ def test_symbols_not_found(src, response_empty_xml):
     assert "data not found" in str(e.value)
 
 
-def test_known_pair(src, type, response_ok):
+def test_fetch_known_pair(src, type, response_ok):
     series = src.fetch(Series("EUR", "AUD", type, "2021-01-04", "2021-01-08"))
     assert series.prices[0] == Price("2021-01-04", Decimal("1.5928"))
     assert series.prices[-1] == Price("2021-01-08", Decimal("1.5758"))
     assert len(series.prices) == 5
 
 
-def test_requests_logged_for_fetch(src, response_ok, caplog):
+def test_fetch_requests_logged(src, response_ok, caplog):
     with caplog.at_level(logging.DEBUG):
         src.fetch(Series("EUR", "AUD", type, "2021-01-04", "2021-01-08"))
-    assert in_log(caplog, "DEBUG", " curl ")
+    assert any(
+        ["DEBUG" == r.levelname and " curl " in r.message for r in caplog.records]
+    )
 
 
-def test_recent_interval_uses_90d_data(src, type, response_ok_90d):
+def test_fetch_recent_interval_uses_90d_data(src, type, response_ok_90d):
     today = datetime.now().date()
     start = (today - timedelta(days=80)).isoformat()
     end = today.isoformat()
@@ -156,51 +154,51 @@ def test_recent_interval_uses_90d_data(src, type, response_ok_90d):
     assert len(response_ok_90d.calls) > 0
 
 
-def test_long_hist_from_start(src, type, response_ok):
+def test_fetch_long_hist_from_start(src, type, response_ok):
     series = src.fetch(Series("EUR", "AUD", type, src.start(), "2021-01-08"))
     assert series.prices[0] == Price("1999-01-04", Decimal("1.91"))
     assert series.prices[-1] == Price("2021-01-08", Decimal("1.5758"))
     assert len(series.prices) > 9
 
 
-def test_from_before_start(src, type, response_ok):
+def test_fetch_from_before_start(src, type, response_ok):
     series = src.fetch(Series("EUR", "AUD", type, "1998-12-01", "1999-01-10"))
     assert series.prices[0] == Price("1999-01-04", Decimal("1.91"))
     assert series.prices[-1] == Price("1999-01-08", Decimal("1.8406"))
     assert len(series.prices) == 5
 
 
-def test_to_future(src, type, response_ok):
+def test_fetch_to_future(src, type, response_ok):
     series = src.fetch(Series("EUR", "AUD", type, "2021-01-04", "2100-01-01"))
     assert len(series.prices) > 0
 
 
-def test_known_pair_no_data(src, type, response_ok):
+def test_fetch_known_pair_no_data(src, type, response_ok):
     series = src.fetch(Series("EUR", "ROL", type, "2021-01-04", "2021-02-08"))
     assert len(series.prices) == 0
 
 
-def test_non_eur_base(src, type):
+def test_fetch_non_eur_base(src, type):
     with pytest.raises(exceptions.InvalidPair):
         src.fetch(Series("USD", "AUD", type, "2021-01-04", "2021-01-08"))
 
 
-def test_unknown_quote(src, type, response_ok):
+def test_fetch_unknown_quote(src, type, response_ok):
     with pytest.raises(exceptions.InvalidPair):
         src.fetch(Series("EUR", "XZY", type, "2021-01-04", "2021-01-08"))
 
 
-def test_no_quote(src, type):
+def test_fetch_no_quote(src, type):
     with pytest.raises(exceptions.InvalidPair):
         src.fetch(Series("EUR", "", type, "2021-01-04", "2021-01-08"))
 
 
-def test_unknown_pair(src, type):
+def test_fetch_unknown_pair(src, type):
     with pytest.raises(exceptions.InvalidPair):
         src.fetch(Series("ABC", "XZY", type, "2021-01-04", "2021-01-08"))
 
 
-def test_network_issue(src, type, requests_mock):
+def test_fetch_network_issue(src, type, requests_mock):
     requests_mock.add(
         responses.GET,
         "https://www.ecb.europa.eu/stats/eurofxref/eurofxref-hist.xml",
@@ -211,7 +209,7 @@ def test_network_issue(src, type, requests_mock):
     assert "Network issue" in str(e.value)
 
 
-def test_bad_status(src, type, requests_mock):
+def test_fetch_bad_status(src, type, requests_mock):
     requests_mock.add(
         responses.GET,
         "https://www.ecb.europa.eu/stats/eurofxref/eurofxref-hist.xml",
@@ -222,7 +220,7 @@ def test_bad_status(src, type, requests_mock):
     assert "Server Error" in str(e.value)
 
 
-def test_parsing_error(src, type, requests_mock):
+def test_fetch_parsing_error(src, type, requests_mock):
     requests_mock.add(
         responses.GET,
         "https://www.ecb.europa.eu/stats/eurofxref/eurofxref-hist.xml",
