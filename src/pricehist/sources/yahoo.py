@@ -2,7 +2,7 @@ import csv
 import dataclasses
 import json
 import logging
-from datetime import datetime
+from datetime import datetime, timezone
 from decimal import Decimal
 
 import requests
@@ -102,8 +102,16 @@ class Yahoo(BaseSource):
         )
         spark = json.loads(spark_response.content)
 
-        start_ts = int(datetime.strptime(series.start, "%Y-%m-%d").timestamp())
-        end_ts = int(datetime.strptime(series.end, "%Y-%m-%d").timestamp()) + (
+        start_ts = int(
+            datetime.strptime(series.start, "%Y-%m-%d")
+            .replace(tzinfo=timezone.utc)
+            .timestamp()
+        )
+        end_ts = int(
+            datetime.strptime(series.end, "%Y-%m-%d")
+            .replace(tzinfo=timezone.utc)
+            .timestamp()
+        ) + (
             24 * 60 * 60
         )  # round up to include the last day
 

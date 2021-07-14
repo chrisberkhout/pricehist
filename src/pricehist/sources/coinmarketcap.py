@@ -1,6 +1,6 @@
 import dataclasses
 import json
-from datetime import datetime
+from datetime import datetime, timezone
 from decimal import Decimal
 
 import requests
@@ -77,10 +77,19 @@ class CoinMarketCap(BaseSource):
             params["convert"] = series.quote
 
         params["time_start"] = int(
-            int(datetime.strptime(series.start, "%Y-%m-%d").timestamp())
+            int(
+                datetime.strptime(series.start, "%Y-%m-%d")
+                .replace(tzinfo=timezone.utc)
+                .timestamp()
+            )
         )
         params["time_end"] = (
-            int(datetime.strptime(series.end, "%Y-%m-%d").timestamp()) + 24 * 60 * 60
+            int(
+                datetime.strptime(series.end, "%Y-%m-%d")
+                .replace(tzinfo=timezone.utc)
+                .timestamp()
+            )
+            + 24 * 60 * 60
         )  # round up to include the last day
 
         response = self.log_curl(requests.get(url, params=params))
