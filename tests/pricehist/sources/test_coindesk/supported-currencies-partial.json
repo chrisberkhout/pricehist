@@ -1,0 +1,26 @@
+[
+  {
+    "currency": "AUD",
+    "country": "Australian Dollar"
+  },
+  {
+    "currency": "BTC",
+    "country": "Bitcoin"
+  },
+  {
+    "currency": "CUP",
+    "country": "Cuban Peso"
+  },
+  {
+    "currency": "EUR",
+    "country": "Euro"
+  },
+  {
+    "currency": "USD",
+    "country": "United States Dollar"
+  },
+  {
+    "currency": "XBT",
+    "country": "Bitcoin"
+  }
+]
