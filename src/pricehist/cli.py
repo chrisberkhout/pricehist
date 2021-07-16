@@ -130,6 +130,7 @@ def build_parser():
     )
 
     parser.add_argument(
+        "-vvv",
         "--verbose",
         action="store_true",
         help="show all log messages",
@@ -137,10 +138,16 @@ def build_parser():
 
     subparsers = parser.add_subparsers(title="commands", dest="command")
 
-    subparsers.add_parser(
+    sources_parser = subparsers.add_parser(
         "sources",
         help="list sources",
         formatter_class=formatter,
+    )
+    sources_parser.add_argument(
+        "-vvv",
+        "--verbose",
+        action="store_true",
+        help="show all log messages",
     )
 
     source_parser = subparsers.add_parser(
@@ -155,6 +162,12 @@ def build_parser():
         type=str,
         choices=sources.by_id.keys(),
         help="the source identifier",
+    )
+    source_parser.add_argument(
+        "-vvv",
+        "--verbose",
+        action="store_true",
+        help="show all log messages",
     )
 
     source_list_or_search = source_parser.add_mutually_exclusive_group(required=False)
@@ -177,7 +190,7 @@ def build_parser():
         usage=(
             # Set usage manually to have positional arguments before options
             # and show allowed values where appropriate
-            "pricehist fetch SOURCE PAIR [-h] "
+            "pricehist fetch SOURCE PAIR [-h] [-vvv] "
             "[-t TYPE] [-s DATE | -sx DATE] [-e DATE | -ex DATE] "
             f"[-o {'|'.join(outputs.by_type.keys())}] "
             "[--invert] [--quantize INT] "
@@ -200,6 +213,12 @@ def build_parser():
         metavar="PAIR",
         type=valid_pair,
         help="pair, usually BASE/QUOTE, e.g. BTC/USD",
+    )
+    fetch_parser.add_argument(
+        "-vvv",
+        "--verbose",
+        action="store_true",
+        help="show all log messages",
     )
     fetch_parser.add_argument(
         "-t",
