@@ -5,6 +5,7 @@ from decimal import Decimal
 
 import requests
 
+from pricehist import exceptions
 from pricehist.price import Price
 
 from .basesource import BaseSource
@@ -47,10 +48,13 @@ class CoinMarketCap(BaseSource):
         return list(zip(ids, descriptions))
 
     def fetch(self, series):
+        if series.base == "ID=" or not series.quote or series.quote == "ID=":
+            raise exceptions.InvalidPair(series.base, series.quote, self)
+
         data = self._data(series)
 
         prices = []
-        for item in data["data"]["quotes"]:
+        for item in data.get("quotes", []):
             d = item["time_open"][0:10]
             amount = self._amount(next(iter(item["quote"].values())), series.type)
             prices.append(Price(d, amount))
@@ -82,19 +86,73 @@ class CoinMarketCap(BaseSource):
                 .replace(tzinfo=timezone.utc)
                 .timestamp()
             )
+            - 24 * 60 * 60
+            # Start one period earlier since the start is exclusive.
         )
-        params["time_end"] = (
-            int(
-                datetime.strptime(series.end, "%Y-%m-%d")
-                .replace(tzinfo=timezone.utc)
-                .timestamp()
+        params["time_end"] = int(
+            datetime.strptime(series.end, "%Y-%m-%d")
+            .replace(tzinfo=timezone.utc)
+            .timestamp()
+        )  # Don't round up since it's inclusive of the period covering the end time.
+
+        try:
+            response = self.log_curl(requests.get(url, params=params))
+        except Exception as e:
+            raise exceptions.RequestError(str(e)) from e
+
+        code = response.status_code
+        text = response.text
+
+        if code == 400 and "No items found." in text:
+            raise exceptions.InvalidPair(
+                series.base, series.quote, self, "Bad base ID."
             )
-            + 24 * 60 * 60
-        )  # round up to include the last day
 
-        response = self.log_curl(requests.get(url, params=params))
+        elif code == 400 and 'Invalid value for \\"convert_id\\"' in text:
+            raise exceptions.InvalidPair(
+                series.base, series.quote, self, "Bad quote ID."
+            )
 
-        return json.loads(response.content)
+        elif code == 400 and 'Invalid value for \\"convert\\"' in text:
+            raise exceptions.InvalidPair(
+                series.base, series.quote, self, "Bad quote symbol."
+            )
+
+        elif code == 400 and "must be older than" in text:
+            if series.start <= series.end:
+                raise exceptions.BadResponse("The start date must be in the past.")
+            else:
+                raise exceptions.BadResponse(
+                    "The start date must preceed or match the end date."
+                )
+
+        elif (
+            code == 400
+            and "must be a valid ISO 8601 timestamp or unix time" in text
+            and series.start < "2001-09-11"
+        ):
+            raise exceptions.BadResponse("The start date can't preceed 2001-09-11.")
+
+        try:
+            response.raise_for_status()
+        except Exception as e:
+            raise exceptions.BadResponse(str(e)) from e
+
+        try:
+            parsed = json.loads(response.content)
+        except Exception as e:
+            raise exceptions.ResponseParsingError(str(e)) from e
+
+        if type(parsed) != dict or "data" not in parsed:
+            raise exceptions.ResponseParsingError("Unexpected content.")
+
+        elif len(parsed["data"]) == 0:
+            raise exceptions.ResponseParsingError(
+                "The data section was empty. This can happen when the quote "
+                "currency symbol can't be found, and potentially for other reasons."
+            )
+
+        return parsed["data"]
 
     def _amount(self, data, type):
         if type in ["mid"]:
@@ -105,26 +163,52 @@ class CoinMarketCap(BaseSource):
             return Decimal(str(data[type]))
 
     def _output_pair(self, base, quote, data):
-        data_base = data["data"]["symbol"]
-        data_quote = next(iter(data["data"]["quotes"][0]["quote"].keys()))
+        data_base = data["symbol"]
 
-        lookup_quote = False
+        data_quote = None
+        if len(data["quotes"]) > 0:
+            data_quote = next(iter(data["quotes"][0]["quote"].keys()))
+
+        lookup_quote = None
         if quote.startswith("ID="):
             symbols = {i["id"]: (i["symbol"] or i["code"]) for i in self._symbol_data()}
             lookup_quote = symbols[int(quote[3:])]
 
         output_base = data_base
-        output_quote = lookup_quote or data_quote
+        output_quote = lookup_quote or data_quote or quote
 
         return (output_base, output_quote)
 
     def _symbol_data(self):
-        fiat_url = "https://web-api.coinmarketcap.com/v1/fiat/map?include_metals=true"
-        fiat_res = self.log_curl(requests.get(fiat_url))
-        fiat = json.loads(fiat_res.content)
-        crypto_url = (
-            "https://web-api.coinmarketcap.com/v1/cryptocurrency/map?sort=cmc_rank"
-        )
-        crypto_res = self.log_curl(requests.get(crypto_url))
-        crypto = json.loads(crypto_res.content)
-        return crypto["data"] + fiat["data"]
+        base_url = "https://web-api.coinmarketcap.com/v1/"
+        fiat_url = f"{base_url}fiat/map?include_metals=true"
+        crypto_url = f"{base_url}cryptocurrency/map?sort=cmc_rank"
+
+        fiat = self._get_json_data(fiat_url)
+        crypto = self._get_json_data(crypto_url)
+
+        return crypto + fiat
+
+    def _get_json_data(self, url, params={}):
+        try:
+            response = self.log_curl(requests.get(url, params=params))
+        except Exception as e:
+            raise exceptions.RequestError(str(e)) from e
+
+        try:
+            response.raise_for_status()
+        except Exception as e:
+            raise exceptions.BadResponse(str(e)) from e
+
+        try:
+            parsed = json.loads(response.content)
+        except Exception as e:
+            raise exceptions.ResponseParsingError(str(e)) from e
+
+        if type(parsed) != dict or "data" not in parsed:
+            raise exceptions.ResponseParsingError("Unexpected content.")
+
+        elif len(parsed["data"]) == 0:
+            raise exceptions.ResponseParsingError("Empty data section.")
+
+        return parsed["data"]

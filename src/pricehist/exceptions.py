@@ -5,17 +5,19 @@ class SourceError(Exception):
 class InvalidPair(SourceError, ValueError):
     """An invalid pair was requested."""
 
-    def __init__(self, base, quote, source):
+    def __init__(self, base, quote, source, message=None):
         self.base = base
         self.quote = quote
         self.source = source
         pair = "/".join([base, quote])
-        message = (
-            f"Invalid pair '{pair}'. "
+        insert = message + " " if message else ""
+
+        full_message = (
+            f"Invalid pair '{pair}'. {insert}"
             f"Run 'pricehist source {source.id()} --symbols' "
             f"for information about valid pairs."
         )
-        super(InvalidPair, self).__init__(message)
+        super(InvalidPair, self).__init__(full_message)
 
 
 class InvalidType(SourceError, ValueError):
