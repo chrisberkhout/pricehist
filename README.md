@@ -35,14 +35,14 @@ Show usage information:
 pricehist -h
 ```
 ```
-usage: pricehist [-h] [--version] [--verbose] {sources,source,fetch} ...
+usage: pricehist [-h] [--version] [-vvv] {sources,source,fetch} ...
 
 Fetch historical price data
 
 optional arguments:
   -h, --help              show this help message and exit
   --version               show version information
-  --verbose               show all log messages
+  -vvv, --verbose         show all log messages
 
 commands:
   {sources,source,fetch}
@@ -57,7 +57,7 @@ Show usage information for the `fetch` command:
 pricehist fetch -h
 ```
 ```
-usage: pricehist fetch SOURCE PAIR [-h] [-t TYPE] [-s DATE | -sx DATE] [-e DATE | -ex DATE]
+usage: pricehist fetch SOURCE PAIR [-h] [-vvv] [-t TYPE] [-s DATE | -sx DATE] [-e DATE | -ex DATE]
 [-o beancount|csv|gnucash-sql|ledger] [--invert] [--quantize INT]
 [--fmt-base SYM] [--fmt-quote SYM] [--fmt-time TIME] [--fmt-decimal CHAR] [--fmt-thousands CHAR]
 [--fmt-symbol rightspace|right|leftspace|left] [--fmt-datesep CHAR] [--fmt-csvdelim CHAR]
@@ -68,6 +68,7 @@ positional arguments:
 
 optional arguments:
   -h, --help               show this help message and exit
+  -vvv, --verbose          show all log messages
   -t TYPE, --type TYPE     price type, e.g. close
   -s DATE, --start DATE    start date, inclusive (default: source start)
   -sx DATE, --startx DATE  start date, exclusive
