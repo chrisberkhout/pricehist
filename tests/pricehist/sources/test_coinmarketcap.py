@@ -201,6 +201,13 @@ def test_symbols_crypto_parsing_error(src, requests_mock, fiat_ok):
     assert "while parsing data" in str(e.value)
 
 
+def test_symbols_no_data(src, type, requests_mock):
+    requests_mock.add(responses.GET, fiat_url, body='{"data": []}')
+    with pytest.raises(exceptions.ResponseParsingError) as e:
+        src.symbols()
+    assert "Empty data section" in str(e.value)
+
+
 def test_fetch_known_pair_id_id(src, type, recent_id_id_ok, crypto_ok, fiat_ok):
     series = src.fetch(Series("ID=1", "ID=2782", type, "2021-01-01", "2021-01-07"))
     req = recent_id_id_ok.calls[0].request
@@ -323,6 +330,23 @@ def test_fetch_in_future(src, type, requests_mock):
     assert "start date must be in the past" in str(e.value)
 
 
+def test_fetch_reversed_dates(src, type, requests_mock):
+    requests_mock.add(
+        responses.GET,
+        fetch_url,
+        status=400,
+        body="""{
+            "status": {
+                "error_code": 400,
+                "error_message": "\\"time_start\\" must be older than \\"time_end\\"."
+            }
+        }""",
+    )
+    with pytest.raises(exceptions.BadResponse) as e:
+        src.fetch(Series("BTC", "AUD", type, "2021-01-07", "2021-01-01"))
+    assert "start date must preceed or match the end" in str(e.value)
+
+
 def test_fetch_empty(src, type, requests_mock):
     requests_mock.add(
         responses.GET,
@@ -428,3 +452,10 @@ def test_fetch_parsing_error(src, type, requests_mock):
     with pytest.raises(exceptions.ResponseParsingError) as e:
         src.fetch(Series("BTC", "AUD", type, "2021-01-01", "2021-01-07"))
     assert "while parsing data" in str(e.value)
+
+
+def test_fetch_unexpected_json(src, type, requests_mock):
+    requests_mock.add(responses.GET, fetch_url, body='{"notdata": []}')
+    with pytest.raises(exceptions.ResponseParsingError) as e:
+        src.fetch(Series("BTC", "AUD", type, "2021-01-01", "2021-01-07"))
+    assert "Unexpected content" in str(e.value)
