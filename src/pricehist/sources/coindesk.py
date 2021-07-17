@@ -105,7 +105,7 @@ class CoinDesk(BaseSource):
             raise exceptions.BadResponse(
                 "No results returned from database. This can happen when data "
                 "for a valid quote currency (e.g. CUP) doesn't go all the way "
-                "back to the start date, or potentially for other reasons."
+                "back to the start date, and potentially for other reasons."
             )
         else:
             try:
