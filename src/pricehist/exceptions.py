@@ -9,7 +9,7 @@ class InvalidPair(SourceError, ValueError):
         self.base = base
         self.quote = quote
         self.source = source
-        pair = "/".join([base, quote])
+        pair = "/".join([s for s in [base, quote] if s])
         insert = message + " " if message else ""
 
         full_message = (
@@ -25,7 +25,7 @@ class InvalidType(SourceError, ValueError):
 
     def __init__(self, type, base, quote, source):
         self.type = type
-        self.pair = "/".join([base, quote])
+        self.pair = "/".join([s for s in [base, quote] if s])
         message = (
             f"Invalid price type '{type}' for pair '{self.pair}'. "
             f"Run 'pricehist source {source.id()} "
