@@ -1,0 +1,81 @@
+{
+  "Meta Data": {
+    "1. Information": "Daily Time Series with Splits and Dividend Events",
+    "2. Symbol": "IBM",
+    "3. Last Refreshed": "2021-07-20",
+    "4. Output Size": "Full size",
+    "5. Time Zone": "US/Eastern"
+  },
+  "Time Series (Daily)": {
+    "2021-01-11": {
+      "1. open": "127.95",
+      "2. high": "129.675",
+      "3. low": "127.66",
+      "4. close": "128.58",
+      "5. adjusted close": "125.471469081",
+      "6. volume": "5602466",
+      "7. dividend amount": "0.0000",
+      "8. split coefficient": "1.0"
+    },
+    "2021-01-08": {
+      "1. open": "128.57",
+      "2. high": "129.32",
+      "3. low": "126.98",
+      "4. close": "128.53",
+      "5. adjusted close": "125.422677873",
+      "6. volume": "4676487",
+      "7. dividend amount": "0.0000",
+      "8. split coefficient": "1.0"
+    },
+    "2021-01-07": {
+      "1. open": "130.04",
+      "2. high": "130.46",
+      "3. low": "128.26",
+      "4. close": "128.99",
+      "5. adjusted close": "125.871556982",
+      "6. volume": "4507382",
+      "7. dividend amount": "0.0000",
+      "8. split coefficient": "1.0"
+    },
+    "2021-01-06": {
+      "1. open": "126.9",
+      "2. high": "131.88",
+      "3. low": "126.72",
+      "4. close": "129.29",
+      "5. adjusted close": "126.164304226",
+      "6. volume": "7956740",
+      "7. dividend amount": "0.0000",
+      "8. split coefficient": "1.0"
+    },
+    "2021-01-05": {
+      "1. open": "125.01",
+      "2. high": "126.68",
+      "3. low": "124.61",
+      "4. close": "126.14",
+      "5. adjusted close": "123.090458157",
+      "6. volume": "6114619",
+      "7. dividend amount": "0.0000",
+      "8. split coefficient": "1.0"
+    },
+    "2021-01-04": {
+      "1. open": "125.85",
+      "2. high": "125.9174",
+      "3. low": "123.04",
+      "4. close": "123.94",
+      "5. adjusted close": "120.943645029",
+      "6. volume": "5179161",
+      "7. dividend amount": "0.0000",
+      "8. split coefficient": "1.0"
+    },
+    "2020-12-31": {
+      "1. open": "124.22",
+      "2. high": "126.03",
+      "3. low": "123.99",
+      "4. close": "125.88",
+      "5. adjusted close": "122.836743878",
+      "6. volume": "3574696",
+      "7. dividend amount": "0.0000",
+      "8. split coefficient": "1.0"
+    }
+  }
+}

@@ -8,6 +8,7 @@ from decimal import Decimal
 
 import requests
 
+from pricehist import exceptions
 from pricehist.price import Price
 
 from .basesource import BaseSource
@@ -85,19 +86,37 @@ class AlphaVantage(BaseSource):
         output_quote = series.quote
 
         if series.quote == "":
-            output_quote = self._stock_currency(output_base)
-            data = self._stock_data(series)
+            output_quote, data = self._stock_data(series)
         else:
             if series.type == "adjclose":
-                logging.critical(
-                    "The 'adjclose' price type is only available for stocks. "
-                    "Use 'close' instead."
+                raise exceptions.InvalidType(
+                    series.type, series.base, series.quote, self
                 )
-                exit(1)
-            elif series.base in [s for s, n in self._physical_symbols()]:
+
+            physical_symbols = [s for s, n in self._physical_symbols()]
+
+            if series.quote not in physical_symbols:
+                raise exceptions.InvalidPair(
+                    series.base,
+                    series.quote,
+                    self,
+                    "When given, the quote must be a physical currency.",
+                )
+
+            if series.base in physical_symbols:
                 data = self._physical_data(series)
-            else:
+
+            elif series.base in [s for s, n in self._digital_symbols()]:
                 data = self._digital_data(series)
+
+            else:
+                raise exceptions.InvalidPair(
+                    series.base,
+                    series.quote,
+                    self,
+                    "When a quote currency is given, the base must be a known "
+                    "physical or digital currency.",
+                )
 
         prices = [
             Price(day, amount)
@@ -112,7 +131,7 @@ class AlphaVantage(BaseSource):
     def _amount(self, day, entries, series):
         if day < series.start or day > series.end:
             return None
-        elif type == "mid":
+        elif series.type == "mid":
             return sum([Decimal(entries["high"]), Decimal(entries["low"])]) / 2
         else:
             return Decimal(entries[series.type])
@@ -122,7 +141,7 @@ class AlphaVantage(BaseSource):
         for match in data["bestMatches"]:
             if match["1. symbol"] == symbol:
                 return match["8. currency"]
-        return "Unknown"
+        return None
 
     def _search_data(self, keywords: str):
         params = {
@@ -130,30 +149,87 @@ class AlphaVantage(BaseSource):
             "keywords": keywords,
             "apikey": self._apikey(),
         }
-        response = self.log_curl(requests.get(self.QUERY_URL, params=params))
-        data = json.loads(response.content)
+
+        try:
+            response = self.log_curl(requests.get(self.QUERY_URL, params=params))
+        except Exception as e:
+            raise exceptions.RequestError(str(e)) from e
+
+        try:
+            response.raise_for_status()
+        except Exception as e:
+            raise exceptions.BadResponse(str(e)) from e
+
+        try:
+            data = json.loads(response.content)
+        except Exception as e:
+            raise exceptions.ResponseParsingError(str(e)) from e
+
+        if type(data) == dict and "Note" in data and "call frequency" in data["Note"]:
+            raise exceptions.RateLimit(data["Note"])
+
+        expected_keys = ["1. symbol", "2. name", "3. type", "4. region", "8. currency"]
+        if (
+            type(data) != dict
+            or "bestMatches" not in data
+            or type(data["bestMatches"]) != list
+            or not all(k in m for k in expected_keys for m in data["bestMatches"])
+        ):
+            raise exceptions.ResponseParsingError("Unexpected content.")
+
         return data
 
     def _stock_data(self, series):
+        output_quote = self._stock_currency(series.base) or "UNKNOWN"
+
         params = {
             "function": "TIME_SERIES_DAILY_ADJUSTED",
             "symbol": series.base,
             "outputsize": self._outputsize(series.start),
             "apikey": self._apikey(),
         }
-        response = self.log_curl(requests.get(self.QUERY_URL, params=params))
-        data = json.loads(response.content)
-        normalized_data = {
-            day: {
-                "open": entries["1. open"],
-                "high": entries["2. high"],
-                "low": entries["3. low"],
-                "close": entries["4. close"],
-                "adjclose": entries["5. adjusted close"],
+
+        try:
+            response = self.log_curl(requests.get(self.QUERY_URL, params=params))
+        except Exception as e:
+            raise exceptions.RequestError(str(e)) from e
+
+        try:
+            response.raise_for_status()
+        except Exception as e:
+            raise exceptions.BadResponse(str(e)) from e
+
+        try:
+            data = json.loads(response.content)
+        except Exception as e:
+            raise exceptions.ResponseParsingError(str(e)) from e
+
+        if type(data) == dict and "Note" in data and "call frequency" in data["Note"]:
+            raise exceptions.RateLimit(data["Note"])
+
+        if "Error Message" in data:
+            if output_quote == "UNKNOWN":
+                raise exceptions.InvalidPair(
+                    series.base, series.quote, self, "Unknown stock symbol."
+                )
+            else:
+                raise exceptions.BadResponse(data["Error Message"])
+
+        try:
+            normalized_data = {
+                day: {
+                    "open": entries["1. open"],
+                    "high": entries["2. high"],
+                    "low": entries["3. low"],
+                    "close": entries["4. close"],
+                    "adjclose": entries["5. adjusted close"],
+                }
+                for day, entries in reversed(data["Time Series (Daily)"].items())
             }
-            for day, entries in reversed(data["Time Series (Daily)"].items())
-        }
-        return normalized_data
+        except Exception as e:
+            raise exceptions.ResponseParsingError("Unexpected content.") from e
+
+        return output_quote, normalized_data
 
     def _physical_data(self, series):
         params = {
@@ -163,8 +239,28 @@ class AlphaVantage(BaseSource):
             "outputsize": self._outputsize(series.start),
             "apikey": self._apikey(),
         }
-        response = self.log_curl(requests.get(self.QUERY_URL, params=params))
-        data = json.loads(response.content)
+
+        try:
+            response = self.log_curl(requests.get(self.QUERY_URL, params=params))
+        except Exception as e:
+            raise exceptions.RequestError(str(e)) from e
+
+        try:
+            response.raise_for_status()
+        except Exception as e:
+            raise exceptions.BadResponse(str(e)) from e
+
+        try:
+            data = json.loads(response.content)
+        except Exception as e:
+            raise exceptions.ResponseParsingError(str(e)) from e
+
+        if type(data) == dict and "Note" in data and "call frequency" in data["Note"]:
+            raise exceptions.RateLimit(data["Note"])
+
+        if type(data) != dict or "Time Series FX (Daily)" not in data:
+            raise exceptions.ResponseParsingError("Unexpected content.")
+
         normalized_data = {
             day: {k[3:]: v for k, v in entries.items()}
             for day, entries in reversed(data["Time Series FX (Daily)"].items())
@@ -185,8 +281,28 @@ class AlphaVantage(BaseSource):
             "market": series.quote,
             "apikey": self._apikey(),
         }
-        response = self.log_curl(requests.get(self.QUERY_URL, params=params))
-        data = json.loads(response.content)
+
+        try:
+            response = self.log_curl(requests.get(self.QUERY_URL, params=params))
+        except Exception as e:
+            raise exceptions.RequestError(str(e)) from e
+
+        try:
+            response.raise_for_status()
+        except Exception as e:
+            raise exceptions.BadResponse(str(e)) from e
+
+        try:
+            data = json.loads(response.content)
+        except Exception as e:
+            raise exceptions.ResponseParsingError(str(e)) from e
+
+        if type(data) == dict and "Note" in data and "call frequency" in data["Note"]:
+            raise exceptions.RateLimit(data["Note"])
+
+        if type(data) != dict or "Time Series (Digital Currency Daily)" not in data:
+            raise exceptions.ResponseParsingError("Unexpected content.")
+
         normalized_data = {
             day: {
                 "open": entries[f"1a. open ({series.quote})"],
@@ -204,24 +320,36 @@ class AlphaVantage(BaseSource):
         key_name = "ALPHAVANTAGE_API_KEY"
         key = os.getenv(key_name)
         if require and not key:
-            logging.critical(
-                f"The environment variable {key_name} is empty. "
-                "Get a free API key from https://www.alphavantage.co/support/#api-key, "
-                f'export {key_name}="YOUR_OWN_API_KEY" and retry.'
-            )
-            exit(1)
+            raise exceptions.CredentialsError([key_name], self)
         return key
 
     def _physical_symbols(self) -> list[(str, str)]:
         url = "https://www.alphavantage.co/physical_currency_list/"
-        response = self.log_curl(requests.get(url))
-        lines = response.content.decode("utf-8").splitlines()
-        data = csv.reader(lines[1:], delimiter=",")
-        return [(s, f"Physical: {n}") for s, n in data]
+        return self._get_symbols(url, "Physical: ")
 
     def _digital_symbols(self) -> list[(str, str)]:
         url = "https://www.alphavantage.co/digital_currency_list/"
-        response = self.log_curl(requests.get(url))
-        lines = response.content.decode("utf-8").splitlines()
-        data = csv.reader(lines[1:], delimiter=",")
-        return [(s, f"Digital: {n}") for s, n in data]
+        return self._get_symbols(url, "Digital: ")
+
+    def _get_symbols(self, url, prefix) -> list[(str, str)]:
+        try:
+            response = self.log_curl(requests.get(url))
+        except Exception as e:
+            raise exceptions.RequestError(str(e)) from e
+
+        try:
+            response.raise_for_status()
+        except Exception as e:
+            raise exceptions.BadResponse(str(e)) from e
+
+        try:
+            lines = response.content.decode("utf-8").splitlines()
+            data = csv.reader(lines[1:], delimiter=",")
+            results = [(s, f"{prefix}{n}") for s, n in data]
+        except Exception as e:
+            raise exceptions.ResponseParsingError(str(e)) from e
+
+        if len(results) == 0:
+            raise exceptions.ResponseParsingError("Symbols data missing.")
+
+        return results

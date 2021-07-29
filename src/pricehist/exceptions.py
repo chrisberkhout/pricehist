@@ -28,10 +28,32 @@ class InvalidType(SourceError, ValueError):
         self.pair = "/".join([s for s in [base, quote] if s])
         message = (
             f"Invalid price type '{type}' for pair '{self.pair}'. "
-            f"Run 'pricehist source {source.id()} "
+            f"Run 'pricehist source {source.id()}' "
             f"for information about valid types."
         )
-        super(InvalidPair, self).__init__(message)
+        super(InvalidType, self).__init__(message)
+
+
+class CredentialsError(SourceError):
+    """Access credentials are unavailable or invalid."""
+
+    def __init__(self, keys, source):
+        self.keys = keys
+        self.source = source
+        message = (
+            f"Access credentials for source '{source.id()}' are unavailable "
+            f"""or invalid. Set the environment variables '{"', '".join(keys)}' """
+            f"correctly. Run 'pricehist source {source.id()}' for more "
+            f"information about credentials."
+        )
+        super(CredentialsError, self).__init__(message)
+
+
+class RateLimit(SourceError):
+    """Source request rate limit reached."""
+
+    def __init__(self, message):
+        super(RateLimit, self).__init__(f"{self.__doc__} {message}")
 
 
 class RequestError(SourceError):
