@@ -1,0 +1,23 @@
+image: python:latest
+
+variables:
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+  POETRY_CACHE_DIR: "$CI_PROJECT_DIR/.cache/poetry"
+
+cache:
+  paths:
+    - .cache/pip
+    - .cache/poetry
+
+before_script:
+  - python -V
+  - pip install poetry
+  - poetry install
+
+test:
+  script:
+    - poetry run isort --check
+    - poetry run black --check
+    - poetry run pytest
+    - poetry run coverage run --source=pricehist -m pytest
+    - poetry run coverage report
