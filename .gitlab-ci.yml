@@ -16,8 +16,8 @@ before_script:
 
 test:
   script:
-    - poetry run isort . --check
-    - poetry run black . --check
+    - poetry run isort src tests --check
+    - poetry run black src tests --check
     - poetry run pytest
     - poetry run coverage run --source=pricehist -m pytest
     - poetry run coverage report
