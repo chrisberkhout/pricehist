@@ -90,13 +90,11 @@ def _parse(entry):
     except (IndexError, ValueError):
         minor_units = None
 
-    name_tags = entry.cssselect("CcyNm")
-    if name_tags:
+    name = None
+    is_fund = None
+    if name_tags := entry.cssselect("CcyNm"):
         name = name_tags[0].text
         is_fund = name_tags[0].attrib.get("IsFund", "").upper() in ["TRUE", "WAHR"]
-    else:
-        name = None
-        is_fund = None
 
     countries = [t.text for t in entry.cssselect("CtryNm")]
 
