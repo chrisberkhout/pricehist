@@ -1,5 +1,4 @@
 import logging
-import sys
 from datetime import date, datetime, timedelta
 
 from pricehist import exceptions
@@ -12,12 +11,8 @@ def fetch(series, source, output, invert: bool, quantize: int, fmt) -> str:
             f"source start date of {source.start()}."
         )
 
-    try:
+    with exceptions.handler():
         series = source.fetch(series)
-    except exceptions.SourceError as e:
-        logging.debug("Critical exception encountered", exc_info=e)
-        logging.critical(str(e))
-        sys.exit(1)
 
     if len(series.prices) == 0:
         logging.warn(f"No data found for the interval [{series.start}--{series.end}].")

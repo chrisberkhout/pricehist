@@ -1,3 +1,18 @@
+import logging
+import sys
+from contextlib import contextmanager
+
+
+@contextmanager
+def handler():
+    try:
+        yield
+    except SourceError as e:
+        logging.debug("Critical exception encountered", exc_info=e)
+        logging.critical(str(e))
+        sys.exit(1)
+
+
 class SourceError(Exception):
     """Base exception for errors rased by sources"""
 

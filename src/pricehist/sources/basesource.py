@@ -1,9 +1,11 @@
 import logging
+import sys
 from abc import ABC, abstractmethod
 from textwrap import TextWrapper
 
 import curlify
 
+from pricehist import exceptions
 from pricehist.series import Series
 
 
@@ -56,13 +58,18 @@ class BaseSource(ABC):
         return response
 
     def format_symbols(self) -> str:
-        symbols = self.symbols()
+        with exceptions.handler():
+            symbols = self.symbols()
+
         width = max([len(sym) for sym, desc in symbols] + [0])
         lines = [sym.ljust(width + 4) + desc + "\n" for sym, desc in symbols]
         return "".join(lines)
 
     def format_search(self, query) -> str:
-        if (symbols := self.search(query)) is None:
+        with exceptions.handler():
+            symbols = self.search(query)
+
+        if symbols is None:
             logging.error(f"Symbol search is not possible for the {self.id()} source.")
             exit(1)
         elif symbols == []:
@@ -75,15 +82,18 @@ class BaseSource(ABC):
 
     def format_info(self, total_width=80) -> str:
         k_width = 11
-        parts = [
-            self._fmt_field("ID", self.id(), k_width, total_width),
-            self._fmt_field("Name", self.name(), k_width, total_width),
-            self._fmt_field("Description", self.description(), k_width, total_width),
-            self._fmt_field("URL", self.source_url(), k_width, total_width, False),
-            self._fmt_field("Start", self.start(), k_width, total_width),
-            self._fmt_field("Types", ", ".join(self.types()), k_width, total_width),
-            self._fmt_field("Notes", self.notes(), k_width, total_width),
-        ]
+        with exceptions.handler():
+            parts = [
+                self._fmt_field("ID", self.id(), k_width, total_width),
+                self._fmt_field("Name", self.name(), k_width, total_width),
+                self._fmt_field(
+                    "Description", self.description(), k_width, total_width
+                ),
+                self._fmt_field("URL", self.source_url(), k_width, total_width, False),
+                self._fmt_field("Start", self.start(), k_width, total_width),
+                self._fmt_field("Types", ", ".join(self.types()), k_width, total_width),
+                self._fmt_field("Notes", self.notes(), k_width, total_width),
+            ]
         return "\n".join(filter(None, parts))
 
     def _fmt_field(self, key, value, key_width, total_width, force=True):
