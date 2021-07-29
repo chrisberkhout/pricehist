@@ -65,6 +65,9 @@ class BaseSource(ABC):
         if (symbols := self.search(query)) is None:
             logging.error(f"Symbol search is not possible for the {self.id()} source.")
             exit(1)
+        elif symbols == []:
+            logging.info(f"No results found for query '{query}'.")
+            return ""
         else:
             width = max([len(sym) for sym, desc in symbols] + [0])
             lines = [sym.ljust(width + 4) + desc + "\n" for sym, desc in symbols]
