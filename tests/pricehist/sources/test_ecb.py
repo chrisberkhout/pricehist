@@ -105,7 +105,7 @@ def test_symbols_requests_logged_for(src, response_ok, caplog):
     with caplog.at_level(logging.DEBUG):
         src.symbols()
     assert any(
-        ["DEBUG" == r.levelname and " curl " in r.message for r in caplog.records]
+        ["DEBUG" == r.levelname and "curl " in r.message for r in caplog.records]
     )
 
 
@@ -134,7 +134,7 @@ def test_fetch_requests_logged(src, response_ok, caplog):
     with caplog.at_level(logging.DEBUG):
         src.fetch(Series("EUR", "AUD", type, "2021-01-04", "2021-01-08"))
     assert any(
-        ["DEBUG" == r.levelname and " curl " in r.message for r in caplog.records]
+        ["DEBUG" == r.levelname and "curl " in r.message for r in caplog.records]
     )
 
 

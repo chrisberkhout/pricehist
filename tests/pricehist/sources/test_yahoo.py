@@ -124,7 +124,7 @@ def test_fetch_requests_logged(src, type, spark_ok, recent_ok, caplog):
         src.fetch(Series("TSLA", "", type, "2021-01-04", "2021-01-08"))
     logged_requests = 0
     for r in caplog.records:
-        if r.levelname == "DEBUG" and " curl " in r.message:
+        if r.levelname == "DEBUG" and "curl " in r.message:
             logged_requests += 1
     assert logged_requests == 2
 

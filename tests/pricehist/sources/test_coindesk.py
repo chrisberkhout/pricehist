@@ -114,7 +114,7 @@ def test_symbols_requests_logged(src, currencies_response_ok, caplog):
     with caplog.at_level(logging.DEBUG):
         src.symbols()
     assert any(
-        ["DEBUG" == r.levelname and " curl " in r.message for r in caplog.records]
+        ["DEBUG" == r.levelname and "curl " in r.message for r in caplog.records]
     )
 
 
@@ -165,7 +165,7 @@ def test_fetch_requests_logged(src, type, recent_response_ok, caplog):
     with caplog.at_level(logging.DEBUG):
         src.fetch(Series("BTC", "AUD", type, "2021-01-01", "2021-01-07"))
     assert any(
-        ["DEBUG" == r.levelname and " curl " in r.message for r in caplog.records]
+        ["DEBUG" == r.levelname and "curl " in r.message for r in caplog.records]
     )
 
 

@@ -52,7 +52,7 @@ class BaseSource(ABC):
 
     def log_curl(self, response):
         curl = curlify.to_curl(response.request, compressed=True)
-        logging.debug(f"Request to {self.id()}: {curl}")
+        logging.debug(curl)
         return response
 
     def format_symbols(self) -> str:

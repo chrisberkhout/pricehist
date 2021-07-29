@@ -305,7 +305,7 @@ def test_fetch_stock_requests_logged(src, type, search_ok, ibm_ok, caplog):
         src.fetch(Series("IBM", "", type, "2021-01-04", "2021-01-08"))
     logged_requests = 0
     for r in caplog.records:
-        if r.levelname == "DEBUG" and " curl " in r.message:
+        if r.levelname == "DEBUG" and "curl " in r.message:
             logged_requests += 1
     assert logged_requests == 2
 
@@ -428,7 +428,7 @@ def test_fetch_physical_requests_logged(src, type, physical_list_ok, euraud_ok, 
         src.fetch(Series("EUR", "AUD", type, "2021-01-04", "2021-01-08"))
     logged_requests = 0
     for r in caplog.records:
-        if r.levelname == "DEBUG" and " curl " in r.message:
+        if r.levelname == "DEBUG" and "curl " in r.message:
             logged_requests += 1
     assert logged_requests == 2
 
@@ -527,7 +527,7 @@ def test_fetch_digital_requests_logged(
         src.fetch(Series("BTC", "AUD", type, "2021-01-04", "2021-01-08"))
     logged_requests = 0
     for r in caplog.records:
-        if r.levelname == "DEBUG" and " curl " in r.message:
+        if r.levelname == "DEBUG" and "curl " in r.message:
             logged_requests += 1
     assert logged_requests == 3
 
