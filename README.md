@@ -3,6 +3,12 @@
 A command-line tool for fetching and formatting historical price data, with
 support for multiple data sources and output formats.
 
+[![Pipeline status](https://gitlab.com/chrisberkhout/pricehist/badges/master/pipeline.svg)](https://gitlab.com/chrisberkhout/pricehist/-/commits/master)
+[![Coverage report](https://gitlab.com/chrisberkhout/pricehist/badges/master/coverage.svg)](https://gitlab.com/chrisberkhout/pricehist/-/commits/master)
+[![PyPI version](https://badge.fury.io/py/pricehist.svg)](https://badge.fury.io/py/pricehist)
+[![Downloads](https://pepy.tech/badge/pricehist)](https://pepy.tech/project/pricehist)
+[![License](https://img.shields.io/pypi/l/pricehist)](https://gitlab.com/chrisberkhout/pricehist/-/blob/master/LICENSE)
+
 ## Installation
 
 Install via [pip](https://pip.pypa.io/en/stable/) or
