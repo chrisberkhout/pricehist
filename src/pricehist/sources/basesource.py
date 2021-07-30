@@ -1,5 +1,4 @@
 import logging
-import sys
 from abc import ABC, abstractmethod
 from textwrap import TextWrapper
 

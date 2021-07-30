@@ -10,9 +10,11 @@ the Beancount format in mind.
 
 Relevant sections of the Beancount documentation:
 
-* `Commodities / Currencies <https://beancount.github.io/docs/beancount_language_syntax.html#commodities-currencies>`_
+* `Commodities / Currencies
+   <https://beancount.github.io/docs/beancount_language_syntax.html#commodities-currencies>`_
 * `Prices <https://beancount.github.io/docs/beancount_language_syntax.html#prices>`_
-* `Fetching Prices in Beancount <https://beancount.github.io/docs/fetching_prices_in_beancount.html>`_
+* `Fetching Prices in Beancount
+   <https://beancount.github.io/docs/fetching_prices_in_beancount.html>`_
 
 Classes:
 

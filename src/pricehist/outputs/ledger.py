@@ -11,8 +11,10 @@ format.
 
 Relevant sections of the Ledger manual:
 
-* `Commodities and Currencies <https://www.ledger-cli.org/3.0/doc/ledger3.html#Commodities-and-Currencies>`_
-* `Commoditized Amounts <https://www.ledger-cli.org/3.0/doc/ledger3.html#Commoditized-Amounts>`_
+* `Commodities and Currencies
+   <https://www.ledger-cli.org/3.0/doc/ledger3.html#Commodities-and-Currencies>`_
+* `Commoditized Amounts
+   <https://www.ledger-cli.org/3.0/doc/ledger3.html#Commoditized-Amounts>`_
 
 Relevant sections of the hledger manual:
 
