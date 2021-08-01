@@ -110,7 +110,7 @@ class GnuCashSQL(BaseOutput):
         if too_big:
             # https://code.gnucash.org/docs/MAINT/group__Numeric.html
             # https://code.gnucash.org/docs/MAINT/structgnc__price__s.html
-            logging.warn(
+            logging.warning(
                 "This SQL contains numbers outside of the int64 range required "
                 "by GnuCash for the numerators and denominators of prices. "
                 "Using the --quantize option to limit the number of decimal "
@@ -132,7 +132,7 @@ class GnuCashSQL(BaseOutput):
     def _warn_about_backslashes(self, fields):
         hits = [name for name, value in fields.items() if "\\" in value]
         if hits:
-            logging.warn(
+            logging.warning(
                 f"Before running this SQL, check the formatting of the "
                 f"{self._english_join(hits)} strings. "
                 f"SQLite treats backslahes in strings as plain characters, but "

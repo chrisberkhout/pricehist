@@ -6,7 +6,7 @@ from pricehist import exceptions
 
 def fetch(series, source, output, invert: bool, quantize: int, fmt) -> str:
     if series.start < source.start():
-        logging.warn(
+        logging.warning(
             f"The start date {series.start} preceeds the {source.name()} "
             f"source start date of {source.start()}."
         )
@@ -15,7 +15,9 @@ def fetch(series, source, output, invert: bool, quantize: int, fmt) -> str:
         series = source.fetch(series)
 
     if len(series.prices) == 0:
-        logging.warn(f"No data found for the interval [{series.start}--{series.end}].")
+        logging.warning(
+            f"No data found for the interval [{series.start}--{series.end}]."
+        )
     else:
         first = series.prices[0].date
         last = series.prices[-1].date
@@ -28,7 +30,7 @@ def fetch(series, source, output, invert: bool, quantize: int, fmt) -> str:
             if first == series.start and last == expected_end:
                 logging.debug(message)  # Missing today's price is expected
             else:
-                logging.warn(message)
+                logging.warning(message)
 
     if invert:
         series = series.invert()
