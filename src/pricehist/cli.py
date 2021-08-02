@@ -42,21 +42,16 @@ def cli(argv=sys.argv, output_file=sys.stdout):
         elif args.command == "fetch":
             source = sources.by_id[args.source]
             output = outputs.by_type[args.output]
-            if args.start:
-                start = args.start
-            else:
-                start = source.start()
-                logging.info(f"Using the source default start date of {start}.")
-            if args.end < start:
+            if args.end < args.start:
                 logging.critical(
-                    f"The end date '{args.end}' preceeds the start date '{start}'!"
+                    f"The end date '{args.end}' preceeds the start date '{args.start}'!"
                 )
                 sys.exit(1)
             series = Series(
                 base=source.normalizesymbol(args.pair[0]),
                 quote=source.normalizesymbol(args.pair[1]),
-                type=args.type or (source.types() + ["(none)"])[0],
-                start=start,
+                type=args.type,
+                start=args.start,
                 end=args.end,
             )
             if series.type not in source.types():
@@ -115,6 +110,15 @@ def build_parser():
 
     def formatter(prog):
         return argparse.HelpFormatter(prog, max_help_position=50)
+
+    class SetSourceDefaults(argparse.Action):
+        def __call__(self, parser, namespace, value, option_string=None):
+            source = sources.by_id[value]
+            setattr(namespace, self.dest, value)
+            if getattr(namespace, "type") is None:
+                setattr(namespace, "type", source.types()[0])
+            if getattr(namespace, "start") is None:
+                setattr(namespace, "start", source.start())
 
     default_fmt = Format()
     parser = argparse.ArgumentParser(
@@ -206,6 +210,7 @@ def build_parser():
         metavar="SOURCE",
         type=str,
         choices=sources.by_id.keys(),
+        action=SetSourceDefaults,
         help="the source identifier",
     )
     fetch_parser.add_argument(
@@ -226,7 +231,7 @@ def build_parser():
         dest="type",
         metavar="TYPE",
         type=str,
-        help="price type, e.g. close",
+        help="price type, e.g. close (default: first for source)",
     )
     fetch_start_group = fetch_parser.add_mutually_exclusive_group(required=False)
     fetch_start_group.add_argument(
