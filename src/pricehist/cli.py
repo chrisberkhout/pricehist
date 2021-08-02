@@ -69,43 +69,49 @@ def cli(argv=sys.argv, output_file=sys.stdout):
         logging.debug(f"Ended pricehist run at {datetime.now()}.")
 
 
+def valid_pair(s):
+    base, quote = (s + "/").split("/")[0:2]
+    if base == "":
+        msg = f"No base found in the requested pair '{s}'."
+        raise argparse.ArgumentTypeError(msg)
+    return (base, quote)
+
+
+def valid_date(s):
+    if s == "today":
+        return today()
+    try:
+        return datetime.strptime(s, "%Y-%m-%d").date().isoformat()
+    except ValueError:
+        msg = f"Not a valid YYYY-MM-DD date: '{s}'."
+        raise argparse.ArgumentTypeError(msg)
+
+
+def valid_date_before(s):
+    return (
+        datetime.strptime(valid_date(s), "%Y-%m-%d").date() - timedelta(days=1)
+    ).isoformat()
+
+
+def valid_date_after(s):
+    return (
+        datetime.strptime(valid_date(s), "%Y-%m-%d").date() + timedelta(days=1)
+    ).isoformat()
+
+
+def valid_char(s):
+    if len(s) == 1:
+        return s
+    else:
+        msg = f"Not a single character: '{s}'."
+        raise argparse.ArgumentTypeError(msg)
+
+
+def today():
+    return datetime.now().date().isoformat()
+
+
 def build_parser():
-    def valid_pair(s):
-        base, quote = (s + "/").split("/")[0:2]
-        if base == "":
-            msg = f"No base found in the requested pair '{s}'."
-            raise argparse.ArgumentTypeError(msg)
-        return (base, quote)
-
-    def valid_date(s):
-        if s == "today":
-            return today()
-        try:
-            return datetime.strptime(s, "%Y-%m-%d").date().isoformat()
-        except ValueError:
-            msg = f"Not a valid YYYY-MM-DD date: '{s}'."
-            raise argparse.ArgumentTypeError(msg)
-
-    def previous_valid_date(s):
-        return (
-            datetime.strptime(valid_date(s), "%Y-%m-%d").date() - timedelta(days=1)
-        ).isoformat()
-
-    def following_valid_date(s):
-        return (
-            datetime.strptime(valid_date(s), "%Y-%m-%d").date() + timedelta(days=1)
-        ).isoformat()
-
-    def today():
-        return datetime.now().date().isoformat()
-
-    def valid_char(s):
-        if len(s) == 1:
-            return s
-        else:
-            msg = f"Not a single character: '{s}'."
-            raise argparse.ArgumentTypeError(msg)
-
     def formatter(prog):
         return argparse.HelpFormatter(prog, max_help_position=50)
 
@@ -245,7 +251,7 @@ def build_parser():
         "--startx",
         dest="start",
         metavar="DATE",
-        type=following_valid_date,
+        type=valid_date_after,
         help="start date, exclusive",
     )
 
@@ -264,7 +270,7 @@ def build_parser():
         "--endx",
         dest="end",
         metavar="DATE",
-        type=previous_valid_date,
+        type=valid_date_before,
         help="end date, exclusive",
     )
 
