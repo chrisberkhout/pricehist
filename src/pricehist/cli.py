@@ -43,10 +43,14 @@ def cli(argv=sys.argv, output_file=sys.stdout):
             source = sources.by_id[args.source]
             output = outputs.by_type[args.output]
             if args.end < args.start:
-                logging.critical(
+                parser.error(
                     f"The end date '{args.end}' preceeds the start date '{args.start}'!"
                 )
-                sys.exit(1)
+            if args.type not in source.types():
+                parser.error(
+                    f"The requested price type '{args.type}' is not "
+                    f"recognized by the {source.id()} source!"
+                )
             series = Series(
                 base=source.normalizesymbol(args.pair[0]),
                 quote=source.normalizesymbol(args.pair[1]),
@@ -54,12 +58,6 @@ def cli(argv=sys.argv, output_file=sys.stdout):
                 start=args.start,
                 end=args.end,
             )
-            if series.type not in source.types():
-                logging.critical(
-                    f"The requested price type '{series.type}' is not "
-                    f"recognized by the {source.id()} source!"
-                )
-                sys.exit(1)
             fmt = Format.fromargs(args)
             result = fetch(series, source, output, args.invert, args.quantize, fmt)
             print(result, end="", file=output_file)
