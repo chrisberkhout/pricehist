@@ -10,7 +10,7 @@ from pricehist.format import Format
 from pricehist.series import Series
 
 
-def cli(argv=sys.argv, output_file=sys.stdout):
+def cli(argv=sys.argv):
     start_time = datetime.now()
 
     logger.init()
@@ -25,20 +25,20 @@ def cli(argv=sys.argv, output_file=sys.stdout):
 
     try:
         if args.version:
-            print(f"pricehist {__version__}", file=output_file)
+            print(f"pricehist {__version__}")
         elif args.command == "sources":
             result = sources.formatted()
-            print(result, file=output_file)
+            print(result)
         elif args.command == "source" and args.symbols:
             result = sources.by_id[args.source].format_symbols()
-            print(result, file=output_file, end="")
+            print(result, end="")
         elif args.command == "source" and args.search:
             result = sources.by_id[args.source].format_search(args.search)
-            print(result, file=output_file, end="")
+            print(result, end="")
         elif args.command == "source":
             total_width = shutil.get_terminal_size().columns
             result = sources.by_id[args.source].format_info(total_width)
-            print(result, file=output_file)
+            print(result)
         elif args.command == "fetch":
             source = sources.by_id[args.source]
             output = outputs.by_type[args.output]
@@ -60,9 +60,9 @@ def cli(argv=sys.argv, output_file=sys.stdout):
             )
             fmt = Format.fromargs(args)
             result = fetch(series, source, output, args.invert, args.quantize, fmt)
-            print(result, end="", file=output_file)
+            print(result, end="")
         else:
-            parser.print_help(file=sys.stderr)
+            parser.print_help()
     except BrokenPipeError:
         logging.debug("The output pipe was closed early.")
     finally:
