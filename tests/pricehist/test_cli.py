@@ -1,6 +1,4 @@
 import argparse
-import logging
-from decimal import Decimal
 
 import pytest
 
