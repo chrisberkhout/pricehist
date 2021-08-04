@@ -8,4 +8,4 @@ from pricehist.sources.basesource import BaseSource
 class BaseOutput(ABC):
     @abstractmethod
     def format(self, series: Series, source: BaseSource, fmt: Format) -> str:
-        pass
+        pass  # pragma: nocover
