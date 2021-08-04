@@ -58,6 +58,7 @@ class GnuCashSQL(BaseOutput):
 
         self._warn_about_backslashes(
             {
+                "date": fmt.format_date("1970-01-01"),
                 "time": fmt.time,
                 "base": base,
                 "quote": quote,
@@ -135,7 +136,7 @@ class GnuCashSQL(BaseOutput):
             logging.warning(
                 f"Before running this SQL, check the formatting of the "
                 f"{self._english_join(hits)} strings. "
-                f"SQLite treats backslahes in strings as plain characters, but "
+                f"SQLite treats backslashes in strings as plain characters, but "
                 f"MariaDB/MySQL and PostgreSQL may interpret them as escape "
                 f"codes."
             )
