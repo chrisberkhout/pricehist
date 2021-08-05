@@ -18,6 +18,7 @@ test:
   script:
     - poetry run isort src tests --check
     - poetry run black src tests --check
+    - poetry run flake8
     - poetry run pytest
     - poetry run coverage run --source=pricehist -m pytest
     - poetry run coverage report
