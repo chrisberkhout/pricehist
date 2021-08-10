@@ -34,4 +34,4 @@ install-pre-commit-hook: ## Install the git pre-commit hook
 pre-commit: ## Checks to run before each commit
 	poetry run isort src tests --check
 	poetry run black src tests --check
-	poetry run flake8
+	poetry run flake8 src tests
