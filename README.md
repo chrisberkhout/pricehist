@@ -8,6 +8,7 @@ support for multiple data sources and output formats.
 [![PyPI version](https://badge.fury.io/py/pricehist.svg)](https://badge.fury.io/py/pricehist)
 [![Downloads](https://pepy.tech/badge/pricehist)](https://pepy.tech/project/pricehist)
 [![License](https://img.shields.io/pypi/l/pricehist)](https://gitlab.com/chrisberkhout/pricehist/-/blob/master/LICENSE)
+[![Code style](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
 ## Installation
 
@@ -157,14 +158,3 @@ method for fetching historical prices.
 The GnuCash wiki documents [wrapper scripts](https://wiki.gnucash.org/wiki/Stocks/get_prices)
 for the [Finance::QuoteHist](https://metacpan.org/pod/Finance::QuoteHist) Perl
 module.
-
-Other projects with related goals include:
-
-* [`hledger-stockquotes`](https://github.com/prikhi/hledger-stockquotes):
-  A CLI addon for hledger that reads a journal file and pulls the historical prices for commodities.
-* [`ledger_get_prices`](https://github.com/nathankot/ledger-get-prices):
-  Uses Yahoo Finance to generate a price database based on your current Ledger commodities and time period.
-* [LedgerStockUpdate](https://github.com/adchari/LedgerStockUpdate):
-  Locates any stocks you have in your ledger-cli file, then generates a price database of those stocks.
-* [`market-prices`](https://github.com/barrucadu/hledger-scripts#market-prices):
-  Downloads market values of commodities from a few different sources.
