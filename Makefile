@@ -12,12 +12,12 @@ lint: ## Lint source code
 	poetry run flake8
 
 .PHONY: test
-test: ## Run non-live tests
-	poetry run pytest -m "not live" --color=yes
+test: ## Run tests
+	poetry run pytest --color=yes
 
 .PHONY: test-live
 test-live: ## Run live tests
-	poetry run pytest -m live --color=yes
+	tests/live.sh
 
 .PHONY: coverage
 coverage: ## Generate and open coverage report

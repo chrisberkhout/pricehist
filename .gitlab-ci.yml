@@ -14,11 +14,19 @@ before_script:
   - pip install poetry
   - poetry install
 
+pre-commit:
+  script:
+    - make pre-commit
+
 test:
   script:
-    - poetry run isort src tests --check
-    - poetry run black src tests --check
-    - poetry run flake8 src tests
     - poetry run pytest
+
+test-live:
+  script:
+    - tests/live.sh
+
+coverage:
+  script:
     - poetry run coverage run --source=pricehist -m pytest
     - poetry run coverage report
