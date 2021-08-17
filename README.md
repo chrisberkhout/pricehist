@@ -13,7 +13,7 @@ support for multiple data sources and output formats.
 ## Installation
 
 Install via pip or
-[pipx](https://pypa.github.io/pipx/):
+[pipx](https://pypa.github.io/pipx/).
 
 ```
 pipx install pricehist
@@ -34,11 +34,11 @@ pipx install pricehist
 - **`gnucash-sql`**: [GnuCash](https://www.gnucash.org/) SQL
 - **`ledger`**: [Ledger](https://www.ledger-cli.org/) and [hledger](https://hledger.org/)
 
-## Usage
+## How to
 
 ### Fetch prices
 
-Fetch prices by choosing a source, a pair and, optionally, a time interval:
+Fetch prices by choosing a source, a pair and, optionally, a time interval.
 
 ```
 pricehist fetch ecb EUR/AUD -s 2021-01-04 -e 2021-01-08
@@ -53,13 +53,13 @@ date,base,quote,amount,source,type
 ```
 
 The default output format is CSV, which is suitable for use in spreadsheets and
-with other tools. For example, on the command line using
-[gnuplot](http://www.gnuplot.info/) we can chart Bitcoin prices:
+with other tools. For example, you can generate a price chart from the command
+line as follows (or using [an alias](https://gitlab.com/-/snippets/2163031)).
 
 ```
 pricehist fetch coindesk BTC/USD -s 2021-01-01 | \
-  cut -d, -f1,4 | \
   sed 1d | \
+  cut -d, -f1,4 | \
   gnuplot -p -e '
     set datafile separator ",";
     set xdata time;
@@ -73,7 +73,7 @@ pricehist fetch coindesk BTC/USD -s 2021-01-01 | \
 
 ### Show usage information
 
-Add `-h` to any command to see usage information:
+Add `-h` to any command to see usage information.
 
 ```
 pricehist fetch -h
@@ -142,7 +142,7 @@ P 2021/01/08 € $1.5758
 ### Load prices into GnuCash
 
 You can generate SQL for a GnuCash database and apply it immediately with one
-of the following commands:
+of the following commands.
 
 ```
 pricehist fetch ecb EUR/AUD -s 2021-01-01 -o gnucash-sql | sqlite3 Accounts.gnucash
@@ -175,7 +175,7 @@ Notes       : Alpha Vantage has data on...
 ```
 
 Available symbols can be listed for most sources, either as full pairs or as
-separate base and quote symbols that will work in certain combinations:
+separate base and quote symbols that will work in certain combinations.
 
 ```
 pricehist source ecb --symbols
@@ -189,7 +189,7 @@ EUR/CHF    Euro against Swiss Franc
 ...
 ```
 
-It may also be possible to search for symbols:
+It may also be possible to search for symbols.
 
 ```
 pricehist source alphavantage --search Tesla
@@ -205,8 +205,7 @@ TXLZF         Tesla Exploration Ltd, Equity, United States, USD
 ### Inspect source interactions
 
 You can see extra information by adding the verbose option (`--verbose` or
-`-vvv`). This will include `curl` commands to reproduce each request to a
-source.
+`-vvv`), including `curl` commands that reproduce each request to a source.
 
 ```
 pricehist fetch coindesk BTC/USD -s 2021-01-01 -e 2021-01-05 -vvv
@@ -226,8 +225,8 @@ date,base,quote,amount,source,type
 DEBUG Ended pricehist run at 2021-08-12 14:38:26.709428.
 ```
 
-You can run a logged `curl` command to see exactly what data is returned by the
-source:
+Running a logged `curl` command shows exactly what data is returned by the
+source.
 
 ```
 pricehist fetch coindesk BTC/USD -s 2021-01-01 -e 2021-01-05 -vvv 2>&1 \
@@ -252,7 +251,7 @@ pricehist fetch coindesk BTC/USD -s 2021-01-01 -e 2021-01-05 -vvv 2>&1 \
 
 ### Use as a library
 
-You may find `pricehist`'s source classes useful in your own scripts:
+You may find `pricehist`'s source classes useful in your own scripts.
 
 ```
 $ python
@@ -292,17 +291,17 @@ The **prices** in a series each have a date and an amount.
 The **amount** is the number of units of the quote that are equal to one unit
 of the base.
 
-Consider the following command:
+Consider the following command.
 
 ```
 pricehist fetch coindesk BTC/USD --type close
 ```
 
 - **`coindesk`** is the ID of the CoinDesk Bitcoin Price Index source.
-- **`BTC`** is the symbol for Bitcoin.
-- **`USD`** is the symbol for the United States Dollar.
+- **`BTC`** is the symbol for Bitcoin, used here as the base.
+- **`USD`** is the symbol for the United States Dollar, used here as the quote.
 - **`BTC/USD`** is the pair Bitcoin against United States Dollar.
-- **`close`** is the price type for last price of each day.
+- **`close`** is the price type for the last price of each day.
 
 A BTC/USD price of the amount 29,391.775 can be written as
 "BTC/USD = 29391.775" or "BTC 29391.775 USD", and means that one Bitcoin is
@@ -315,10 +314,10 @@ daily historical prices. It doesn't provide other types of market, financial or
 economic data, real-time prices, or other temporal resolutions. Multiple or
 multivariate series require multiple invocations.
 
-## Future potential features
+## Potential features
 
-While the following features are relatively low value or beyond `pricehist`'s
-primary use case, they could be built upon the foundation it has established.
+In the future, `pricehist` may be extended to cover some of the following
+features:
 
 - **Time of day**: Sources sometimes provide specific times for each day's
   high/low prices and these could be preserved for output. This would require
@@ -328,7 +327,7 @@ primary use case, they could be built upon the foundation it has established.
   resolution data, such as hourly or weekly. These could be supported where
   available. For other cases an option could be provided for downsampling data
   before output.
-- **Real-time prices**: These generally come from different soruce endpoints
+- **Real-time prices**: These generally come from different source endpoints
   than the historical data. Real-time prices will usually have a different
   price type, such as `last`, `bid` or `ask`. Support for real-time prices
   would allow adding sources that don't provide historical data. Start and end
