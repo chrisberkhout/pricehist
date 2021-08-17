@@ -269,7 +269,7 @@ A subclass of `pricehist.exceptions.SourceError` will be raised for any error.
 
 ## Terminology
 
-A **source** is the upstream service that can provide a series of prices.
+A **source** is an upstream service that can provide a series of prices.
 
 Each **series** of prices is for one pair and price type.
 
