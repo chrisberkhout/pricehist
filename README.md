@@ -304,8 +304,8 @@ pricehist fetch coindesk BTC/USD --type close
 - **`close`** is the price type for the last price of each day.
 
 A BTC/USD price of the amount 29,391.775 can be written as
-"BTC/USD = 29391.775" or "BTC 29391.775 USD", and means that one Bitcoin is
-worth 29,391.775 United States Dollars.
+"BTC/USD = 29391.78" or "BTC 29391.78 USD", and means that one Bitcoin is
+worth 29,391.78 United States Dollars.
 
 ## Initial design choices
 
