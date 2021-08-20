@@ -69,7 +69,7 @@ pricehist fetch coindesk BTC/USD -s 2021-01-01 | \
   '
 ```
 
-![BTC/USD prices](example-gnuplot.png)
+![BTC/USD prices](https://gitlab.com/chrisberkhout/pricehist/-/raw/master/example-gnuplot.png)
 
 ### Show usage information
 
