@@ -36,7 +36,7 @@ def output(mocker):
 
 
 @pytest.fixture
-def fmt(mocker):
+def fmt():
     return Format()
 
 
