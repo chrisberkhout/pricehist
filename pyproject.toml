@@ -10,6 +10,7 @@ homepage = "https://gitlab.com/chrisberkhout/pricehist"
 repository = "https://gitlab.com/chrisberkhout/pricehist"
 include = [
     "LICENSE",
+    "example-gnuplot.png",
 ]
 
 [tool.poetry.dependencies]
