@@ -249,6 +249,62 @@ pricehist fetch coindesk BTC/USD -s 2021-01-01 -e 2021-01-05 -vvv 2>&1 \
 }
 ```
 
+### Use via `bean-price`
+
+Beancount users may wish to use `pricehist` sources via `bean-price`. To do so,
+ensure the `pricehist` package is installed in an accessible location.
+
+You can fetch the latest price directly from the command line.
+
+```
+bean-price -e "USD:pricehist.beanprice.coindesk/BTC:USD"
+```
+```
+2021-08-18 price BTC:USD                          44725.12 USD
+```
+
+You can fetch a series of prices by providing a Beancount file as input.
+
+```
+; input.beancount
+2021-08-14 commodity BTC
+  price: "USD:pricehist.beanprice.coindesk/BTC:USD:close"
+```
+
+```
+bean-price input.beancount --update --update-rate daily --inactive --clear-cache
+```
+```
+2021-08-14 price BTC                            47098.2633 USD
+2021-08-15 price BTC                            47018.9017 USD
+2021-08-16 price BTC                             45927.405 USD
+2021-08-17 price BTC                            44686.3333 USD
+2021-08-18 price BTC                              44725.12 USD
+```
+
+Adding `-v` will print progress information, `-vv` will print debug information,
+including that from `pricehist`.
+
+A source map specification for `bean-price` has the form
+`<currency>:<module>/[^]<ticker>`. Additional `<module>/[^]<ticker>` parts can
+be appended, separated by commas.
+
+The module name will be of the form `pricehist.beanprice.<source_id>`.
+
+The ticker symbol will be of the form `BASE:QUOTE:TYPE`.
+
+Any non-alphanumeric characters except the equals sign (`=`), hyphen (`-`),
+period (`.`), or parentheses (`(` or `)`) are special characters that need to
+be encoded as their a two-digit hexadecimal code prefixed with an underscore,
+because `bean-price` ticker symbols don't allow all the characters used by
+`pricehist` pairs.
+[This page](https://replit.com/@chrisberkhout/bpticker) will do it for you.
+
+For example, the Yahoo! Finance symbol for the Dow Jones Industrial Average is
+`^DJI`, and would have the source map specification
+`USD:pricehist.beanprice.yahoo/_5eDJI`, or for the daily high price
+`USD:pricehist.beanprice.yahoo/_5eDJI::high`.
+
 ### Use as a library
 
 You may find `pricehist`'s source classes useful in your own scripts.
