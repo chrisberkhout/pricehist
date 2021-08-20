@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pricehist"
-version = "1.0.1"
+version = "1.1.0"
 description = "Fetch and format historical price data"
 authors = ["Chris Berkhout <chris@chrisberkhout.com>"]
 license = "MIT"
