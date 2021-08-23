@@ -9,7 +9,7 @@ import pytest
 import requests
 import responses
 
-from pricehist import exceptions
+from pricehist import __version__, exceptions
 from pricehist.price import Price
 from pricehist.series import Series
 from pricehist.sources.alphavantage import AlphaVantage
@@ -625,8 +625,22 @@ def test_fetch_bad_pair_quote_non_physical(src, type, physical_list_ok):
     assert "quote must be a physical currency" in str(e.value)
 
 
-def test_fetch_api_key_missing(src, type, physical_list_ok, monkeypatch):
+def test_fetch_api_key_defaults_to_generic(
+    src, type, physical_list_ok, euraud_ok, monkeypatch
+):
     monkeypatch.delenv(api_key_name)
+    src.fetch(Series("EUR", "AUD", type, "2021-01-04", "2021-01-08"))
+    req = euraud_ok.calls[-1].request
+    assert req.params["apikey"] == f"pricehist_{__version__}"
+
+
+def test_fetch_api_key_invalid(src, type, physical_list_ok, requests_mock):
+    body = (
+        '{ "Error Message": "the parameter apikey is invalid or missing. Please '
+        "claim your free API key on (https://www.alphavantage.co/support/#api-key). "
+        'It should take less than 20 seconds." }'
+    )
+    requests_mock.add(responses.GET, physical_url, body=body)
     with pytest.raises(exceptions.CredentialsError) as e:
         src.fetch(Series("EUR", "AUD", type, "2021-01-04", "2021-01-08"))
     assert "unavailable or invalid" in str(e.value)

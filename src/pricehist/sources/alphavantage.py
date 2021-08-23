@@ -8,7 +8,7 @@ from decimal import Decimal
 
 import requests
 
-from pricehist import exceptions
+from pricehist import __version__, exceptions
 from pricehist.price import Price
 
 from .basesource import BaseSource
@@ -16,6 +16,7 @@ from .basesource import BaseSource
 
 class AlphaVantage(BaseSource):
     QUERY_URL = "https://www.alphavantage.co/query"
+    API_KEY_NAME = "ALPHAVANTAGE_API_KEY"
 
     def id(self):
         return "alphavantage"
@@ -36,14 +37,14 @@ class AlphaVantage(BaseSource):
         return ["close", "open", "high", "low", "adjclose", "mid"]
 
     def notes(self):
-        keystatus = "already set" if self._apikey(require=False) else "NOT YET set"
+        keystatus = "already set" if self._apikey(require=False) else "not yet set"
         return (
             "Alpha Vantage has data on digital (crypto) currencies, physical "
             "(fiat) currencies and stocks.\n"
-            "An API key is required. One can be obtained for free from "
-            "https://www.alphavantage.co/support/#api-key and should be made "
-            "available in the ALPHAVANTAGE_API_KEY environment variable "
-            f"({keystatus}).\n"
+            "You should obtain a free API key from "
+            "https://www.alphavantage.co/support/#api-key and set it in "
+            f"the {self.API_KEY_NAME} environment variable ({keystatus}), "
+            "otherise, pricehist will attempt to use a generic key.\n"
             "The PAIR for currencies should be in BASE/QUOTE form. The quote "
             "symbol must always be for a physical currency. The --symbols option "
             "will list all digital and physical currency symbols.\n"
@@ -165,8 +166,7 @@ class AlphaVantage(BaseSource):
         except Exception as e:
             raise exceptions.ResponseParsingError(str(e)) from e
 
-        if type(data) == dict and "Note" in data and "call frequency" in data["Note"]:
-            raise exceptions.RateLimit(data["Note"])
+        self._raise_for_generic_errors(data)
 
         expected_keys = ["1. symbol", "2. name", "3. type", "4. region", "8. currency"]
         if (
@@ -204,8 +204,7 @@ class AlphaVantage(BaseSource):
         except Exception as e:
             raise exceptions.ResponseParsingError(str(e)) from e
 
-        if type(data) == dict and "Note" in data and "call frequency" in data["Note"]:
-            raise exceptions.RateLimit(data["Note"])
+        self._raise_for_generic_errors(data)
 
         if "Error Message" in data:
             if output_quote == "UNKNOWN":
@@ -255,8 +254,7 @@ class AlphaVantage(BaseSource):
         except Exception as e:
             raise exceptions.ResponseParsingError(str(e)) from e
 
-        if type(data) == dict and "Note" in data and "call frequency" in data["Note"]:
-            raise exceptions.RateLimit(data["Note"])
+        self._raise_for_generic_errors(data)
 
         if type(data) != dict or "Time Series FX (Daily)" not in data:
             raise exceptions.ResponseParsingError("Unexpected content.")
@@ -297,8 +295,7 @@ class AlphaVantage(BaseSource):
         except Exception as e:
             raise exceptions.ResponseParsingError(str(e)) from e
 
-        if type(data) == dict and "Note" in data and "call frequency" in data["Note"]:
-            raise exceptions.RateLimit(data["Note"])
+        self._raise_for_generic_errors(data)
 
         if type(data) != dict or "Time Series (Digital Currency Daily)" not in data:
             raise exceptions.ResponseParsingError("Unexpected content.")
@@ -317,11 +314,22 @@ class AlphaVantage(BaseSource):
         return normalized_data
 
     def _apikey(self, require=True):
-        key_name = "ALPHAVANTAGE_API_KEY"
-        key = os.getenv(key_name)
+        key = os.getenv(self.API_KEY_NAME)
         if require and not key:
-            raise exceptions.CredentialsError([key_name], self)
+            generic_key = f"pricehist_{__version__}"
+            logging.debug(
+                f"{self.API_KEY_NAME} not set. "
+                f"Defaulting to generic key '{generic_key}'."
+            )
+            return generic_key
         return key
+
+    def _raise_for_generic_errors(self, data):
+        if type(data) == dict:
+            if "Note" in data and "call frequency" in data["Note"]:
+                raise exceptions.RateLimit(data["Note"])
+            if "Error Message" in data and "apikey " in data["Error Message"]:
+                raise exceptions.CredentialsError([self.API_KEY_NAME], self)
 
     def _physical_symbols(self) -> list[(str, str)]:
         url = "https://www.alphavantage.co/physical_currency_list/"
