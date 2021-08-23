@@ -80,6 +80,18 @@ date,base,quote,amount,source,type
 END
 run_test "$name" "$cmd" "$expected"
 
+name="Coinbase Pro"
+cmd="pricehist fetch coinbasepro BTC/EUR -s 2021-01-04 -e 2021-01-08"
+read -r -d '' expected <<END
+date,base,quote,amount,source,type
+2021-01-04,BTC,EUR,24127,coinbasepro,mid
+2021-01-05,BTC,EUR,26201.31,coinbasepro,mid
+2021-01-06,BTC,EUR,28527.005,coinbasepro,mid
+2021-01-07,BTC,EUR,31208.49,coinbasepro,mid
+2021-01-08,BTC,EUR,32019,coinbasepro,mid
+END
+run_test "$name" "$cmd" "$expected"
+
 name="CoinDesk Bitcoin Price Index"
 cmd="pricehist fetch coindesk BTC/EUR -s 2021-01-04 -e 2021-01-08"
 read -r -d '' expected <<END

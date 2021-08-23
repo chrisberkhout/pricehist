@@ -1,0 +1,141 @@
+[
+  {
+    "id": "BTC",
+    "name": "Bitcoin",
+    "min_size": "0.00000001",
+    "status": "online",
+    "message": "",
+    "max_precision": "0.00000001",
+    "convertible_to": [],
+    "details": {
+      "type": "crypto",
+      "symbol": "₿",
+      "network_confirmations": 3,
+      "sort_order": 20,
+      "crypto_address_link": "https://live.blockcypher.com/btc/address/{{address}}",
+      "crypto_transaction_link": "https://live.blockcypher.com/btc/tx/{{txId}}",
+      "push_payment_methods": [
+        "crypto"
+      ],
+      "group_types": [
+        "btc",
+        "crypto"
+      ],
+      "display_name": "",
+      "processing_time_seconds": 0,
+      "min_withdrawal_amount": 0.0001,
+      "max_withdrawal_amount": 2400
+    }
+  },
+  {
+    "id": "DOGE",
+    "name": "Dogecoin",
+    "min_size": "1",
+    "status": "online",
+    "message": "",
+    "max_precision": "0.1",
+    "convertible_to": [],
+    "details": {
+      "type": "crypto",
+      "symbol": "",
+      "network_confirmations": 60,
+      "sort_order": 29,
+      "crypto_address_link": "https://dogechain.info/address/{{address}}",
+      "crypto_transaction_link": "",
+      "push_payment_methods": [
+        "crypto"
+      ],
+      "group_types": [],
+      "display_name": "",
+      "processing_time_seconds": 0,
+      "min_withdrawal_amount": 1,
+      "max_withdrawal_amount": 17391300
+    }
+  },
+  {
+    "id": "ETH",
+    "name": "Ether",
+    "min_size": "0.00000001",
+    "status": "online",
+    "message": "",
+    "max_precision": "0.00000001",
+    "convertible_to": [],
+    "details": {
+      "type": "crypto",
+      "symbol": "Ξ",
+      "network_confirmations": 35,
+      "sort_order": 25,
+      "crypto_address_link": "https://etherscan.io/address/{{address}}",
+      "crypto_transaction_link": "https://etherscan.io/tx/0x{{txId}}",
+      "push_payment_methods": [
+        "crypto"
+      ],
+      "group_types": [
+        "eth",
+        "crypto"
+      ],
+      "display_name": "",
+      "processing_time_seconds": 0,
+      "min_withdrawal_amount": 0.001,
+      "max_withdrawal_amount": 7450
+    }
+  },
+  {
+    "id": "EUR",
+    "name": "Euro",
+    "min_size": "0.01",
+    "status": "online",
+    "message": "",
+    "max_precision": "0.01",
+    "convertible_to": [],
+    "details": {
+      "type": "fiat",
+      "symbol": "€",
+      "network_confirmations": 0,
+      "sort_order": 2,
+      "crypto_address_link": "",
+      "crypto_transaction_link": "",
+      "push_payment_methods": [
+        "sepa_bank_account"
+      ],
+      "group_types": [
+        "fiat",
+        "eur"
+      ],
+      "display_name": "",
+      "processing_time_seconds": 0,
+      "min_withdrawal_amount": 0,
+      "max_withdrawal_amount": 0
+    }
+  },
+  {
+    "id": "GBP",
+    "name": "British Pound",
+    "min_size": "0.01",
+    "status": "online",
+    "message": "",
+    "max_precision": "0.01",
+    "convertible_to": [],
+    "details": {
+      "type": "fiat",
+      "symbol": "£",
+      "network_confirmations": 0,
+      "sort_order": 3,
+      "crypto_address_link": "",
+      "crypto_transaction_link": "",
+      "push_payment_methods": [
+        "uk_bank_account",
+        "swift_lhv",
+        "swift"
+      ],
+      "group_types": [
+        "fiat",
+        "gbp"
+      ],
+      "display_name": "",
+      "processing_time_seconds": 0,
+      "min_withdrawal_amount": 0,
+      "max_withdrawal_amount": 0
+    }
+  }
+]
