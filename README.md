@@ -332,6 +332,20 @@ Type "help", "copyright", "credits" or "license" for more information.
 
 A subclass of `pricehist.exceptions.SourceError` will be raised for any error.
 
+### Contribute
+
+Contributions are welcome! If you discover a bug or want to work on a
+non-trivial change, please open a
+[GitLab issue](https://gitlab.com/chrisberkhout/pricehist/-/issues)
+to discuss it.
+
+Run `make install-pre-commit-hook` set up local pre-commit checks.
+Set up your editor to run
+[isort](https://pycqa.github.io/isort/),
+[Black](https://black.readthedocs.io/en/stable/) and
+[Flake8](https://flake8.pycqa.org/en/latest/),
+or run them manually via `make format lint`.
+
 ## Terminology
 
 A **source** is an upstream service that can provide a series of prices.
