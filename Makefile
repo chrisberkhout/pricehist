@@ -9,7 +9,7 @@ format: ## Format source code
 
 .PHONY: lint
 lint: ## Lint source code
-	poetry run flake8
+	poetry run flake8 src tests
 
 .PHONY: test
 test: ## Run tests
