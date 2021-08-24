@@ -35,10 +35,10 @@ WHERE tp.base = g1.mnemonic
   AND tp.guid NOT IN (SELECT guid FROM prices)
 ;
 
--- Show the summary.
-SELECT * FROM summary;
-
 -- Show the final relevant rows of the main prices table
 SELECT 'final' AS status, p.* FROM prices p WHERE p.guid IN (SELECT guid FROM new_prices) ORDER BY p.date;
+
+-- Show the summary.
+SELECT * FROM summary;
 
 COMMIT;
