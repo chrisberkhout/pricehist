@@ -25,6 +25,7 @@ Functions:
 
 from dataclasses import dataclass, field
 from importlib.resources import read_binary
+from typing import List
 
 from lxml import etree
 
@@ -36,7 +37,7 @@ class ISOCurrency:
     minor_units: int = None
     name: str = None
     is_fund: bool = False
-    countries: list[str] = field(default_factory=list)
+    countries: List[str] = field(default_factory=list)
     historical: bool = False
     withdrawal_date: str = None
 

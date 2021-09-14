@@ -1,5 +1,6 @@
 from dataclasses import dataclass, field, replace
 from decimal import Decimal, getcontext
+from typing import List
 
 from pricehist.price import Price
 
@@ -11,7 +12,7 @@ class Series:
     type: str
     start: str
     end: str
-    prices: list[Price] = field(default_factory=list)
+    prices: List[Price] = field(default_factory=list)
 
     def invert(self):
         return replace(

@@ -1,4 +1,5 @@
 import logging
+from typing import List, Tuple
 
 import pytest
 
@@ -22,13 +23,13 @@ class TestSource(BaseSource):
     def start(self) -> str:
         return ""
 
-    def types(self) -> list[str]:
+    def types(self) -> List[str]:
         return []
 
     def notes(self) -> str:
         return ""
 
-    def symbols(self) -> list[(str, str)]:
+    def symbols(self) -> List[Tuple[str, str]]:
         return []
 
     def fetch(self, series: Series) -> Series:

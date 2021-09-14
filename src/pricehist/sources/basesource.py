@@ -1,6 +1,7 @@
 import logging
 from abc import ABC, abstractmethod
 from textwrap import TextWrapper
+from typing import List, Tuple
 
 import curlify
 
@@ -30,7 +31,7 @@ class BaseSource(ABC):
         pass  # pragma: nocover
 
     @abstractmethod
-    def types(self) -> list[str]:
+    def types(self) -> List[str]:
         pass  # pragma: nocover
 
     @abstractmethod
@@ -41,10 +42,10 @@ class BaseSource(ABC):
         return str.upper()
 
     @abstractmethod
-    def symbols(self) -> list[(str, str)]:
+    def symbols(self) -> List[Tuple[str, str]]:
         pass  # pragma: nocover
 
-    def search(self, query) -> list[(str, str)]:
+    def search(self, query) -> List[Tuple[str, str]]:
         pass  # pragma: nocover
 
     @abstractmethod

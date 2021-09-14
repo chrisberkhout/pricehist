@@ -5,6 +5,7 @@ import logging
 import os
 from datetime import datetime, timedelta
 from decimal import Decimal
+from typing import List, Tuple
 
 import requests
 
@@ -334,15 +335,15 @@ class AlphaVantage(BaseSource):
             if "Error Message" in data and "apikey " in data["Error Message"]:
                 raise exceptions.CredentialsError([self.API_KEY_NAME], self)
 
-    def _physical_symbols(self) -> list[(str, str)]:
+    def _physical_symbols(self) -> List[Tuple[str, str]]:
         url = "https://www.alphavantage.co/physical_currency_list/"
         return self._get_symbols(url, "Physical: ")
 
-    def _digital_symbols(self) -> list[(str, str)]:
+    def _digital_symbols(self) -> List[Tuple[str, str]]:
         url = "https://www.alphavantage.co/digital_currency_list/"
         return self._get_symbols(url, "Digital: ")
 
-    def _get_symbols(self, url, prefix) -> list[(str, str)]:
+    def _get_symbols(self, url, prefix) -> List[Tuple[str, str]]:
         try:
             response = self.log_curl(requests.get(url))
         except Exception as e:
