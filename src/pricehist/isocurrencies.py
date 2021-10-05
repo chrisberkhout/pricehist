@@ -24,6 +24,7 @@ Functions:
 """
 
 from dataclasses import dataclass, field
+from datetime import datetime
 from importlib.resources import read_binary
 from typing import List
 
@@ -44,7 +45,9 @@ class ISOCurrency:
 
 def current_data_date():
     one = etree.fromstring(read_binary("pricehist.resources", "list_one.xml"))
-    return one.cssselect("ISO_4217")[0].attrib["Pblshd"]
+    pblshd = one.cssselect("ISO_4217")[0].attrib["Pblshd"]
+    date = datetime.strptime(pblshd, "%B %d, %Y").date().isoformat()
+    return date
 
 
 def historical_data_date():
