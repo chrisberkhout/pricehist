@@ -35,3 +35,7 @@ pre-commit: ## Checks to run before each commit
 	poetry run isort src tests --check
 	poetry run black src tests --check
 	poetry run flake8 src tests
+
+.PHONY: tox
+tox: ## Run tests via tox
+	poetry run tox
