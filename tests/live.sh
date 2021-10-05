@@ -64,7 +64,7 @@ date,base,quote,amount,source,type
 2021-01-05,AUD,EUR,0.63086,alphavantage,close
 2021-01-06,AUD,EUR,0.63306,alphavantage,close
 2021-01-07,AUD,EUR,0.63284,alphavantage,close
-2021-01-08,AUD,EUR,0.63530,alphavantage,close
+2021-01-08,AUD,EUR,0.63360,alphavantage,close
 END
 run_test "$name" "$cmd" "$expected"
 
