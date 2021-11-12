@@ -64,6 +64,13 @@ def long_ok(requests_mock):
     yield requests_mock
 
 
+@pytest.fixture
+def date_with_nulls_ok(requests_mock):
+    json = (Path(os.path.splitext(__file__)[0]) / "ibm-date-with-nulls.csv").read_text()
+    requests_mock.add(responses.GET, history_url("IBM"), body=json, status=200)
+    yield requests_mock
+
+
 def test_normalizesymbol(src):
     assert src.normalizesymbol("tsla") == "TSLA"
 
@@ -161,6 +168,13 @@ def test_fetch_from_before_start(src, type, spark_ok, long_ok):
     assert series.prices[0] == Price("1962-01-02", Decimal("1.837710"))
     assert series.prices[-1] == Price("2021-01-08", Decimal("125.433624"))
     assert len(series.prices) > 9
+
+
+def test_fetch_skips_dates_with_nulls(src, type, spark_ok, date_with_nulls_ok):
+    series = src.fetch(Series("IBM", "", type, "2021-01-05", "2021-01-07"))
+    assert series.prices[0] == Price("2021-01-05", Decimal("123.101204"))
+    assert series.prices[1] == Price("2021-01-07", Decimal("125.882545"))
+    assert len(series.prices) == 2
 
 
 def test_fetch_to_future(src, type, spark_ok, recent_ok):

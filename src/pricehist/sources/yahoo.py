@@ -84,8 +84,10 @@ class Yahoo(BaseSource):
     def _amount(self, row, type):
         if type == "mid" and row["high"] != "null" and row["low"] != "null":
             return sum([Decimal(row["high"]), Decimal(row["low"])]) / 2
-        else:
+        elif row[type] != "null":
             return Decimal(row[type])
+        else:
+            return None
 
     def _data(self, series) -> (dict, csv.DictReader):
         base_url = "https://query1.finance.yahoo.com/v7/finance"
