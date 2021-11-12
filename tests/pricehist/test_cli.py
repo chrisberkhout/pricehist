@@ -54,7 +54,7 @@ def test_cli_no_args_shows_usage(capfd):
     cli.cli(w("pricehist"))
     out, err = capfd.readouterr()
     assert "usage: pricehist" in out
-    assert "optional arguments:" in out
+    assert "optional arguments:" in out or "options:" in out
     assert "commands:" in out
 
 
@@ -64,7 +64,7 @@ def test_cli_help_shows_usage_and_exits(capfd):
     assert e.value.code == 0
     out, err = capfd.readouterr()
     assert "usage: pricehist" in out
-    assert "optional arguments:" in out
+    assert "optional arguments:" in out or "options:" in out
     assert "commands:" in out
 
 
