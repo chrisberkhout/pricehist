@@ -80,6 +80,18 @@ date,base,quote,amount,source,type
 END
 run_test "$name" "$cmd" "$expected"
 
+name="Bank of Canada"
+cmd="pricehist fetch bankofcanada CAD/USD -s 2021-01-04 -e 2021-01-08"
+read -r -d '' expected <<END
+date,base,quote,amount,source,type
+2021-01-04,CAD,USD,0.7843,bankofcanada,default
+2021-01-05,CAD,USD,0.7870,bankofcanada,default
+2021-01-06,CAD,USD,0.7883,bankofcanada,default
+2021-01-07,CAD,USD,0.7870,bankofcanada,default
+2021-01-08,CAD,USD,0.7871,bankofcanada,default
+END
+run_test "$name" "$cmd" "$expected"
+
 name="Coinbase Pro"
 cmd="pricehist fetch coinbasepro BTC/EUR -s 2021-01-04 -e 2021-01-08"
 read -r -d '' expected <<END

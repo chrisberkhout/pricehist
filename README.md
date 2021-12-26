@@ -22,6 +22,7 @@ pipx install pricehist
 ## Sources
 
 - **`alphavantage`**: [Alpha Vantage](https://www.alphavantage.co/)
+- **`bankofcanada`**: [Bank of Canada daily exchange rates](https://www.bankofcanada.ca/valet/docs)
 - **`coinbasepro`**: [Coinbase Pro](https://pro.coinbase.com/)
 - **`coindesk`**: [CoinDesk Bitcoin Price Index](https://www.coindesk.com/coindesk-api)
 - **`coinmarketcap`**: [CoinMarketCap](https://coinmarketcap.com/)

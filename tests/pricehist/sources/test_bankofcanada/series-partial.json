@@ -1,0 +1,272 @@
+{
+    "terms": {
+        "url": "https://www.bankofcanada.ca/terms/"
+    },
+    "series": {
+        "FXAUDCAD": {
+            "label": "AUD/CAD",
+            "description": "Australian dollar to Canadian dollar daily exchange rate",
+            "link": "https://www.bankofcanada.ca/valet/series/FXAUDCAD"
+        },
+        "FXBRLCAD": {
+            "label": "BRL/CAD",
+            "description": "Brazilian real to Canadian dollar daily exchange rate",
+            "link": "https://www.bankofcanada.ca/valet/series/FXBRLCAD"
+        },
+        "FXCNYCAD": {
+            "label": "CNY/CAD",
+            "description": "Chinese renminbi to Canadian dollar daily exchange rate",
+            "link": "https://www.bankofcanada.ca/valet/series/FXCNYCAD"
+        },
+        "FXEURCAD": {
+            "label": "EUR/CAD",
+            "description": "European euro to Canadian dollar daily exchange rate",
+            "link": "https://www.bankofcanada.ca/valet/series/FXEURCAD"
+        },
+        "FXHKDCAD": {
+            "label": "HKD/CAD",
+            "description": "Hong Kong dollar to Canadian dollar daily exchange rate",
+            "link": "https://www.bankofcanada.ca/valet/series/FXHKDCAD"
+        },
+        "FXINRCAD": {
+            "label": "INR/CAD",
+            "description": "Indian rupee to Canadian dollar daily exchange rate",
+            "link": "https://www.bankofcanada.ca/valet/series/FXINRCAD"
+        },
+        "FXIDRCAD": {
+            "label": "IDR/CAD",
+            "description": "Indonesian rupiah to Canadian dollar daily exchange rate",
+            "link": "https://www.bankofcanada.ca/valet/series/FXIDRCAD"
+        },
+        "FXJPYCAD": {
+            "label": "JPY/CAD",
+            "description": "Japanese yen to Canadian dollar daily exchange rate",
+            "link": "https://www.bankofcanada.ca/valet/series/FXJPYCAD"
+        },
+        "FXMYRCAD": {
+            "label": "MYR/CAD",
+            "description": "Malaysian ringgit to Canadian dollar daily exchange rate",
+            "link": "https://www.bankofcanada.ca/valet/series/FXMYRCAD"
+        },
+        "FXMXNCAD": {
+            "label": "MXN/CAD",
+            "description": "Mexican peso to Canadian dollar daily exchange rate",
+            "link": "https://www.bankofcanada.ca/valet/series/FXMXNCAD"
+        },
+        "FXNZDCAD": {
+            "label": "NZD/CAD",
+            "description": "New Zealand dollar to Canadian dollar daily exchange rate",
+            "link": "https://www.bankofcanada.ca/valet/series/FXNZDCAD"
+        },
+        "FXNOKCAD": {
+            "label": "NOK/CAD",
+            "description": "Norwegian krone to Canadian dollar daily exchange rate",
+            "link": "https://www.bankofcanada.ca/valet/series/FXNOKCAD"
+        },
+        "FXPENCAD": {
+            "label": "PEN/CAD",
+            "description": "Peruvian new sol to Canadian dollar daily exchange rate",
+            "link": "https://www.bankofcanada.ca/valet/series/FXPENCAD"
+        },
+        "FXRUBCAD": {
+            "label": "RUB/CAD",
+            "description": "Russian ruble to Canadian dollar daily exchange rate",
+            "link": "https://www.bankofcanada.ca/valet/series/FXRUBCAD"
+        },
+        "FXSARCAD": {
+            "label": "SAR/CAD",
+            "description": "Saudi riyal to Canadian dollar daily exchange rate",
+            "link": "https://www.bankofcanada.ca/valet/series/FXSARCAD"
+        },
+        "FXSGDCAD": {
+            "label": "SGD/CAD",
+            "description": "Singapore dollar to Canadian dollar daily exchange rate",
+            "link": "https://www.bankofcanada.ca/valet/series/FXSGDCAD"
+        },
+        "FXZARCAD": {
+            "label": "ZAR/CAD",
+            "description": "South African rand to Canadian dollar daily exchange rate",
+            "link": "https://www.bankofcanada.ca/valet/series/FXZARCAD"
+        },
+        "FXKRWCAD": {
+            "label": "KRW/CAD",
+            "description": "South Korean won to Canadian dollar daily exchange rate",
+            "link": "https://www.bankofcanada.ca/valet/series/FXKRWCAD"
+        },
+        "FXSEKCAD": {
+            "label": "SEK/CAD",
+            "description": "Swedish krona to Canadian dollar daily exchange rate",
+            "link": "https://www.bankofcanada.ca/valet/series/FXSEKCAD"
+        },
+        "FXCHFCAD": {
+            "label": "CHF/CAD",
+            "description": "Swiss franc to Canadian dollar daily exchange rate",
+            "link": "https://www.bankofcanada.ca/valet/series/FXCHFCAD"
+        },
+        "FXTWDCAD": {
+            "label": "TWD/CAD",
+            "description": "Taiwanese dollar to Canadian dollar daily exchange rate",
+            "link": "https://www.bankofcanada.ca/valet/series/FXTWDCAD"
+        },
+        "FXTHBCAD": {
+            "label": "THB/CAD",
+            "description": "Thai baht to Canadian dollar daily exchange rate",
+            "link": "https://www.bankofcanada.ca/valet/series/FXTHBCAD"
+        },
+        "FXTRYCAD": {
+            "label": "TRY/CAD",
+            "description": "Turkish lira to Canadian dollar daily exchange rate",
+            "link": "https://www.bankofcanada.ca/valet/series/FXTRYCAD"
+        },
+        "FXGBPCAD": {
+            "label": "GBP/CAD",
+            "description": "UK pound sterling to Canadian dollar daily exchange rate",
+            "link": "https://www.bankofcanada.ca/valet/series/FXGBPCAD"
+        },
+        "FXUSDCAD": {
+            "label": "USD/CAD",
+            "description": "US dollar to Canadian dollar daily exchange rate",
+            "link": "https://www.bankofcanada.ca/valet/series/FXUSDCAD"
+        },
+        "FXVNDCAD": {
+            "label": "VND/CAD",
+            "description": "Vietnamese dong to Canadian dollar daily exchange rate",
+            "link": "https://www.bankofcanada.ca/valet/series/FXVNDCAD"
+        },
+        "FXCADAUD": {
+            "label": "CAD/AUD",
+            "description": "Canadian dollar to Australian dollar daily exchange rate",
+            "link": "https://www.bankofcanada.ca/valet/series/FXCADAUD"
+        },
+        "FXCADBRL": {
+            "label": "CAD/BRL",
+            "description": "Canadian dollar to Brazilian real daily exchange rate",
+            "link": "https://www.bankofcanada.ca/valet/series/FXCADBRL"
+        },
+        "FXCADCNY": {
+            "label": "CAD/CNY",
+            "description": "Canadian dollar to Chinese renminbi daily exchange rate",
+            "link": "https://www.bankofcanada.ca/valet/series/FXCADCNY"
+        },
+        "FXCADEUR": {
+            "label": "CAD/EUR",
+            "description": "Canadian dollar to European euro daily exchange rate",
+            "link": "https://www.bankofcanada.ca/valet/series/FXCADEUR"
+        },
+        "FXCADHKD": {
+            "label": "CAD/HKD",
+            "description": "Canadian dollar to Hong Kong dollar daily exchange rate",
+            "link": "https://www.bankofcanada.ca/valet/series/FXCADHKD"
+        },
+        "FXCADINR": {
+            "label": "CAD/INR",
+            "description": "Canadian dollar to Indian rupee daily exchange rate",
+            "link": "https://www.bankofcanada.ca/valet/series/FXCADINR"
+        },
+        "FXCADIDR": {
+            "label": "CAD/IDR",
+            "description": "Canadian dollar to Indonesian rupiah daily exchange rate",
+            "link": "https://www.bankofcanada.ca/valet/series/FXCADIDR"
+        },
+        "FXCADJPY": {
+            "label": "CAD/JPY",
+            "description": "Canadian dollar to Japanese yen daily exchange rate",
+            "link": "https://www.bankofcanada.ca/valet/series/FXCADJPY"
+        },
+        "FXCADMYR": {
+            "label": "CAD/MYR",
+            "description": "Canadian dollar to Malaysian ringgit daily exchange rate",
+            "link": "https://www.bankofcanada.ca/valet/series/FXCADMYR"
+        },
+        "FXCADMXN": {
+            "label": "CAD/MXN",
+            "description": "Canadian dollar to Mexican peso daily exchange rate",
+            "link": "https://www.bankofcanada.ca/valet/series/FXCADMXN"
+        },
+        "FXCADNZD": {
+            "label": "CAD/NZD",
+            "description": "Canadian dollar to New Zealand dollar daily exchange rate",
+            "link": "https://www.bankofcanada.ca/valet/series/FXCADNZD"
+        },
+        "FXCADNOK": {
+            "label": "CAD/NOK",
+            "description": "Canadian dollar to Norwegian krone daily exchange rate",
+            "link": "https://www.bankofcanada.ca/valet/series/FXCADNOK"
+        },
+        "FXCADPEN": {
+            "label": "CAD/PEN",
+            "description": "Canadian dollar to Peruvian new sol daily exchange rate",
+            "link": "https://www.bankofcanada.ca/valet/series/FXCADPEN"
+        },
+        "FXCADRUB": {
+            "label": "CAD/RUB",
+            "description": "Canadian dollar to Russian ruble daily exchange rate",
+            "link": "https://www.bankofcanada.ca/valet/series/FXCADRUB"
+        },
+        "FXCADSAR": {
+            "label": "CAD/SAR",
+            "description": "Canadian dollar to Saudi riyal daily exchange rate",
+            "link": "https://www.bankofcanada.ca/valet/series/FXCADSAR"
+        },
+        "FXCADSGD": {
+            "label": "CAD/SGD",
+            "description": "Canadian dollar to Singapore dollar daily exchange rate",
+            "link": "https://www.bankofcanada.ca/valet/series/FXCADSGD"
+        },
+        "FXCADZAR": {
+            "label": "CAD/ZAR",
+            "description": "Canadian dollar to South African rand daily exchange rate",
+            "link": "https://www.bankofcanada.ca/valet/series/FXCADZAR"
+        },
+        "FXCADKRW": {
+            "label": "CAD/KRW",
+            "description": "Canadian dollar to South Korean won daily exchange rate",
+            "link": "https://www.bankofcanada.ca/valet/series/FXCADKRW"
+        },
+        "FXCADSEK": {
+            "label": "CAD/SEK",
+            "description": "Canadian dollar to Swedish krona daily exchange rate",
+            "link": "https://www.bankofcanada.ca/valet/series/FXCADSEK"
+        },
+        "FXCADCHF": {
+            "label": "CAD/CHF",
+            "description": "Canadian dollar to Swiss franc daily exchange rate",
+            "link": "https://www.bankofcanada.ca/valet/series/FXCADCHF"
+        },
+        "FXCADTWD": {
+            "label": "CAD/TWD",
+            "description": "Canadian dollar to Taiwanese dollar daily exchange rate",
+            "link": "https://www.bankofcanada.ca/valet/series/FXCADTWD"
+        },
+        "FXCADTHB": {
+            "label": "CAD/THB",
+            "description": "Canadian dollar to Thai baht daily exchange rate",
+            "link": "https://www.bankofcanada.ca/valet/series/FXCADTHB"
+        },
+        "FXCADTRY": {
+            "label": "CAD/TRY",
+            "description": "Canadian dollar to Turkish lira daily exchange rate",
+            "link": "https://www.bankofcanada.ca/valet/series/FXCADTRY"
+        },
+        "FXCADGBP": {
+            "label": "CAD/GBP",
+            "description": "Canadian dollar to UK pound sterling daily exchange rate",
+            "link": "https://www.bankofcanada.ca/valet/series/FXCADGBP"
+        },
+        "FXCADUSD": {
+            "label": "CAD/USD",
+            "description": "Canadian dollar to US dollar daily exchange rate",
+            "link": "https://www.bankofcanada.ca/valet/series/FXCADUSD"
+        },
+        "FXCADVND": {
+            "label": "CAD/VND",
+            "description": "Canadian dollar to Vietnamese dong daily exchange rate",
+            "link": "https://www.bankofcanada.ca/valet/series/FXCADVND"
+        },
+        "INDINF_GRACE_Q": {
+            "label": "Foreign demand for Canadian non-commodity exports (GRACE) (2007=100)",
+            "description": "Foreign demand for Canadian non-commodity exports (GRACE) (2007=100)",
+            "link": "https://www.bankofcanada.ca/valet/series/INDINF_GRACE_Q"
+        }
+    }
+}

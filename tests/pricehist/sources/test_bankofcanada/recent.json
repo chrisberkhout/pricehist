@@ -1,0 +1,41 @@
+{
+    "terms": {
+        "url": "https://www.bankofcanada.ca/terms/"
+    },
+    "seriesDetail": {
+        "FXCADUSD": {
+            "label": "CAD/USD",
+            "description": "Canadian dollar to US dollar daily exchange rate",
+            "dimension": {
+                "key": "d",
+                "name": "date"
+            }
+        }
+    },
+    "observations": [
+        {
+            "d": "2021-01-04",
+            "FXCADUSD": {
+                "v": "0.7843"
+            }
+        },
+        {
+            "d": "2021-01-05",
+            "FXCADUSD": {
+                "v": "0.7870"
+            }
+        },
+        {
+            "d": "2021-01-06",
+            "FXCADUSD": {
+                "v": "0.7883"
+            }
+        },
+        {
+            "d": "2021-01-07",
+            "FXCADUSD": {
+                "v": "0.7870"
+            }
+        }
+    ]
+}

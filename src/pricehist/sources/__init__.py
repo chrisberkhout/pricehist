@@ -1,4 +1,5 @@
 from .alphavantage import AlphaVantage
+from .bankofcanada import BankOfCanada
 from .coinbasepro import CoinbasePro
 from .coindesk import CoinDesk
 from .coinmarketcap import CoinMarketCap
@@ -9,6 +10,7 @@ by_id = {
     source.id(): source
     for source in [
         AlphaVantage(),
+        BankOfCanada(),
         CoinbasePro(),
         CoinDesk(),
         CoinMarketCap(),

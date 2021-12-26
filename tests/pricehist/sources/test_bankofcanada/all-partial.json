@@ -1,0 +1,101 @@
+{
+    "terms": {
+        "url": "https://www.bankofcanada.ca/terms/"
+    },
+    "seriesDetail": {
+        "FXCADUSD": {
+            "label": "CAD/USD",
+            "description": "Canadian dollar to US dollar daily exchange rate",
+            "dimension": {
+                "key": "d",
+                "name": "date"
+            }
+        }
+    },
+    "observations": [
+        {
+            "d": "2017-01-03",
+            "FXCADUSD": {
+                "v": "0.7443"
+            }
+        },
+        {
+            "d": "2017-01-04",
+            "FXCADUSD": {
+                "v": "0.7510"
+            }
+        },
+        {
+            "d": "2017-01-05",
+            "FXCADUSD": {
+                "v": "0.7551"
+            }
+        },
+        {
+            "d": "2017-01-06",
+            "FXCADUSD": {
+                "v": "0.7568"
+            }
+        },
+        {
+            "d": "2017-01-09",
+            "FXCADUSD": {
+                "v": "0.7553"
+            }
+        },
+        {
+            "d": "2017-01-10",
+            "FXCADUSD": {
+                "v": "0.7568"
+            }
+        },
+        {
+            "d": "2017-01-11",
+            "FXCADUSD": {
+                "v": "0.7547"
+            }
+        },
+        {
+            "d": "2020-12-29",
+            "FXCADUSD": {
+                "v": "0.7809"
+            }
+        },
+        {
+            "d": "2020-12-30",
+            "FXCADUSD": {
+                "v": "0.7831"
+            }
+        },
+        {
+            "d": "2020-12-31",
+            "FXCADUSD": {
+                "v": "0.7854"
+            }
+        },
+        {
+            "d": "2021-01-04",
+            "FXCADUSD": {
+                "v": "0.7843"
+            }
+        },
+        {
+            "d": "2021-01-05",
+            "FXCADUSD": {
+                "v": "0.7870"
+            }
+        },
+        {
+            "d": "2021-01-06",
+            "FXCADUSD": {
+                "v": "0.7883"
+            }
+        },
+        {
+            "d": "2021-01-07",
+            "FXCADUSD": {
+                "v": "0.7870"
+            }
+        }
+    ]
+}
