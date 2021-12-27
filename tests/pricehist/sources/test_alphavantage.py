@@ -426,7 +426,6 @@ def test_fetch_stock_rate_limit(src, type, search_ok, requests_mock):
     assert "rate limit" in str(e.value)
 
 
-# TODO
 def test_fetch_stock_premium(src, search_ok, requests_mock):
     requests_mock.add(responses.GET, adj_stock_url, body=premium_json)
     with pytest.raises(exceptions.CredentialsError) as e:
