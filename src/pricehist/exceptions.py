@@ -52,7 +52,7 @@ class InvalidType(SourceError, ValueError):
 class CredentialsError(SourceError):
     """Access credentials are unavailable or invalid."""
 
-    def __init__(self, keys, source):
+    def __init__(self, keys, source, msg=""):
         self.keys = keys
         self.source = source
         message = (
@@ -61,6 +61,8 @@ class CredentialsError(SourceError):
             f"correctly. Run 'pricehist source {source.id()}' for more "
             f"information about credentials."
         )
+        if msg:
+            message += f" {msg}"
         super(CredentialsError, self).__init__(message)
 
 

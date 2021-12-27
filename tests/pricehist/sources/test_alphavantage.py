@@ -48,6 +48,9 @@ search_url = re.compile(
     r"https://www\.alphavantage\.co/query\?function=SYMBOL_SEARCH.*"
 )
 stock_url = re.compile(
+    r"https://www\.alphavantage\.co/query\?function=TIME_SERIES_DAILY&.*"
+)
+adj_stock_url = re.compile(
     r"https://www\.alphavantage\.co/query\?function=TIME_SERIES_DAILY_ADJUSTED.*"
 )
 physical_url = re.compile(r"https://www\.alphavantage\.co/query\?function=FX_DAILY.*")
@@ -62,6 +65,18 @@ rate_limit_json = (
     "https://www.alphavantage.co/premium/ if you would like to target a higher "
     "API call frequency."
     '" }'
+)
+
+premium_json = (
+    '{ "Information": "Thank you for using Alpha Vantage! This is a premium '
+    "endpoint and there are multiple ways to unlock premium endpoints: (1) "
+    "become a holder of Alpha Vantage Coin (AVC), an Ethereum-based "
+    "cryptocurrency that provides various utility & governance functions "
+    "within the Alpha Vantage ecosystem (AVC mining guide: "
+    "https://www.alphatournament.com/avc_mining_guide/) to unlock all "
+    "premium endpoints, (2) subscribe to any of the premium plans at "
+    "https://www.alphavantage.co/premium/ to instantly unlock all premium "
+    'endpoints" }'
 )
 
 
@@ -96,6 +111,13 @@ def search_not_found(requests_mock):
 def ibm_ok(requests_mock):
     json = (Path(os.path.splitext(__file__)[0]) / "ibm-partial.json").read_text()
     requests_mock.add(responses.GET, stock_url, body=json, status=200)
+    yield requests_mock
+
+
+@pytest.fixture
+def ibm_adj_ok(requests_mock):
+    json = (Path(os.path.splitext(__file__)[0]) / "ibm-partial-adj.json").read_text()
+    requests_mock.add(responses.GET, adj_stock_url, body=json, status=200)
     yield requests_mock
 
 
@@ -282,7 +304,7 @@ def test_fetch_stock_known(src, type, search_ok, ibm_ok):
     stock_req = ibm_ok.calls[1].request
     assert search_req.params["function"] == "SYMBOL_SEARCH"
     assert search_req.params["keywords"] == "IBM"
-    assert stock_req.params["function"] == "TIME_SERIES_DAILY_ADJUSTED"
+    assert stock_req.params["function"] == "TIME_SERIES_DAILY"
     assert stock_req.params["symbol"] == "IBM"
     assert stock_req.params["outputsize"] == "full"
     assert (series.base, series.quote) == ("IBM", "USD")
@@ -315,14 +337,17 @@ def test_fetch_stock_types_all_available(src, search_ok, ibm_ok):
     opn = src.fetch(Series("IBM", "", "open", "2021-01-04", "2021-01-08"))
     hgh = src.fetch(Series("IBM", "", "high", "2021-01-04", "2021-01-08"))
     low = src.fetch(Series("IBM", "", "low", "2021-01-04", "2021-01-08"))
-    adj = src.fetch(Series("IBM", "", "adjclose", "2021-01-04", "2021-01-08"))
     mid = src.fetch(Series("IBM", "", "mid", "2021-01-04", "2021-01-08"))
     assert cls.prices[0].amount == Decimal("123.94")
     assert opn.prices[0].amount == Decimal("125.85")
     assert hgh.prices[0].amount == Decimal("125.9174")
     assert low.prices[0].amount == Decimal("123.04")
-    assert adj.prices[0].amount == Decimal("120.943645029")
     assert mid.prices[0].amount == Decimal("124.4787")
+
+
+def test_fetch_stock_types_adj_available(src, search_ok, ibm_adj_ok):
+    adj = src.fetch(Series("IBM", "", "adjclose", "2021-01-04", "2021-01-08"))
+    assert adj.prices[0].amount == Decimal("120.943645029")
 
 
 def test_fetch_stock_type_mid_is_mean_of_low_and_high(src, search_ok, ibm_ok):
@@ -399,6 +424,14 @@ def test_fetch_stock_rate_limit(src, type, search_ok, requests_mock):
     with pytest.raises(exceptions.RateLimit) as e:
         src.fetch(Series("IBM", "", type, "2021-01-04", "2021-01-08"))
     assert "rate limit" in str(e.value)
+
+
+# TODO
+def test_fetch_stock_premium(src, search_ok, requests_mock):
+    requests_mock.add(responses.GET, adj_stock_url, body=premium_json)
+    with pytest.raises(exceptions.CredentialsError) as e:
+        src.fetch(Series("IBM", "", "adjclose", "2021-01-04", "2021-01-08"))
+    assert "denied access to a premium endpoint" in str(e.value)
 
 
 def test_fetch_physical_known(src, type, physical_list_ok, euraud_ok):

@@ -51,7 +51,8 @@ class AlphaVantage(BaseSource):
             "will list all digital and physical currency symbols.\n"
             "The PAIR for stocks is the stock symbol only. The quote currency "
             f"will be determined automatically. {self._stock_symbols_message()}\n"
-            "The price type 'adjclose' is only available for stocks.\n"
+            "The price type 'adjclose' is only available for stocks, and "
+            "requires an access key for which premium endpoints are unlocked.\n"
             "Beware that digital currencies quoted in non-USD currencies may "
             "be converted from USD data at one recent exchange rate rather "
             "than using historical rates.\n"
@@ -186,8 +187,13 @@ class AlphaVantage(BaseSource):
     def _stock_data(self, series):
         output_quote = self._stock_currency(series.base) or "UNKNOWN"
 
+        if series.type == "adjclose":
+            function = "TIME_SERIES_DAILY_ADJUSTED"
+        else:
+            function = "TIME_SERIES_DAILY"
+
         params = {
-            "function": "TIME_SERIES_DAILY_ADJUSTED",
+            "function": function,
             "symbol": series.base,
             "outputsize": self._outputsize(series.start),
             "apikey": self._apikey(),
@@ -225,7 +231,8 @@ class AlphaVantage(BaseSource):
                     "high": entries["2. high"],
                     "low": entries["3. low"],
                     "close": entries["4. close"],
-                    "adjclose": entries["5. adjusted close"],
+                    "adjclose": "5. adjusted close" in entries
+                    and entries["5. adjusted close"],
                 }
                 for day, entries in reversed(data["Time Series (Daily)"].items())
             }
@@ -332,6 +339,12 @@ class AlphaVantage(BaseSource):
         if type(data) == dict:
             if "Note" in data and "call frequency" in data["Note"]:
                 raise exceptions.RateLimit(data["Note"])
+            if (
+                "Information" in data
+                and "ways to unlock premium" in data["Information"]
+            ):
+                msg = "You were denied access to a premium endpoint."
+                raise exceptions.CredentialsError([self.API_KEY_NAME], self, msg)
             if "Error Message" in data and "apikey " in data["Error Message"]:
                 raise exceptions.CredentialsError([self.API_KEY_NAME], self)
 
