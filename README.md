@@ -37,6 +37,14 @@ pipx install pricehist
 - **`gnucash-sql`**: [GnuCash](https://www.gnucash.org/) SQL
 - **`ledger`**: [Ledger](https://www.ledger-cli.org/) and [hledger](https://hledger.org/)
 
+## Reactions
+
+> This is my new favourite price fetcher, by far.  
+> -- _Simon Michael, creator of [hledger](https://hledger.org/) ([ref](https://groups.google.com/g/hledger/c/SCLbNiKl9D8/m/0ReYmDppAAAJ))_
+
+> This is great!  
+> -- _Martin Blais, creator of [Beancount](https://beancount.github.io/) ([ref](https://groups.google.com/g/beancount/c/cCJc9OhIlNg/m/QGRvNowcAwAJ))_
+
 ## How to
 
 ### Fetch prices
