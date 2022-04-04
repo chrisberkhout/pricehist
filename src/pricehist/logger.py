@@ -23,6 +23,7 @@ def init():
     handler.setFormatter(Formatter())
     logging.root.addHandler(handler)
     logging.root.setLevel(logging.INFO)
+    logging.getLogger("charset_normalizer").disabled = True
 
 
 def show_debug():
