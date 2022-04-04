@@ -45,10 +45,10 @@ class JSON(BaseOutput):
 
         if self.jsonl:
             for row in data:
-                json.dump(row, output)
+                json.dump(row, output, ensure_ascii=False)
                 output.write("\n")
         else:
-            json.dump(data, output, indent=2)
+            json.dump(data, output, ensure_ascii=False, indent=2)
             output.write("\n")
 
         return output.getvalue()
