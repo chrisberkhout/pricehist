@@ -11,6 +11,7 @@ class Format:
     symbol: str = "rightspace"
     datesep: str = "-"
     csvdelim: str = ","
+    jsonnums: bool = False
 
     @classmethod
     def fromargs(cls, args):
@@ -27,6 +28,7 @@ class Format:
             symbol=if_not_none(args.formatsymbol, default.symbol),
             datesep=if_not_none(args.formatdatesep, default.datesep),
             csvdelim=if_not_none(args.formatcsvdelim, default.csvdelim),
+            jsonnums=if_not_none(args.formatjsonnums, default.jsonnums),
         )
 
     def format_date(self, date):

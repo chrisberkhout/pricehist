@@ -205,7 +205,7 @@ def build_parser():
             "[--fmt-base SYM] [--fmt-quote SYM] [--fmt-time TIME] "
             "[--fmt-decimal CHAR] [--fmt-thousands CHAR] "
             "[--fmt-symbol rightspace|right|leftspace|left] [--fmt-datesep CHAR] "
-            "[--fmt-csvdelim CHAR]"
+            "[--fmt-csvdelim CHAR] [--fmt-jsonnums]"
         ),
         formatter_class=formatter,
     )
@@ -352,6 +352,12 @@ def build_parser():
         metavar="CHAR",
         type=valid_char,
         help=f"field delimiter for CSV output (default: '{default_fmt.csvdelim}')",
+    )
+    fetch_parser.add_argument(
+        "--fmt-jsonnums",
+        dest="formatjsonnums",
+        action="store_true",
+        help=f"numbers not strings for JSON output (default: {default_fmt.jsonnums})",
     )
 
     return parser

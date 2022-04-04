@@ -14,6 +14,7 @@ def test_fromargs():
         "formatdatesep": None,
         "formatcsvdelim": None,
         "formatbase": None,
+        "formatjsonnums": None,
     }
     args = namedtuple("args", arg_values.keys())(**arg_values)
     fmt = Format.fromargs(args)

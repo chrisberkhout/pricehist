@@ -125,3 +125,44 @@ def test_format_custom(json_out, series, mocker):
         ).strip()
         + "\n"
     )
+
+
+def test_format_numbers(json_out, series, mocker):
+    source = mocker.MagicMock()
+    source.id = mocker.MagicMock(return_value="sourceid")
+    fmt = Format(jsonnums=True)
+    result = json_out.format(series, source, fmt)
+    assert (
+        result
+        == dedent(
+            """
+                [
+                  {
+                    "date": "2021-01-01",
+                    "base": "BTC",
+                    "quote": "EUR",
+                    "amount": 24139.4648,
+                    "source": "sourceid",
+                    "type": "close"
+                  },
+                  {
+                    "date": "2021-01-02",
+                    "base": "BTC",
+                    "quote": "EUR",
+                    "amount": 26533.576,
+                    "source": "sourceid",
+                    "type": "close"
+                  },
+                  {
+                    "date": "2021-01-03",
+                    "base": "BTC",
+                    "quote": "EUR",
+                    "amount": 27001.2846,
+                    "source": "sourceid",
+                    "type": "close"
+                  }
+                ]
+            """
+        ).strip()
+        + "\n"
+    )

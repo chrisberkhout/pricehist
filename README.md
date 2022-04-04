@@ -95,7 +95,8 @@ pricehist fetch -h
 usage: pricehist fetch SOURCE PAIR [-h] [-vvv] [-t TYPE] [-s DATE | -sx DATE] [-e DATE | -ex DATE]
 [-o beancount|csv|json|jsonl|gnucash-sql|ledger] [--invert] [--quantize INT]
 [--fmt-base SYM] [--fmt-quote SYM] [--fmt-time TIME] [--fmt-decimal CHAR] [--fmt-thousands CHAR]
-[--fmt-symbol rightspace|right|leftspace|left] [--fmt-datesep CHAR] [--fmt-csvdelim CHAR]
+[--fmt-symbol rightspace|right|leftspace|left] [--fmt-datesep CHAR]
+[--fmt-csvdelim CHAR] [--fmt-jsonnums]
 
 positional arguments:
   SOURCE                   the source identifier
@@ -120,6 +121,7 @@ optional arguments:
   --fmt-symbol LOCATION    commodity symbol placement in output (default: rightspace)
   --fmt-datesep CHAR       date separator in output (default: '-')
   --fmt-csvdelim CHAR      field delimiter for CSV output (default: ',')
+  --fmt-jsonnums           numbers not strings for JSON output (default: False)
 ```
 
 ### Choose and customize the output format

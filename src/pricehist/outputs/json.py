@@ -30,7 +30,10 @@ class JSON(BaseOutput):
 
         for price in series.prices:
             date = fmt.format_date(price.date)
-            amount = fmt.format_num(price.amount)
+            if fmt.jsonnums:
+                amount = float(price.amount)
+            else:
+                amount = fmt.format_num(price.amount)
 
             data.append(
                 {
