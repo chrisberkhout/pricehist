@@ -45,7 +45,7 @@ class AlphaVantage(BaseSource):
             "You should obtain a free API key from "
             "https://www.alphavantage.co/support/#api-key and set it in "
             f"the {self.API_KEY_NAME} environment variable ({keystatus}), "
-            "otherise, pricehist will attempt to use a generic key.\n"
+            "otherwise, pricehist will attempt to use a generic key.\n"
             "The PAIR for currencies should be in BASE/QUOTE form. The quote "
             "symbol must always be for a physical currency. The --symbols option "
             "will list all digital and physical currency symbols.\n"
@@ -58,8 +58,8 @@ class AlphaVantage(BaseSource):
             "than using historical rates.\n"
             "Alpha Vantage's standard API call frequency limits is 5 calls per "
             "minute and 500 per day, so you may need to pause between successive "
-            "commands. Note that retrieving prices for one stock requires two "
-            "calls."
+            "commands. Note that retrieving prices for one stock consumes two "
+            "API calls."
         )
 
     def _stock_symbols_message(self):
