@@ -152,6 +152,17 @@ P 2021/01/07 € $1.5836
 P 2021/01/08 € $1.5758
 ```
 
+### Fetch new prices only
+
+You can update an existing file without refetching the prices you already have.
+First find the date of the last price, then fetch from there, drop the header
+line if present and append the rest to the existing file.
+
+```
+last=$(tail -1 prices-eur-usd.csv | cut -d, -f1)
+pricehist fetch ecb EUR/USD -sx $last -o csv | sed 1d >> prices-eur-usd.csv
+```
+
 ### Load prices into GnuCash
 
 You can generate SQL for a GnuCash database and apply it immediately with one
