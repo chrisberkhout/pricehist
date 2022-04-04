@@ -39,3 +39,10 @@ pre-commit: ## Checks to run before each commit
 .PHONY: tox
 tox: ## Run tests via tox
 	poetry run tox
+
+.PHONY: fetch-iso-data
+fetch-iso-data: ## Fetch the latest copy of the ISO 4217 currency data
+	wget -O src/pricehist/resources/list_one.xml \
+		https://www.six-group.com/dam/download/financial-information/data-center/iso-currrency/lists/list_one.xml
+	wget -O src/pricehist/resources/list_three.xml \
+		https://www.six-group.com/dam/download/financial-information/data-center/iso-currrency/lists/list_three.xml
