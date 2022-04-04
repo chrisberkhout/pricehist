@@ -34,6 +34,8 @@ pipx install pricehist
 
 - **`beancount`**: [Beancount](http://furius.ca/beancount/)
 - **`csv`**: [Comma-separated values](https://en.wikipedia.org/wiki/Comma-separated_values)
+- **`json`**: [JSON](https://en.wikipedia.org/wiki/JSON)
+- **`jsonl`**: [JSON lines](https://en.wikipedia.org/wiki/JSON_streaming)
 - **`gnucash-sql`**: [GnuCash](https://www.gnucash.org/) SQL
 - **`ledger`**: [Ledger](https://www.ledger-cli.org/) and [hledger](https://hledger.org/)
 
@@ -91,7 +93,7 @@ pricehist fetch -h
 ```
 ```
 usage: pricehist fetch SOURCE PAIR [-h] [-vvv] [-t TYPE] [-s DATE | -sx DATE] [-e DATE | -ex DATE]
-[-o beancount|csv|gnucash-sql|ledger] [--invert] [--quantize INT]
+[-o beancount|csv|json|jsonl|gnucash-sql|ledger] [--invert] [--quantize INT]
 [--fmt-base SYM] [--fmt-quote SYM] [--fmt-time TIME] [--fmt-decimal CHAR] [--fmt-thousands CHAR]
 [--fmt-symbol rightspace|right|leftspace|left] [--fmt-datesep CHAR] [--fmt-csvdelim CHAR]
 
@@ -122,8 +124,8 @@ optional arguments:
 
 ### Choose and customize the output format
 
-As the output format you can choose one of `beancount`, `csv`, `ledger` or
-`gnucash-sql`.
+As the output format you can choose one of `beancount`, `csv`, `json`, `jsonl`,
+`ledger` or `gnucash-sql`.
 
 ```
 pricehist fetch ecb EUR/AUD -s 2021-01-04 -e 2021-01-08 -o ledger
