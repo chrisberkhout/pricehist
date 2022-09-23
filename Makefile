@@ -42,7 +42,7 @@ tox: ## Run tests via tox
 
 .PHONY: fetch-iso-data
 fetch-iso-data: ## Fetch the latest copy of the ISO 4217 currency data
-	wget -O src/pricehist/resources/list_one.xml \
-		https://www.six-group.com/dam/download/financial-information/data-center/iso-currrency/lists/list_one.xml
-	wget -O src/pricehist/resources/list_three.xml \
-		https://www.six-group.com/dam/download/financial-information/data-center/iso-currrency/lists/list_three.xml
+	wget -O src/pricehist/resources/list-one.xml \
+		https://www.six-group.com/dam/download/financial-information/data-center/iso-currrency/lists/list-one.xml
+	wget -O src/pricehist/resources/list-three.xml \
+		https://www.six-group.com/dam/download/financial-information/data-center/iso-currrency/lists/list-three.xml

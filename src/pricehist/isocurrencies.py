@@ -8,8 +8,8 @@ currencies are included and countries with no universal currency are ignored.
 The data is read from vendored copies of the XML files published by the
 maintainers of the standard:
 
-* :file:`list_one.xml` (current currencies & funds)
-* :file:`list_three.xml` (historical currencies & funds)
+* :file:`list-one.xml` (current currencies & funds)
+* :file:`list-three.xml` (historical currencies & funds)
 
 Classes:
 
@@ -43,20 +43,20 @@ class ISOCurrency:
 
 
 def current_data_date():
-    one = etree.fromstring(read_binary("pricehist.resources", "list_one.xml"))
+    one = etree.fromstring(read_binary("pricehist.resources", "list-one.xml"))
     return one.cssselect("ISO_4217")[0].attrib["Pblshd"]
 
 
 def historical_data_date():
-    three = etree.fromstring(read_binary("pricehist.resources", "list_three.xml"))
+    three = etree.fromstring(read_binary("pricehist.resources", "list-three.xml"))
     return three.cssselect("ISO_4217")[0].attrib["Pblshd"]
 
 
 def by_code():
     result = {}
 
-    one = etree.fromstring(read_binary("pricehist.resources", "list_one.xml"))
-    three = etree.fromstring(read_binary("pricehist.resources", "list_three.xml"))
+    one = etree.fromstring(read_binary("pricehist.resources", "list-one.xml"))
+    three = etree.fromstring(read_binary("pricehist.resources", "list-three.xml"))
 
     for entry in three.cssselect("HstrcCcyNtry") + one.cssselect("CcyNtry"):
         if currency := _parse(entry):
