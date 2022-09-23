@@ -144,11 +144,11 @@ name="Yahoo! Finance"
 cmd="pricehist fetch yahoo TSLA -s 2021-01-04 -e 2021-01-08"
 read -r -d '' expected <<END
 date,base,quote,amount,source,type
-2021-01-04,TSLA,USD,729.770020,yahoo,adjclose
-2021-01-05,TSLA,USD,735.109985,yahoo,adjclose
-2021-01-06,TSLA,USD,755.979980,yahoo,adjclose
-2021-01-07,TSLA,USD,816.039978,yahoo,adjclose
-2021-01-08,TSLA,USD,880.020020,yahoo,adjclose
+2021-01-04,TSLA,USD,243.256668,yahoo,adjclose
+2021-01-05,TSLA,USD,245.036667,yahoo,adjclose
+2021-01-06,TSLA,USD,251.993332,yahoo,adjclose
+2021-01-07,TSLA,USD,272.013336,yahoo,adjclose
+2021-01-08,TSLA,USD,293.339996,yahoo,adjclose
 END
 run_test "$name" "$cmd" "$expected"
 
