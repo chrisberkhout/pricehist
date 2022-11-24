@@ -107,6 +107,7 @@ run_test "$name" "$cmd" "$expected"
 name="CoinDesk Bitcoin Price Index"
 cmd="pricehist fetch coindesk BTC/EUR -s 2021-01-04 -e 2021-01-08"
 read -r -d '' expected <<END
+WARNING This source is deprecated. Data stops at 2022-07-10.
 date,base,quote,amount,source,type
 2021-01-04,BTC,EUR,26135.4901,coindesk,close
 2021-01-05,BTC,EUR,27677.9141,coindesk,close
