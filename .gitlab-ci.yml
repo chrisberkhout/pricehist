@@ -30,3 +30,4 @@ coverage:
   script:
     - poetry run coverage run --source=pricehist -m pytest
     - poetry run coverage report
+  coverage: '/^TOTAL.+?(\d+\%)$/'
