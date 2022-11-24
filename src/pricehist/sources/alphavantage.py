@@ -51,8 +51,7 @@ class AlphaVantage(BaseSource):
             "will list all digital and physical currency symbols.\n"
             "The PAIR for stocks is the stock symbol only. The quote currency "
             f"will be determined automatically. {self._stock_symbols_message()}\n"
-            "The price type 'adjclose' is only available for stocks, and "
-            "requires an access key for which premium endpoints are unlocked.\n"
+            "The price type 'adjclose' is only available for stocks.\n"
             "Beware that digital currencies quoted in non-USD currencies may "
             "be converted from USD data at one recent exchange rate rather "
             "than using historical rates.\n"
@@ -187,10 +186,9 @@ class AlphaVantage(BaseSource):
     def _stock_data(self, series):
         output_quote = self._stock_currency(series.base) or "UNKNOWN"
 
-        if series.type == "adjclose":
-            function = "TIME_SERIES_DAILY_ADJUSTED"
-        else:
-            function = "TIME_SERIES_DAILY"
+        # As of 2022-11-24 TIME_SERIES_DAILY_ADJUSTED is no longer premium, but
+        # now TIME_SERIES_DAILY is. So, always use TIME_SERIES_DAILY_ADJUSTED.
+        function = "TIME_SERIES_DAILY_ADJUSTED"
 
         params = {
             "function": function,
@@ -341,7 +339,7 @@ class AlphaVantage(BaseSource):
                 raise exceptions.RateLimit(data["Note"])
             if (
                 "Information" in data
-                and "ways to unlock premium" in data["Information"]
+                and "unlock all premium endpoints" in data["Information"]
             ):
                 msg = "You were denied access to a premium endpoint."
                 raise exceptions.CredentialsError([self.API_KEY_NAME], self, msg)
