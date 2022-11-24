@@ -169,9 +169,9 @@ class GnuCashSQL(BaseOutput):
             denom = str(1)
         else:
             numerator = sign + "".join([str(d) for d in tup.digits])
-            denom = str(10 ** -tup.exponent)
+            denom = str(10**-tup.exponent)
         fit = self._fit_in_int64(Decimal(numerator), Decimal(denom))
         return (numerator, denom, fit)
 
     def _fit_in_int64(self, *numbers):
-        return all(n >= -(2 ** 63) and n <= (2 ** 63) - 1 for n in numbers)
+        return all(n >= -(2**63) and n <= (2**63) - 1 for n in numbers)
