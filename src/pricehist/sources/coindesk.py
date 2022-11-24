@@ -1,5 +1,6 @@
 import dataclasses
 import json
+import logging
 from decimal import Decimal
 
 import requests
@@ -19,7 +20,9 @@ class CoinDesk(BaseSource):
 
     def description(self):
         return (
-            "An average of Bitcoin prices across leading global exchanges. \n"
+            "WARNING: This source is deprecated. Data stops at 2022-07-10.\n"
+            "The documentation URL now redirects to the main page.\n"
+            "An average of Bitcoin prices across leading global exchanges.\n"
             "Powered by CoinDesk, https://www.coindesk.com/price/bitcoin"
         )
 
@@ -64,6 +67,8 @@ class CoinDesk(BaseSource):
             return results
 
     def fetch(self, series):
+        logging.warning("This source is deprecated. Data stops at 2022-07-10.")
+
         if series.base != "BTC" or series.quote in ["BTC", "XBT"]:
             # BTC is the only valid base.
             # BTC as the quote will return BTC/USD, which we don't want.
