@@ -65,7 +65,7 @@ def test_fetch_returns_formatted_output(source, res_series, output, fmt, mocker)
 
 def test_fetch_inverts_if_requested(source, res_series, output, fmt, mocker):
     req_series = Series("BTC", "EUR", "close", "2021-01-01", "2021-01-03")
-    inv_series = mocker.MagicMock(res_series)
+    inv_series = mocker.MagicMock()
     res_series.invert = mocker.MagicMock(return_value=inv_series)
 
     fetch(req_series, source, output, invert=True, quantize=None, fmt=fmt)
@@ -76,7 +76,7 @@ def test_fetch_inverts_if_requested(source, res_series, output, fmt, mocker):
 
 def test_fetch_quantizes_if_requested(source, res_series, output, fmt, mocker):
     req_series = Series("BTC", "EUR", "close", "2021-01-01", "2021-01-03")
-    qnt_series = mocker.MagicMock(res_series)
+    qnt_series = mocker.MagicMock()
     res_series.quantize = mocker.MagicMock(return_value=qnt_series)
 
     fetch(req_series, source, output, invert=False, quantize=2, fmt=fmt)
