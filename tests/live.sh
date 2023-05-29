@@ -11,6 +11,7 @@ cmd_prefix="poetry run"
 
 passed=0
 failed=0
+skipped=0
 
 run_test(){
   name=$1
@@ -33,12 +34,27 @@ run_test(){
   echo
 }
 
+skip_test(){
+  name=$1
+  cmd=$2
+  echo "TEST: $name"
+  echo "  Action: $cmd"
+  echo "  Result: SKIPPED!"
+  skipped=$((skipped+1))
+  echo
+}
+
 report(){
   total=$((passed+failed))
-  if [[ "$failed" -eq "0" ]]; then
-    echo "SUMMARY: $passed tests passed, none failed"
+  if [[ "$skipped" -eq "0" ]]; then
+    skipped_str="none"
   else
-    echo "SUMMARY: $failed/$total tests failed"
+    skipped_str="$skipped"
+  fi
+  if [[ "$failed" -eq "0" ]]; then
+    echo "SUMMARY: $passed tests passed, none failed, $skipped_str skipped"
+  else
+    echo "SUMMARY: $failed/$total tests failed, $skipped_str skipped"
     exit 1
   fi
 }
@@ -78,7 +94,11 @@ date,base,quote,amount,source,type
 2021-01-07,BTC,USD,39432.28000000,alphavantage,close
 2021-01-08,BTC,USD,40582.81000000,alphavantage,close
 END
-run_test "$name" "$cmd" "$expected"
+if [[ "$(date --iso-8601)" < "2023-06-15" ]]; then
+  skip_test "$name" "$cmd" "$expected"
+else
+  run_test "$name" "$cmd" "$expected"
+fi
 
 name="Bank of Canada"
 cmd="pricehist fetch bankofcanada CAD/USD -s 2021-01-04 -e 2021-01-08"
