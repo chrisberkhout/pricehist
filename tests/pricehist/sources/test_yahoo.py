@@ -126,6 +126,12 @@ def test_fetch_requests_and_receives_correct_times(src, type, spark_ok, recent_o
     assert series.prices[-1] == Price("2021-01-08", Decimal("880.020020"))
 
 
+def test_fetch_ignores_any_extra_row(src, type, spark_ok, recent_ok):
+    series = src.fetch(Series("TSLA", "", type, "2021-01-04", "2021-01-07"))
+    assert series.prices[0] == Price("2021-01-04", Decimal("729.770020"))
+    assert series.prices[-1] == Price("2021-01-07", Decimal("816.039978"))
+
+
 def test_fetch_requests_logged(src, type, spark_ok, recent_ok, caplog):
     with caplog.at_level(logging.DEBUG):
         src.fetch(Series("TSLA", "", type, "2021-01-04", "2021-01-08"))

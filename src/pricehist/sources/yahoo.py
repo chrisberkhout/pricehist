@@ -140,7 +140,7 @@ class Yahoo(BaseSource):
             .timestamp()
         ) + (
             24 * 60 * 60
-        )  # round up to include the last day
+        )  # some symbols require padding on the end timestamp
 
         history_url = f"{base_url}/download/{series.base}"
         history_params = {
@@ -191,4 +191,6 @@ class Yahoo(BaseSource):
         if history_lines[0] != "date,open,high,low,close,adjclose,volume":
             raise exceptions.ResponseParsingError("Unexpected CSV format")
 
-        return (quote, history)
+        requested_history = [row for row in history if row["date"] <= series.end]
+
+        return (quote, requested_history)
