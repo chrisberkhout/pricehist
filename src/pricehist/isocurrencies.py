@@ -24,7 +24,7 @@ Functions:
 """
 
 from dataclasses import dataclass, field
-from importlib.resources import read_binary
+from importlib.resources import files
 from typing import List
 
 from lxml import etree
@@ -43,20 +43,28 @@ class ISOCurrency:
 
 
 def current_data_date():
-    one = etree.fromstring(read_binary("pricehist.resources", "list-one.xml"))
+    one = etree.fromstring(
+        files("pricehist.resources").joinpath("list-one.xml").read_bytes()
+    )
     return one.cssselect("ISO_4217")[0].attrib["Pblshd"]
 
 
 def historical_data_date():
-    three = etree.fromstring(read_binary("pricehist.resources", "list-three.xml"))
+    three = etree.fromstring(
+        files("pricehist.resources").joinpath("list-three.xml").read_bytes()
+    )
     return three.cssselect("ISO_4217")[0].attrib["Pblshd"]
 
 
 def by_code():
     result = {}
 
-    one = etree.fromstring(read_binary("pricehist.resources", "list-one.xml"))
-    three = etree.fromstring(read_binary("pricehist.resources", "list-three.xml"))
+    one = etree.fromstring(
+        files("pricehist.resources").joinpath("list-one.xml").read_bytes()
+    )
+    three = etree.fromstring(
+        files("pricehist.resources").joinpath("list-three.xml").read_bytes()
+    )
 
     for entry in three.cssselect("HstrcCcyNtry") + one.cssselect("CcyNtry"):
         if currency := _parse(entry):

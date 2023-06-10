@@ -42,7 +42,7 @@ import hashlib
 import logging
 from datetime import datetime
 from decimal import Decimal
-from importlib.resources import read_text
+from importlib.resources import files
 
 from pricehist import __version__
 from pricehist.format import Format
@@ -119,13 +119,18 @@ class GnuCashSQL(BaseOutput):
                 "well."
             )
 
-        sql = read_text("pricehist.resources", "gnucash.sql").format(
-            version=__version__,
-            timestamp=datetime.utcnow().isoformat() + "Z",
-            base=self._sql_str(base),
-            quote=self._sql_str(quote),
-            values_comment=values_comment,
-            values=values,
+        sql = (
+            files("pricehist.resources")
+            .joinpath("gnucash.sql")
+            .read_text()
+            .format(
+                version=__version__,
+                timestamp=datetime.utcnow().isoformat() + "Z",
+                base=self._sql_str(base),
+                quote=self._sql_str(quote),
+                values_comment=values_comment,
+                values=values,
+            )
         )
 
         return sql
