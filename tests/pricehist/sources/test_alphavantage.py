@@ -48,6 +48,9 @@ search_url = re.compile(
     r"https://www\.alphavantage\.co/query\?function=SYMBOL_SEARCH.*"
 )
 stock_url = re.compile(
+    r"https://www\.alphavantage\.co/query\?function=TIME_SERIES_DAILY&.*"
+)
+adj_stock_url = re.compile(
     r"https://www\.alphavantage\.co/query\?function=TIME_SERIES_DAILY_ADJUSTED.*"
 )
 physical_url = re.compile(r"https://www\.alphavantage\.co/query\?function=FX_DAILY.*")
@@ -66,7 +69,12 @@ rate_limit_json = (
 
 premium_json = (
     '{ "Information": "Thank you for using Alpha Vantage! This is a premium '
-    "endpoint. You may subscribe to any of the premium plans at "
+    "endpoint and there are multiple ways to unlock premium endpoints: (1) "
+    "become a holder of Alpha Vantage Coin (AVC), an Ethereum-based "
+    "cryptocurrency that provides various utility & governance functions "
+    "within the Alpha Vantage ecosystem (AVC mining guide: "
+    "https://www.alphatournament.com/avc_mining_guide/) to unlock all "
+    "premium endpoints, (2) subscribe to any of the premium plans at "
     "https://www.alphavantage.co/premium/ to instantly unlock all premium "
     'endpoints" }'
 )
@@ -109,7 +117,7 @@ def ibm_ok(requests_mock):
 @pytest.fixture
 def ibm_adj_ok(requests_mock):
     json = (Path(os.path.splitext(__file__)[0]) / "ibm-partial-adj.json").read_text()
-    requests_mock.add(responses.GET, stock_url, body=json, status=200)
+    requests_mock.add(responses.GET, adj_stock_url, body=json, status=200)
     yield requests_mock
 
 
@@ -296,7 +304,7 @@ def test_fetch_stock_known(src, type, search_ok, ibm_ok):
     stock_req = ibm_ok.calls[1].request
     assert search_req.params["function"] == "SYMBOL_SEARCH"
     assert search_req.params["keywords"] == "IBM"
-    assert stock_req.params["function"] == "TIME_SERIES_DAILY_ADJUSTED"
+    assert stock_req.params["function"] == "TIME_SERIES_DAILY"
     assert stock_req.params["symbol"] == "IBM"
     assert stock_req.params["outputsize"] == "full"
     assert (series.base, series.quote) == ("IBM", "USD")
@@ -419,7 +427,7 @@ def test_fetch_stock_rate_limit(src, type, search_ok, requests_mock):
 
 
 def test_fetch_stock_premium(src, search_ok, requests_mock):
-    requests_mock.add(responses.GET, stock_url, body=premium_json)
+    requests_mock.add(responses.GET, adj_stock_url, body=premium_json)
     with pytest.raises(exceptions.CredentialsError) as e:
         src.fetch(Series("IBM", "", "adjclose", "2021-01-04", "2021-01-08"))
     assert "denied access to a premium endpoint" in str(e.value)

@@ -63,11 +63,11 @@ name="Alpha Vantage stocks"
 cmd="pricehist fetch alphavantage TSLA -s 2021-01-04 -e 2021-01-08"
 read -r -d '' expected <<END
 date,base,quote,amount,source,type
-2021-01-04,TSLA,USD,729.77,alphavantage,close
-2021-01-05,TSLA,USD,735.11,alphavantage,close
-2021-01-06,TSLA,USD,755.98,alphavantage,close
-2021-01-07,TSLA,USD,816.04,alphavantage,close
-2021-01-08,TSLA,USD,880.02,alphavantage,close
+2021-01-04,TSLA,USD,729.7700,alphavantage,close
+2021-01-05,TSLA,USD,735.1100,alphavantage,close
+2021-01-06,TSLA,USD,755.9800,alphavantage,close
+2021-01-07,TSLA,USD,816.0400,alphavantage,close
+2021-01-08,TSLA,USD,880.0200,alphavantage,close
 END
 if [[ "$(date --iso-8601)" < "2023-10-01" ]]; then
   skip_test "$name" "$cmd" "$expected"
