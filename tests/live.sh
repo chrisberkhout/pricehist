@@ -69,11 +69,7 @@ date,base,quote,amount,source,type
 2021-01-07,TSLA,USD,816.0400,alphavantage,close
 2021-01-08,TSLA,USD,880.0200,alphavantage,close
 END
-if [[ "$(date --iso-8601)" < "2023-10-01" ]]; then
-  skip_test "$name" "$cmd" "$expected"
-else
-  run_test "$name" "$cmd" "$expected"
-fi
+run_test "$name" "$cmd" "$expected"
 
 name="Alpha Vantage physical currency"
 cmd="pricehist fetch alphavantage AUD/EUR -s 2021-01-04 -e 2021-01-08"
