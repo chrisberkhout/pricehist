@@ -57,7 +57,8 @@ class CoinMarketCap(BaseSource):
         for item in data.get("quotes", []):
             d = item["time_open"][0:10]
             amount = self._amount(next(iter(item["quote"].values())), series.type)
-            prices.append(Price(d, amount))
+            if amount is not None:
+                prices.append(Price(d, amount))
 
         output_base, output_quote = self._output_pair(series.base, series.quote, data)
 
@@ -155,12 +156,14 @@ class CoinMarketCap(BaseSource):
         return parsed["data"]
 
     def _amount(self, data, type):
-        if type in ["mid"]:
+        if type in ["mid"] and data["high"] is not None and data["low"] is not None:
             high = Decimal(str(data["high"]))
             low = Decimal(str(data["low"]))
             return sum([high, low]) / 2
-        else:
+        elif type in data and data[type] is not None:
             return Decimal(str(data[type]))
+        else:
+            return None
 
     def _output_pair(self, base, quote, data):
         data_base = data["symbol"]
