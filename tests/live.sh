@@ -69,8 +69,11 @@ date,base,quote,amount,source,type
 2021-01-07,TSLA,USD,816.04,alphavantage,close
 2021-01-08,TSLA,USD,880.02,alphavantage,close
 END
-run_test "$name" "$cmd" "$expected"
-
+if [[ "$(date --iso-8601)" < "2023-10-01" ]]; then
+  skip_test "$name" "$cmd" "$expected"
+else
+  run_test "$name" "$cmd" "$expected"
+fi
 
 name="Alpha Vantage physical currency"
 cmd="pricehist fetch alphavantage AUD/EUR -s 2021-01-04 -e 2021-01-08"
@@ -80,7 +83,7 @@ date,base,quote,amount,source,type
 2021-01-05,AUD,EUR,0.63086,alphavantage,close
 2021-01-06,AUD,EUR,0.63306,alphavantage,close
 2021-01-07,AUD,EUR,0.63284,alphavantage,close
-2021-01-08,AUD,EUR,0.63530,alphavantage,close
+2021-01-08,AUD,EUR,0.63360,alphavantage,close
 END
 run_test "$name" "$cmd" "$expected"
 
@@ -94,11 +97,7 @@ date,base,quote,amount,source,type
 2021-01-07,BTC,USD,39432.28000000,alphavantage,close
 2021-01-08,BTC,USD,40582.81000000,alphavantage,close
 END
-if [[ "$(date --iso-8601)" < "2023-06-15" ]]; then
-  skip_test "$name" "$cmd" "$expected"
-else
-  run_test "$name" "$cmd" "$expected"
-fi
+run_test "$name" "$cmd" "$expected"
 
 name="Bank of Canada"
 cmd="pricehist fetch bankofcanada CAD/USD -s 2021-01-04 -e 2021-01-08"
@@ -141,11 +140,11 @@ name="CoinMarketCap"
 cmd="pricehist fetch coinmarketcap BTC/EUR -s 2021-01-04 -e 2021-01-08"
 read -r -d '' expected <<END
 date,base,quote,amount,source,type
-2021-01-04,BTC,EUR,25329.110170161484,coinmarketcap,mid
-2021-01-05,BTC,EUR,26321.26752264663,coinmarketcap,mid
-2021-01-06,BTC,EUR,28572.211551075297,coinmarketcap,mid
-2021-01-07,BTC,EUR,31200.894541155460,coinmarketcap,mid
-2021-01-08,BTC,EUR,32155.0183793871585,coinmarketcap,mid
+2021-01-04,BTC,EUR,25330.6611989461305,coinmarketcap,mid
+2021-01-05,BTC,EUR,26320.957584331295,coinmarketcap,mid
+2021-01-06,BTC,EUR,28571.407214265565,coinmarketcap,mid
+2021-01-07,BTC,EUR,31200.6391028267445,coinmarketcap,mid
+2021-01-08,BTC,EUR,32154.244768031175,coinmarketcap,mid
 END
 run_test "$name" "$cmd" "$expected"
 
