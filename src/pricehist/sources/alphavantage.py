@@ -341,7 +341,8 @@ class AlphaVantage(BaseSource):
                 raise exceptions.RateLimit(data["Note"])
             if (
                 "Information" in data
-                and "ways to unlock premium" in data["Information"]
+                and "unlock" in data["Information"]
+                and "premium" in data["Information"]
             ):
                 msg = "You were denied access to a premium endpoint."
                 raise exceptions.CredentialsError([self.API_KEY_NAME], self, msg)
