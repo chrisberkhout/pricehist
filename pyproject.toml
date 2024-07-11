@@ -14,7 +14,7 @@ include = [
 ]
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = "^3.8.1"
 requests = "^2.25.1"
 lxml = "^5.1.0"
 cssselect = "^1.1.0"
@@ -23,7 +23,7 @@ curlify = "^2.2.1"
 [tool.poetry.dev-dependencies]
 pytest = "^6.2.2"
 black = "^22.10.0"
-flake8 = "^3.9.1"
+flake8 = "^7.1.0"
 isort = "^5.8.0"
 responses = "^0.13.3"
 coverage = "^5.5"
