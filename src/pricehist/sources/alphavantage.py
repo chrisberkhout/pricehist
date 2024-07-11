@@ -313,10 +313,10 @@ class AlphaVantage(BaseSource):
 
         normalized_data = {
             day: {
-                "open": entries[f"1. open"],
-                "high": entries[f"2. high"],
-                "low": entries[f"3. low"],
-                "close": entries[f"4. close"],
+                "open": entries["1. open"],
+                "high": entries["2. high"],
+                "low": entries["3. low"],
+                "close": entries["4. close"],
             }
             for day, entries in reversed(
                 data["Time Series (Digital Currency Daily)"].items()
