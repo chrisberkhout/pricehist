@@ -72,26 +72,26 @@ END
 run_test "$name" "$cmd" "$expected"
 
 name="Alpha Vantage physical currency"
-cmd="pricehist fetch alphavantage AUD/EUR -s 2021-01-04 -e 2021-01-08"
+cmd="pricehist fetch alphavantage AUD/EUR -s 2021-01-10 -e 2021-01-14"
 read -r -d '' expected <<END
 date,base,quote,amount,source,type
-2021-01-04,AUD,EUR,0.62558,alphavantage,close
-2021-01-05,AUD,EUR,0.63086,alphavantage,close
-2021-01-06,AUD,EUR,0.63306,alphavantage,close
-2021-01-07,AUD,EUR,0.63284,alphavantage,close
-2021-01-08,AUD,EUR,0.63360,alphavantage,close
+2021-01-10,AUD,EUR,0.63313,alphavantage,close
+2021-01-11,AUD,EUR,0.63374,alphavantage,close
+2021-01-12,AUD,EUR,0.63684,alphavantage,close
+2021-01-13,AUD,EUR,0.63686,alphavantage,close
+2021-01-14,AUD,EUR,0.63984,alphavantage,close
 END
 run_test "$name" "$cmd" "$expected"
 
 name="Alpha Vantage digital currency"
-cmd="pricehist fetch alphavantage BTC/USD -s 2021-01-04 -e 2021-01-08"
+cmd="pricehist fetch alphavantage BTC/USD -s 2024-07-01 -e 2024-07-05"
 read -r -d '' expected <<END
 date,base,quote,amount,source,type
-2021-01-04,BTC,USD,31988.71000000,alphavantage,close
-2021-01-05,BTC,USD,33949.53000000,alphavantage,close
-2021-01-06,BTC,USD,36769.36000000,alphavantage,close
-2021-01-07,BTC,USD,39432.28000000,alphavantage,close
-2021-01-08,BTC,USD,40582.81000000,alphavantage,close
+2024-07-01,BTC,USD,62830.13000000,alphavantage,close
+2024-07-02,BTC,USD,62040.22000000,alphavantage,close
+2024-07-03,BTC,USD,60145.01000000,alphavantage,close
+2024-07-04,BTC,USD,57042.14000000,alphavantage,close
+2024-07-05,BTC,USD,56639.43000000,alphavantage,close
 END
 run_test "$name" "$cmd" "$expected"
 
