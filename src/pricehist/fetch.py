@@ -80,5 +80,8 @@ def _cov_description(
             f"and ends {end_uncovered} day{s(end_uncovered)} earlier "
             f"than requested"
         )
-    else:
+    elif start_uncovered == 0 and end_uncovered == 0:
         return "as requested"
+    else:
+        return "which doesn't match the request"
+
