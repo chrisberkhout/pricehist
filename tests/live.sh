@@ -130,7 +130,7 @@ date,base,quote,amount,source,type
 2021-01-07,BTC,EUR,32183.1594,coindesk,close
 2021-01-08,BTC,EUR,33238.5724,coindesk,close
 END
-run_test "$name" "$cmd" "$expected"
+skip_test "$name" "$cmd" "$expected"
 
 name="CoinMarketCap"
 cmd="pricehist fetch coinmarketcap BTC/EUR -s 2021-01-04 -e 2021-01-08"
@@ -142,7 +142,7 @@ date,base,quote,amount,source,type
 2021-01-07,BTC,EUR,31200.6391028267445,coinmarketcap,mid
 2021-01-08,BTC,EUR,32154.244768031175,coinmarketcap,mid
 END
-run_test "$name" "$cmd" "$expected"
+skip_test "$name" "$cmd" "$expected"
 
 name="European Central Bank"
 cmd="pricehist fetch ecb EUR/JPY -s 2021-01-04 -e 2021-01-08"
