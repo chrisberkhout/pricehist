@@ -40,7 +40,7 @@ Classes:
 
 import hashlib
 import logging
-from datetime import datetime
+from datetime import datetime, timezone
 from decimal import Decimal
 from importlib.resources import files
 
@@ -125,7 +125,7 @@ class GnuCashSQL(BaseOutput):
             .read_text()
             .format(
                 version=__version__,
-                timestamp=datetime.utcnow().isoformat() + "Z",
+                timestamp=datetime.now(timezone.utc).isoformat()[:-6] + "Z",
                 base=self._sql_str(base),
                 quote=self._sql_str(quote),
                 values_comment=values_comment,
