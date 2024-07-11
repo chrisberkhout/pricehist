@@ -175,9 +175,9 @@ class AlphaVantage(BaseSource):
 
         expected_keys = ["1. symbol", "2. name", "3. type", "4. region", "8. currency"]
         if (
-            type(data) != dict
+            type(data) is not dict
             or "bestMatches" not in data
-            or type(data["bestMatches"]) != list
+            or type(data["bestMatches"]) is not list
             or not all(k in m for k in expected_keys for m in data["bestMatches"])
         ):
             raise exceptions.ResponseParsingError("Unexpected content.")
@@ -267,7 +267,7 @@ class AlphaVantage(BaseSource):
 
         self._raise_for_generic_errors(data)
 
-        if type(data) != dict or "Time Series FX (Daily)" not in data:
+        if type(data) is not dict or "Time Series FX (Daily)" not in data:
             raise exceptions.ResponseParsingError("Unexpected content.")
 
         normalized_data = {
@@ -308,7 +308,7 @@ class AlphaVantage(BaseSource):
 
         self._raise_for_generic_errors(data)
 
-        if type(data) != dict or "Time Series (Digital Currency Daily)" not in data:
+        if type(data) is not dict or "Time Series (Digital Currency Daily)" not in data:
             raise exceptions.ResponseParsingError("Unexpected content.")
 
         normalized_data = {
@@ -336,7 +336,7 @@ class AlphaVantage(BaseSource):
         return key
 
     def _raise_for_generic_errors(self, data):
-        if type(data) == dict:
+        if type(data) is dict:
             if "Note" in data and "call frequency" in data["Note"]:
                 raise exceptions.RateLimit(data["Note"])
             if (

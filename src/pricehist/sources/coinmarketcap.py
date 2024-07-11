@@ -144,7 +144,7 @@ class CoinMarketCap(BaseSource):
         except Exception as e:
             raise exceptions.ResponseParsingError(str(e)) from e
 
-        if type(parsed) != dict or "data" not in parsed:
+        if type(parsed) is not dict or "data" not in parsed:
             raise exceptions.ResponseParsingError("Unexpected content.")
 
         elif len(parsed["data"]) == 0:
@@ -208,7 +208,7 @@ class CoinMarketCap(BaseSource):
         except Exception as e:
             raise exceptions.ResponseParsingError(str(e)) from e
 
-        if type(parsed) != dict or "data" not in parsed:
+        if type(parsed) is not dict or "data" not in parsed:
             raise exceptions.ResponseParsingError("Unexpected content.")
 
         elif len(parsed["data"]) == 0:
