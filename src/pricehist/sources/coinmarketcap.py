@@ -2,6 +2,7 @@ import dataclasses
 import json
 from datetime import datetime, timezone
 from decimal import Decimal
+from functools import lru_cache
 
 import requests
 
@@ -55,8 +56,8 @@ class CoinMarketCap(BaseSource):
 
         prices = []
         for item in data.get("quotes", []):
-            d = item["time_open"][0:10]
-            amount = self._amount(next(iter(item["quote"].values())), series.type)
+            d = item["timeOpen"][0:10]
+            amount = self._amount(item["quote"], series.type)
             if amount is not None:
                 prices.append(Price(d, amount))
 
@@ -67,21 +68,21 @@ class CoinMarketCap(BaseSource):
         )
 
     def _data(self, series):
-        url = "https://web-api.coinmarketcap.com/v1/cryptocurrency/ohlcv/historical"
+        url = "https://api.coinmarketcap.com/data-api/v3.1/cryptocurrency/historical"
 
         params = {}
 
         if series.base.startswith("ID="):
             params["id"] = series.base[3:]
         else:
-            params["symbol"] = series.base
+            params["id"] = self._id_from_symbol(series.base, series)
 
         if series.quote.startswith("ID="):
-            params["convert_id"] = series.quote[3:]
+            params["convertId"] = series.quote[3:]
         else:
-            params["convert"] = series.quote
+            params["convertId"] = self._id_from_symbol(series.quote, series)
 
-        params["time_start"] = int(
+        params["timeStart"] = int(
             int(
                 datetime.strptime(series.start, "%Y-%m-%d")
                 .replace(tzinfo=timezone.utc)
@@ -90,11 +91,13 @@ class CoinMarketCap(BaseSource):
             - 24 * 60 * 60
             # Start one period earlier since the start is exclusive.
         )
-        params["time_end"] = int(
+        params["timeEnd"] = int(
             datetime.strptime(series.end, "%Y-%m-%d")
             .replace(tzinfo=timezone.utc)
             .timestamp()
         )  # Don't round up since it's inclusive of the period covering the end time.
+
+        params["interval"] = "daily"
 
         try:
             response = self.log_curl(requests.get(url, params=params))
@@ -112,11 +115,6 @@ class CoinMarketCap(BaseSource):
         elif code == 400 and 'Invalid value for \\"convert_id\\"' in text:
             raise exceptions.InvalidPair(
                 series.base, series.quote, self, "Bad quote ID."
-            )
-
-        elif code == 400 and 'Invalid value for \\"convert\\"' in text:
-            raise exceptions.InvalidPair(
-                series.base, series.quote, self, "Bad quote symbol."
             )
 
         elif code == 400 and "must be older than" in text:
@@ -182,15 +180,127 @@ class CoinMarketCap(BaseSource):
 
         return (output_base, output_quote)
 
+    def _id_from_symbol(self, symbol, series):
+        for i in self._symbol_data():
+            if i["symbol"] == symbol:
+                return i["id"]
+        raise exceptions.InvalidPair(
+            series.base, series.quote, self, f"Invalid symbol '{symbol}'."
+        )
+
+    @lru_cache(maxsize=1)
     def _symbol_data(self):
-        base_url = "https://web-api.coinmarketcap.com/v1/"
-        fiat_url = f"{base_url}fiat/map?include_metals=true"
+
+        base_url = "https://api.coinmarketcap.com/data-api/v1/"
         crypto_url = f"{base_url}cryptocurrency/map?sort=cmc_rank"
 
-        fiat = self._get_json_data(fiat_url)
         crypto = self._get_json_data(crypto_url)
 
-        return crypto + fiat
+        # fmt: off
+        fiat = [
+            {"id": 2781, "symbol": "USD", "name": "United States Dollar"},
+            {"id": 3526, "symbol": "ALL", "name": "Albanian Lek"},
+            {"id": 3537, "symbol": "DZD", "name": "Algerian Dinar"},
+            {"id": 2821, "symbol": "ARS", "name": "Argentine Peso"},
+            {"id": 3527, "symbol": "AMD", "name": "Armenian Dram"},
+            {"id": 2782, "symbol": "AUD", "name": "Australian Dollar"},
+            {"id": 3528, "symbol": "AZN", "name": "Azerbaijani Manat"},
+            {"id": 3531, "symbol": "BHD", "name": "Bahraini Dinar"},
+            {"id": 3530, "symbol": "BDT", "name": "Bangladeshi Taka"},
+            {"id": 3533, "symbol": "BYN", "name": "Belarusian Ruble"},
+            {"id": 3532, "symbol": "BMD", "name": "Bermudan Dollar"},
+            {"id": 2832, "symbol": "BOB", "name": "Bolivian Boliviano"},
+            {"id": 3529, "symbol": "BAM", "name": "Bosnia-Herzegovina Convertible Mark"},  # noqa: E501
+            {"id": 2783, "symbol": "BRL", "name": "Brazilian Real"},
+            {"id": 2814, "symbol": "BGN", "name": "Bulgarian Lev"},
+            {"id": 3549, "symbol": "KHR", "name": "Cambodian Riel"},
+            {"id": 2784, "symbol": "CAD", "name": "Canadian Dollar"},
+            {"id": 2786, "symbol": "CLP", "name": "Chilean Peso"},
+            {"id": 2787, "symbol": "CNY", "name": "Chinese Yuan"},
+            {"id": 2820, "symbol": "COP", "name": "Colombian Peso"},
+            {"id": 3534, "symbol": "CRC", "name": "Costa Rican Colón"},
+            {"id": 2815, "symbol": "HRK", "name": "Croatian Kuna"},
+            {"id": 3535, "symbol": "CUP", "name": "Cuban Peso"},
+            {"id": 2788, "symbol": "CZK", "name": "Czech Koruna"},
+            {"id": 2789, "symbol": "DKK", "name": "Danish Krone"},
+            {"id": 3536, "symbol": "DOP", "name": "Dominican Peso"},
+            {"id": 3538, "symbol": "EGP", "name": "Egyptian Pound"},
+            {"id": 2790, "symbol": "EUR", "name": "Euro"},
+            {"id": 3539, "symbol": "GEL", "name": "Georgian Lari"},
+            {"id": 3540, "symbol": "GHS", "name": "Ghanaian Cedi"},
+            {"id": 3541, "symbol": "GTQ", "name": "Guatemalan Quetzal"},
+            {"id": 3542, "symbol": "HNL", "name": "Honduran Lempira"},
+            {"id": 2792, "symbol": "HKD", "name": "Hong Kong Dollar"},
+            {"id": 2793, "symbol": "HUF", "name": "Hungarian Forint"},
+            {"id": 2818, "symbol": "ISK", "name": "Icelandic Króna"},
+            {"id": 2796, "symbol": "INR", "name": "Indian Rupee"},
+            {"id": 2794, "symbol": "IDR", "name": "Indonesian Rupiah"},
+            {"id": 3544, "symbol": "IRR", "name": "Iranian Rial"},
+            {"id": 3543, "symbol": "IQD", "name": "Iraqi Dinar"},
+            {"id": 2795, "symbol": "ILS", "name": "Israeli New Shekel"},
+            {"id": 3545, "symbol": "JMD", "name": "Jamaican Dollar"},
+            {"id": 2797, "symbol": "JPY", "name": "Japanese Yen"},
+            {"id": 3546, "symbol": "JOD", "name": "Jordanian Dinar"},
+            {"id": 3551, "symbol": "KZT", "name": "Kazakhstani Tenge"},
+            {"id": 3547, "symbol": "KES", "name": "Kenyan Shilling"},
+            {"id": 3550, "symbol": "KWD", "name": "Kuwaiti Dinar"},
+            {"id": 3548, "symbol": "KGS", "name": "Kyrgystani Som"},
+            {"id": 3552, "symbol": "LBP", "name": "Lebanese Pound"},
+            {"id": 3556, "symbol": "MKD", "name": "Macedonian Denar"},
+            {"id": 2800, "symbol": "MYR", "name": "Malaysian Ringgit"},
+            {"id": 2816, "symbol": "MUR", "name": "Mauritian Rupee"},
+            {"id": 2799, "symbol": "MXN", "name": "Mexican Peso"},
+            {"id": 3555, "symbol": "MDL", "name": "Moldovan Leu"},
+            {"id": 3558, "symbol": "MNT", "name": "Mongolian Tugrik"},
+            {"id": 3554, "symbol": "MAD", "name": "Moroccan Dirham"},
+            {"id": 3557, "symbol": "MMK", "name": "Myanma Kyat"},
+            {"id": 3559, "symbol": "NAD", "name": "Namibian Dollar"},
+            {"id": 3561, "symbol": "NPR", "name": "Nepalese Rupee"},
+            {"id": 2811, "symbol": "TWD", "name": "New Taiwan Dollar"},
+            {"id": 2802, "symbol": "NZD", "name": "New Zealand Dollar"},
+            {"id": 3560, "symbol": "NIO", "name": "Nicaraguan Córdoba"},
+            {"id": 2819, "symbol": "NGN", "name": "Nigerian Naira"},
+            {"id": 2801, "symbol": "NOK", "name": "Norwegian Krone"},
+            {"id": 3562, "symbol": "OMR", "name": "Omani Rial"},
+            {"id": 2804, "symbol": "PKR", "name": "Pakistani Rupee"},
+            {"id": 3563, "symbol": "PAB", "name": "Panamanian Balboa"},
+            {"id": 2822, "symbol": "PEN", "name": "Peruvian Sol"},
+            {"id": 2803, "symbol": "PHP", "name": "Philippine Peso"},
+            {"id": 2805, "symbol": "PLN", "name": "Polish Złoty"},
+            {"id": 2791, "symbol": "GBP", "name": "Pound Sterling"},
+            {"id": 3564, "symbol": "QAR", "name": "Qatari Rial"},
+            {"id": 2817, "symbol": "RON", "name": "Romanian Leu"},
+            {"id": 2806, "symbol": "RUB", "name": "Russian Ruble"},
+            {"id": 3566, "symbol": "SAR", "name": "Saudi Riyal"},
+            {"id": 3565, "symbol": "RSD", "name": "Serbian Dinar"},
+            {"id": 2808, "symbol": "SGD", "name": "Singapore Dollar"},
+            {"id": 2812, "symbol": "ZAR", "name": "South African Rand"},
+            {"id": 2798, "symbol": "KRW", "name": "South Korean Won"},
+            {"id": 3567, "symbol": "SSP", "name": "South Sudanese Pound"},
+            {"id": 3573, "symbol": "VES", "name": "Sovereign Bolivar"},
+            {"id": 3553, "symbol": "LKR", "name": "Sri Lankan Rupee"},
+            {"id": 2807, "symbol": "SEK", "name": "Swedish Krona"},
+            {"id": 2785, "symbol": "CHF", "name": "Swiss Franc"},
+            {"id": 2809, "symbol": "THB", "name": "Thai Baht"},
+            {"id": 3569, "symbol": "TTD", "name": "Trinidad and Tobago Dollar"},
+            {"id": 3568, "symbol": "TND", "name": "Tunisian Dinar"},
+            {"id": 2810, "symbol": "TRY", "name": "Turkish Lira"},
+            {"id": 3570, "symbol": "UGX", "name": "Ugandan Shilling"},
+            {"id": 2824, "symbol": "UAH", "name": "Ukrainian Hryvnia"},
+            {"id": 2813, "symbol": "AED", "name": "United Arab Emirates Dirham"},
+            {"id": 3571, "symbol": "UYU", "name": "Uruguayan Peso"},
+            {"id": 3572, "symbol": "UZS", "name": "Uzbekistan Som"},
+            {"id": 2823, "symbol": "VND", "name": "Vietnamese Dong"},
+        ]
+        metals = [
+            {"id": 3575, "symbol": "XAU", "name": "Gold Troy Ounce"},
+            {"id": 3574, "symbol": "XAG", "name": "Silver Troy Ounce"},
+            {"id": 3577, "symbol": "XPT", "name": "Platinum Ounce"},
+            {"id": 3576, "symbol": "XPD", "name": "Palladium Ounce"},
+        ]
+        # fmt: on
+
+        return fiat + metals + crypto
 
     def _get_json_data(self, url, params={}):
         try:
