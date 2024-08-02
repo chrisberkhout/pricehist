@@ -166,17 +166,18 @@ class CoinMarketCap(BaseSource):
     def _output_pair(self, base, quote, data):
         data_base = data["symbol"]
 
+        symbols = {i["id"]: (i["symbol"] or i["code"]) for i in self._symbol_data()}
+
         data_quote = None
         if len(data["quotes"]) > 0:
-            data_quote = next(iter(data["quotes"][0]["quote"].keys()))
+            data_quote = symbols[int(data["quotes"][0]["quote"]["name"])]
 
         lookup_quote = None
         if quote.startswith("ID="):
-            symbols = {i["id"]: (i["symbol"] or i["code"]) for i in self._symbol_data()}
             lookup_quote = symbols[int(quote[3:])]
 
         output_base = data_base
-        output_quote = lookup_quote or data_quote or quote
+        output_quote = data_quote or lookup_quote or quote
 
         return (output_base, output_quote)
 
