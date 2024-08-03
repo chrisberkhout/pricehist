@@ -33,13 +33,16 @@ class CoinMarketCap(BaseSource):
 
     def notes(self):
         return (
-            "This source makes unoffical use of endpoints that power CoinMarketCap's "
-            "public web interface. The price data comes from a public equivalent of "
-            "the OHLCV Historical endpoint found in CoinMarketCap's official API.\n"
-            "CoinMarketCap currency symbols are not necessarily unique, so it "
-            "is recommended that you use IDs, which can be listed via the "
-            "--symbols option. For example, 'ETH/BTC' is 'id=1027/id=1'. The "
-            "corresponding symbols will be used in output."
+            "This source makes unoffical use of endpoints that power "
+            "CoinMarketCap's public web interface.\n"
+            "CoinMarketCap currency symbols are not necessarily unique. "
+            "Each symbol you give will be coverted an ID by checking fiat and "
+            "metals first, then crypto by CoinMarketCap rank. "
+            "The symbol data is hard-coded for fiat and metals, but fetched "
+            "live for crypto.\n"
+            "You can directly use IDs, which can be listed via the --symbols "
+            "option. For example, 'ETH/BTC' is 'id=1027/id=1'. "
+            "The corresponding symbols will be used in output, when available."
         )
 
     def symbols(self):
