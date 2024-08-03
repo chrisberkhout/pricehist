@@ -72,14 +72,13 @@ END
 run_test "$name" "$cmd" "$expected"
 
 name="Alpha Vantage physical currency"
-cmd="pricehist fetch alphavantage AUD/EUR -s 2021-01-10 -e 2021-01-14"
+cmd="pricehist fetch alphavantage AUD/EUR -s 2021-01-11 -e 2021-01-14"
 read -r -d '' expected <<END
 date,base,quote,amount,source,type
-2021-01-10,AUD,EUR,0.63313,alphavantage,close
-2021-01-11,AUD,EUR,0.63374,alphavantage,close
-2021-01-12,AUD,EUR,0.63684,alphavantage,close
-2021-01-13,AUD,EUR,0.63686,alphavantage,close
-2021-01-14,AUD,EUR,0.63984,alphavantage,close
+2021-01-11,AUD,EUR,0.63318,alphavantage,close
+2021-01-12,AUD,EUR,0.63664,alphavantage,close
+2021-01-13,AUD,EUR,0.63585,alphavantage,close
+2021-01-14,AUD,EUR,0.63960,alphavantage,close
 END
 run_test "$name" "$cmd" "$expected"
 
@@ -136,13 +135,13 @@ name="CoinMarketCap"
 cmd="pricehist fetch coinmarketcap BTC/EUR -s 2021-01-04 -e 2021-01-08"
 read -r -d '' expected <<END
 date,base,quote,amount,source,type
-2021-01-04,BTC,EUR,25330.6611989461305,coinmarketcap,mid
-2021-01-05,BTC,EUR,26320.957584331295,coinmarketcap,mid
-2021-01-06,BTC,EUR,28571.407214265565,coinmarketcap,mid
-2021-01-07,BTC,EUR,31200.6391028267445,coinmarketcap,mid
-2021-01-08,BTC,EUR,32154.244768031175,coinmarketcap,mid
+2021-01-04,BTC,EUR,25322.5034586073,coinmarketcap,mid
+2021-01-05,BTC,EUR,26318.9928757682,coinmarketcap,mid
+2021-01-06,BTC,EUR,28570.9945210226,coinmarketcap,mid
+2021-01-07,BTC,EUR,31200.8342706036,coinmarketcap,mid
+2021-01-08,BTC,EUR,32157.05279624555,coinmarketcap,mid
 END
-skip_test "$name" "$cmd" "$expected"
+run_test "$name" "$cmd" "$expected"
 
 name="European Central Bank"
 cmd="pricehist fetch ecb EUR/JPY -s 2021-01-04 -e 2021-01-08"
