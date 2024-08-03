@@ -117,21 +117,6 @@ class CoinMarketCap(BaseSource):
                 series.base, series.quote, self, "Bad quote ID."
             )
 
-        elif code == 400 and "must be older than" in text:
-            if series.start <= series.end:
-                raise exceptions.BadResponse("The start date must be in the past.")
-            else:
-                raise exceptions.BadResponse(
-                    "The start date must preceed or match the end date."
-                )
-
-        elif (
-            code == 400
-            and "must be a valid ISO 8601 timestamp or unix time" in text
-            and series.start < "2001-09-11"
-        ):
-            raise exceptions.BadResponse("The start date can't preceed 2001-09-11.")
-
         try:
             response.raise_for_status()
         except Exception as e:
@@ -141,6 +126,17 @@ class CoinMarketCap(BaseSource):
             parsed = json.loads(response.content)
         except Exception as e:
             raise exceptions.ResponseParsingError(str(e)) from e
+
+        if (
+            "status" in parsed
+            and "error_code" in parsed["status"]
+            and parsed["status"]["error_code"] == "500"
+            and "The system is busy" in parsed["status"]["error_message"]
+        ):
+            raise exceptions.BadResponse(
+                "The server indicated a general error. "
+                "There may be problem with your request."
+            )
 
         if type(parsed) is not dict or "data" not in parsed:
             raise exceptions.ResponseParsingError("Unexpected content.")
