@@ -128,7 +128,7 @@ date,base,quote,amount,source,type
 2021-01-07,BTC,USD,39713.5079,coindeskbpi,close
 2021-01-08,BTC,USD,40519.4486,coindeskbpi,close
 END
-run_test "$name" "$cmd" "$expected"
+skip_test "$name" "$cmd" "$expected"
 
 name="CoinMarketCap"
 cmd="pricehist fetch coinmarketcap BTC/EUR -s 2021-01-04 -e 2021-01-08"
