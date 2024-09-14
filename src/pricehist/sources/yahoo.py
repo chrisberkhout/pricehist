@@ -1,4 +1,3 @@
-import csv
 import dataclasses
 import json
 import logging
@@ -71,63 +70,36 @@ class Yahoo(BaseSource):
                 series.base, series.quote, self, "Don't specify the quote currency."
             )
 
-        quote, history = self._data(series)
+        data = self._data(series)
+        quote = data["chart"]["result"][0]["meta"]["currency"]
+
+        timestamps = data["chart"]["result"][0]["timestamp"]
+        adjclose_data = data["chart"]["result"][0]["indicators"]["adjclose"][0]
+        rest_data = data["chart"]["result"][0]["indicators"]["quote"][0]
+        amounts = {**adjclose_data, **rest_data}
 
         prices = [
-            Price(row["date"], amount)
-            for row in history
-            if (amount := self._amount(row, series.type))
+            Price(ts, amount)
+            for i in range(len(timestamps))
+            if (ts := datetime.fromtimestamp(timestamps[i]).strftime("%Y-%m-%d"))
+            <= series.end
+            if (amount := self._amount(amounts, series.type, i)) is not None
         ]
 
         return dataclasses.replace(series, quote=quote, prices=prices)
 
-    def _amount(self, row, type):
-        if type == "mid" and row["high"] != "null" and row["low"] != "null":
-            return sum([Decimal(row["high"]), Decimal(row["low"])]) / 2
-        elif row[type] != "null":
-            return Decimal(row[type])
+    def _amount(self, amounts, type, i):
+        if type == "mid" and amounts["high"] != "null" and amounts["low"] != "null":
+            return sum([Decimal(amounts["high"][i]), Decimal(amounts["low"][i])]) / 2
+        elif amounts[type] != "null":
+            return Decimal(amounts[type][i])
         else:
             return None
 
-    def _data(self, series) -> (dict, csv.DictReader):
-        base_url = "https://query1.finance.yahoo.com/v7/finance"
+    def _data(self, series) -> dict:
+        base_url = "https://query1.finance.yahoo.com/v8/finance/chart"
         headers = {"User-Agent": f"pricehist/{__version__}"}
-
-        spark_url = f"{base_url}/spark"
-        spark_params = {
-            "symbols": series.base,
-            "range": "1d",
-            "interval": "1d",
-            "indicators": "close",
-            "includeTimestamps": "false",
-            "includePrePost": "false",
-        }
-        try:
-            spark_response = self.log_curl(
-                requests.get(spark_url, params=spark_params, headers=headers)
-            )
-        except Exception as e:
-            raise exceptions.RequestError(str(e)) from e
-
-        code = spark_response.status_code
-        text = spark_response.text
-        if code == 404 and "No data found for spark symbols" in text:
-            raise exceptions.InvalidPair(
-                series.base, series.quote, self, "Symbol not found."
-            )
-
-        try:
-            spark_response.raise_for_status()
-        except Exception as e:
-            raise exceptions.BadResponse(str(e)) from e
-
-        try:
-            spark = json.loads(spark_response.content)
-            quote = spark["spark"]["result"][0]["response"][0]["meta"]["currency"]
-        except Exception as e:
-            raise exceptions.ResponseParsingError(
-                "The spark data couldn't be parsed. "
-            ) from e
+        url = f"{base_url}/{series.base}"
 
         start_ts = int(
             datetime.strptime(series.start, "%Y-%m-%d")
@@ -142,24 +114,26 @@ class Yahoo(BaseSource):
             24 * 60 * 60
         )  # some symbols require padding on the end timestamp
 
-        history_url = f"{base_url}/download/{series.base}"
-        history_params = {
+        params = {
+            "symbol": series.base,
             "period1": start_ts,
             "period2": end_ts,
             "interval": "1d",
-            "events": "history",
+            "events": "capitalGain%7Cdiv%7Csplit",
             "includeAdjustedClose": "true",
+            "formatted": "true",
+            "userYfid": "true",
+            "lang": "en-US",
+            "region": "US",
         }
 
         try:
-            history_response = self.log_curl(
-                requests.get(history_url, params=history_params, headers=headers)
-            )
+            response = self.log_curl(requests.get(url, params=params, headers=headers))
         except Exception as e:
             raise exceptions.RequestError(str(e)) from e
 
-        code = history_response.status_code
-        text = history_response.text
+        code = response.status_code
+        text = response.text
 
         if code == 404 and "No data found, symbol may be delisted" in text:
             raise exceptions.InvalidPair(
@@ -177,20 +151,15 @@ class Yahoo(BaseSource):
             )
 
         try:
-            history_response.raise_for_status()
+            response.raise_for_status()
         except Exception as e:
             raise exceptions.BadResponse(str(e)) from e
 
         try:
-            history_lines = history_response.content.decode("utf-8").splitlines()
-            history_lines[0] = history_lines[0].lower().replace(" ", "")
-            history = csv.DictReader(history_lines, delimiter=",")
+            data = json.loads(response.content)
         except Exception as e:
-            raise exceptions.ResponseParsingError(str(e)) from e
+            raise exceptions.ResponseParsingError(
+                "The data couldn't be parsed. "
+            ) from e
 
-        if history_lines[0] != "date,open,high,low,close,adjclose,volume":
-            raise exceptions.ResponseParsingError("Unexpected CSV format")
-
-        requested_history = [row for row in history if row["date"] <= series.end]
-
-        return (quote, requested_history)
+        return data

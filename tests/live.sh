@@ -116,20 +116,19 @@ date,base,quote,amount,source,type
 2021-01-07,BTC,EUR,31208.49,coinbasepro,mid
 2021-01-08,BTC,EUR,32019,coinbasepro,mid
 END
-run_test "$name" "$cmd" "$expected"
-
-name="CoinDesk Bitcoin Price Index"
-cmd="pricehist fetch coindesk BTC/EUR -s 2021-01-04 -e 2021-01-08"
-read -r -d '' expected <<END
-WARNING This source is deprecated. Data stops at 2022-07-10.
-date,base,quote,amount,source,type
-2021-01-04,BTC,EUR,26135.4901,coindesk,close
-2021-01-05,BTC,EUR,27677.9141,coindesk,close
-2021-01-06,BTC,EUR,29871.4301,coindesk,close
-2021-01-07,BTC,EUR,32183.1594,coindesk,close
-2021-01-08,BTC,EUR,33238.5724,coindesk,close
-END
 skip_test "$name" "$cmd" "$expected"
+
+name="CoinDesk Bitcoin Price Index v1"
+cmd="pricehist fetch coindeskbpi BTC/USD -s 2021-01-04 -e 2021-01-08"
+read -r -d '' expected <<END
+date,base,quote,amount,source,type
+2021-01-04,BTC,USD,31431.6123,coindeskbpi,close
+2021-01-05,BTC,USD,34433.6065,coindeskbpi,close
+2021-01-06,BTC,USD,36275.7563,coindeskbpi,close
+2021-01-07,BTC,USD,39713.5079,coindeskbpi,close
+2021-01-08,BTC,USD,40519.4486,coindeskbpi,close
+END
+run_test "$name" "$cmd" "$expected"
 
 name="CoinMarketCap"
 cmd="pricehist fetch coinmarketcap BTC/EUR -s 2021-01-04 -e 2021-01-08"
@@ -159,11 +158,11 @@ name="Yahoo! Finance"
 cmd="pricehist fetch yahoo TSLA -s 2021-01-04 -e 2021-01-08"
 read -r -d '' expected <<END
 date,base,quote,amount,source,type
-2021-01-04,TSLA,USD,243.256668,yahoo,adjclose
-2021-01-05,TSLA,USD,245.036667,yahoo,adjclose
-2021-01-06,TSLA,USD,251.993332,yahoo,adjclose
-2021-01-07,TSLA,USD,272.013336,yahoo,adjclose
-2021-01-08,TSLA,USD,293.339996,yahoo,adjclose
+2021-01-04,TSLA,USD,243.2566680908203125,yahoo,adjclose
+2021-01-05,TSLA,USD,245.0366668701171875,yahoo,adjclose
+2021-01-06,TSLA,USD,251.9933319091796875,yahoo,adjclose
+2021-01-07,TSLA,USD,272.013336181640625,yahoo,adjclose
+2021-01-08,TSLA,USD,293.339996337890625,yahoo,adjclose
 END
 run_test "$name" "$cmd" "$expected"
 

@@ -36,38 +36,21 @@ def requests_mock():
         yield mock
 
 
-spark_url = "https://query1.finance.yahoo.com/v7/finance/spark"
-
-
-def history_url(base):
-    return f"https://query1.finance.yahoo.com/v7/finance/download/{base}"
-
-
-@pytest.fixture
-def spark_ok(requests_mock):
-    json = (Path(os.path.splitext(__file__)[0]) / "tsla-spark.json").read_text()
-    requests_mock.add(responses.GET, spark_url, body=json, status=200)
-    yield requests_mock
+def url(base):
+    return f"https://query1.finance.yahoo.com/v8/finance/chart/{base}"
 
 
 @pytest.fixture
 def recent_ok(requests_mock):
-    json = (Path(os.path.splitext(__file__)[0]) / "tsla-recent.csv").read_text()
-    requests_mock.add(responses.GET, history_url("TSLA"), body=json, status=200)
+    json = (Path(os.path.splitext(__file__)[0]) / "tsla-recent.json").read_text()
+    requests_mock.add(responses.GET, url("TSLA"), body=json, status=200)
     yield requests_mock
 
 
 @pytest.fixture
 def long_ok(requests_mock):
-    json = (Path(os.path.splitext(__file__)[0]) / "ibm-long-partial.csv").read_text()
-    requests_mock.add(responses.GET, history_url("IBM"), body=json, status=200)
-    yield requests_mock
-
-
-@pytest.fixture
-def date_with_nulls_ok(requests_mock):
-    json = (Path(os.path.splitext(__file__)[0]) / "ibm-date-with-nulls.csv").read_text()
-    requests_mock.add(responses.GET, history_url("IBM"), body=json, status=200)
+    json = (Path(os.path.splitext(__file__)[0]) / "ibm-long-partial.json").read_text()
+    requests_mock.add(responses.GET, url("IBM"), body=json, status=200)
     yield requests_mock
 
 
@@ -105,59 +88,57 @@ def test_symbols(src, caplog):
     assert any(["Find the symbol of interest on" in r.message for r in caplog.records])
 
 
-def test_fetch_known(src, type, spark_ok, recent_ok):
+def test_fetch_known(src, type, recent_ok):
     series = src.fetch(Series("TSLA", "", type, "2021-01-04", "2021-01-08"))
-    spark_req = recent_ok.calls[0].request
-    hist_req = recent_ok.calls[1].request
-    assert spark_req.params["symbols"] == "TSLA"
-    assert hist_req.params["events"] == "history"
-    assert hist_req.params["includeAdjustedClose"] == "true"
+    req = recent_ok.calls[0].request
+    assert req.params["events"] == "capitalGain%7Cdiv%7Csplit"
+    assert req.params["includeAdjustedClose"] == "true"
     assert (series.base, series.quote) == ("TSLA", "USD")
     assert len(series.prices) == 5
 
 
-def test_fetch_requests_and_receives_correct_times(src, type, spark_ok, recent_ok):
+def test_fetch_requests_and_receives_correct_times(src, type, recent_ok):
     series = src.fetch(Series("TSLA", "", type, "2021-01-04", "2021-01-08"))
-    hist_req = recent_ok.calls[1].request
-    assert hist_req.params["period1"] == str(timestamp("2021-01-04"))
-    assert hist_req.params["period2"] == str(timestamp("2021-01-09"))  # rounded up one
-    assert hist_req.params["interval"] == "1d"
-    assert series.prices[0] == Price("2021-01-04", Decimal("729.770020"))
-    assert series.prices[-1] == Price("2021-01-08", Decimal("880.020020"))
+    req = recent_ok.calls[0].request
+    assert req.params["period1"] == str(timestamp("2021-01-04"))
+    assert req.params["period2"] == str(timestamp("2021-01-09"))  # rounded up one
+    assert req.params["interval"] == "1d"
+    assert series.prices[0] == Price("2021-01-04", Decimal("243.2566680908203125"))
+    assert series.prices[-1] == Price("2021-01-08", Decimal("293.339996337890625"))
 
 
-def test_fetch_ignores_any_extra_row(src, type, spark_ok, recent_ok):
+def test_fetch_ignores_any_extra_row(src, type, recent_ok):
     series = src.fetch(Series("TSLA", "", type, "2021-01-04", "2021-01-07"))
-    assert series.prices[0] == Price("2021-01-04", Decimal("729.770020"))
-    assert series.prices[-1] == Price("2021-01-07", Decimal("816.039978"))
+    assert series.prices[0] == Price("2021-01-04", Decimal("243.2566680908203125"))
+    assert series.prices[-1] == Price("2021-01-07", Decimal("272.013336181640625"))
 
 
-def test_fetch_requests_logged(src, type, spark_ok, recent_ok, caplog):
+def test_fetch_requests_logged(src, type, recent_ok, caplog):
     with caplog.at_level(logging.DEBUG):
         src.fetch(Series("TSLA", "", type, "2021-01-04", "2021-01-08"))
     logged_requests = 0
     for r in caplog.records:
         if r.levelname == "DEBUG" and "curl " in r.message:
             logged_requests += 1
-    assert logged_requests == 2
+    assert logged_requests == 1
 
 
-def test_fetch_types_all_available(src, spark_ok, recent_ok):
+def test_fetch_types_all_available(src, recent_ok):
     adj = src.fetch(Series("TSLA", "", "adjclose", "2021-01-04", "2021-01-08"))
     opn = src.fetch(Series("TSLA", "", "open", "2021-01-04", "2021-01-08"))
     hgh = src.fetch(Series("TSLA", "", "high", "2021-01-04", "2021-01-08"))
     low = src.fetch(Series("TSLA", "", "low", "2021-01-04", "2021-01-08"))
     cls = src.fetch(Series("TSLA", "", "close", "2021-01-04", "2021-01-08"))
     mid = src.fetch(Series("TSLA", "", "mid", "2021-01-04", "2021-01-08"))
-    assert adj.prices[0].amount == Decimal("729.770020")
-    assert opn.prices[0].amount == Decimal("719.460022")
-    assert hgh.prices[0].amount == Decimal("744.489990")
-    assert low.prices[0].amount == Decimal("717.190002")
-    assert cls.prices[0].amount == Decimal("729.770020")
-    assert mid.prices[0].amount == Decimal("730.839996")
+    assert adj.prices[0].amount == Decimal("243.2566680908203125")
+    assert opn.prices[0].amount == Decimal("239.82000732421875")
+    assert hgh.prices[0].amount == Decimal("248.163330078125")
+    assert low.prices[0].amount == Decimal("239.0633392333984375")
+    assert cls.prices[0].amount == Decimal("243.2566680908203125")
+    assert mid.prices[0].amount == Decimal("243.61333465576171875")
 
 
-def test_fetch_type_mid_is_mean_of_low_and_high(src, spark_ok, recent_ok):
+def test_fetch_type_mid_is_mean_of_low_and_high(src, recent_ok):
     mid = src.fetch(Series("TSLA", "", "mid", "2021-01-04", "2021-01-08")).prices
     hgh = src.fetch(Series("TSLA", "", "high", "2021-01-04", "2021-01-08")).prices
     low = src.fetch(Series("TSLA", "", "low", "2021-01-04", "2021-01-08")).prices
@@ -169,29 +150,22 @@ def test_fetch_type_mid_is_mean_of_low_and_high(src, spark_ok, recent_ok):
     )
 
 
-def test_fetch_from_before_start(src, type, spark_ok, long_ok):
+def test_fetch_from_before_start(src, type, long_ok):
     series = src.fetch(Series("IBM", "", type, "1900-01-01", "2021-01-08"))
-    assert series.prices[0] == Price("1962-01-02", Decimal("1.837710"))
-    assert series.prices[-1] == Price("2021-01-08", Decimal("125.433624"))
+    assert series.prices[0] == Price("1962-01-02", Decimal("1.5133211612701416015625"))
+    assert series.prices[-1] == Price("2021-01-08", Decimal("103.2923736572265625"))
     assert len(series.prices) > 9
 
 
-def test_fetch_skips_dates_with_nulls(src, type, spark_ok, date_with_nulls_ok):
-    series = src.fetch(Series("IBM", "", type, "2021-01-05", "2021-01-07"))
-    assert series.prices[0] == Price("2021-01-05", Decimal("123.101204"))
-    assert series.prices[1] == Price("2021-01-07", Decimal("125.882545"))
-    assert len(series.prices) == 2
-
-
-def test_fetch_to_future(src, type, spark_ok, recent_ok):
+def test_fetch_to_future(src, type, recent_ok):
     series = src.fetch(Series("TSLA", "", type, "2021-01-04", "2100-01-08"))
     assert len(series.prices) > 0
 
 
-def test_fetch_no_data_in_past(src, type, spark_ok, requests_mock):
+def test_fetch_no_data_in_past(src, type, requests_mock):
     requests_mock.add(
         responses.GET,
-        history_url("TSLA"),
+        url("TSLA"),
         status=400,
         body=(
             "400 Bad Request: Data doesn't exist for "
@@ -203,10 +177,10 @@ def test_fetch_no_data_in_past(src, type, spark_ok, requests_mock):
     assert "No data for the given interval" in str(e.value)
 
 
-def test_fetch_no_data_in_future(src, type, spark_ok, requests_mock):
+def test_fetch_no_data_in_future(src, type, requests_mock):
     requests_mock.add(
         responses.GET,
-        history_url("TSLA"),
+        url("TSLA"),
         status=400,
         body=(
             "400 Bad Request: Data doesn't exist for "
@@ -218,10 +192,10 @@ def test_fetch_no_data_in_future(src, type, spark_ok, requests_mock):
     assert "No data for the given interval" in str(e.value)
 
 
-def test_fetch_no_data_on_weekend(src, type, spark_ok, requests_mock):
+def test_fetch_no_data_on_weekend(src, type, requests_mock):
     requests_mock.add(
         responses.GET,
-        history_url("TSLA"),
+        url("TSLA"),
         status=404,
         body="404 Not Found: Timestamp data missing.",
     )
@@ -233,30 +207,7 @@ def test_fetch_no_data_on_weekend(src, type, spark_ok, requests_mock):
 def test_fetch_bad_sym(src, type, requests_mock):
     requests_mock.add(
         responses.GET,
-        spark_url,
-        status=404,
-        body="""{
-            "spark": {
-                "result": null,
-                "error": {
-                    "code": "Not Found",
-                    "description": "No data found for spark symbols"
-                }
-            }
-        }""",
-    )
-    with pytest.raises(exceptions.InvalidPair) as e:
-        src.fetch(Series("NOTABASE", "", type, "2021-01-04", "2021-01-08"))
-    assert "Symbol not found" in str(e.value)
-
-
-def test_fetch_bad_sym_history(src, type, spark_ok, requests_mock):
-    # In practice the spark history requests should succeed or fail together.
-    # This extra test ensures that a failure of the the history part is handled
-    # correctly even if the spark part succeeds.
-    requests_mock.add(
-        responses.GET,
-        history_url("NOTABASE"),
+        url("NOTABASE"),
         status=404,
         body="404 Not Found: No data found, symbol may be delisted",
     )
@@ -271,61 +222,23 @@ def test_fetch_giving_quote(src, type):
     assert "quote currency" in str(e.value)
 
 
-def test_fetch_spark_network_issue(src, type, requests_mock):
+def test_fetch_network_issue(src, type, requests_mock):
     body = requests.exceptions.ConnectionError("Network issue")
-    requests_mock.add(responses.GET, spark_url, body=body)
+    requests_mock.add(responses.GET, url("TSLA"), body=body)
     with pytest.raises(exceptions.RequestError) as e:
         src.fetch(Series("TSLA", "", type, "2021-01-04", "2021-01-08"))
     assert "Network issue" in str(e.value)
 
 
-def test_fetch_spark_bad_status(src, type, requests_mock):
-    requests_mock.add(responses.GET, spark_url, status=500, body="Some other reason")
+def test_fetch_bad_status(src, type, requests_mock):
+    requests_mock.add(responses.GET, url("TSLA"), status=500, body="Some other reason")
     with pytest.raises(exceptions.BadResponse) as e:
         src.fetch(Series("TSLA", "", type, "2021-01-04", "2021-01-08"))
     assert "Internal Server Error" in str(e.value)
 
 
-def test_fetch_spark_parsing_error(src, type, requests_mock):
-    requests_mock.add(responses.GET, spark_url, body="NOT JSON")
-    with pytest.raises(exceptions.ResponseParsingError) as e:
-        src.fetch(Series("TSLA", "", type, "2021-01-04", "2021-01-08"))
-    assert "spark data couldn't be parsed" in str(e.value)
-
-
-def test_fetch_spark_unexpected_json(src, type, requests_mock):
-    requests_mock.add(responses.GET, spark_url, body='{"notdata": []}')
-    with pytest.raises(exceptions.ResponseParsingError) as e:
-        src.fetch(Series("TSLA", "", type, "2021-01-04", "2021-01-08"))
-    assert "spark data couldn't be parsed" in str(e.value)
-
-
-def test_fetch_history_network_issue(src, type, spark_ok, requests_mock):
-    body = requests.exceptions.ConnectionError("Network issue")
-    requests_mock.add(responses.GET, history_url("TSLA"), body=body)
-    with pytest.raises(exceptions.RequestError) as e:
-        src.fetch(Series("TSLA", "", type, "2021-01-04", "2021-01-08"))
-    assert "Network issue" in str(e.value)
-
-
-def test_fetch_history_bad_status(src, type, spark_ok, requests_mock):
-    requests_mock.add(
-        responses.GET, history_url("TSLA"), status=500, body="Some other reason"
-    )
-    with pytest.raises(exceptions.BadResponse) as e:
-        src.fetch(Series("TSLA", "", type, "2021-01-04", "2021-01-08"))
-    assert "Internal Server Error" in str(e.value)
-
-
-def test_fetch_history_parsing_error(src, type, spark_ok, requests_mock):
-    requests_mock.add(responses.GET, history_url("TSLA"), body="")
+def test_fetch_parsing_error(src, type, requests_mock):
+    requests_mock.add(responses.GET, url("TSLA"), body="")
     with pytest.raises(exceptions.ResponseParsingError) as e:
         src.fetch(Series("TSLA", "", type, "2021-01-04", "2021-01-08"))
     assert "error occurred while parsing data from the source" in str(e.value)
-
-
-def test_fetch_history_unexpected_csv_format(src, type, spark_ok, requests_mock):
-    requests_mock.add(responses.GET, history_url("TSLA"), body="BAD HEADER\nBAD DATA")
-    with pytest.raises(exceptions.ResponseParsingError) as e:
-        src.fetch(Series("TSLA", "", type, "2021-01-04", "2021-01-08"))
-    assert "Unexpected CSV format" in str(e.value)

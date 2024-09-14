@@ -1,0 +1,126 @@
+{
+  "chart": {
+    "result": [
+      {
+        "meta": {
+          "currency": "USD",
+          "symbol": "TSLA",
+          "exchangeName": "NMS",
+          "fullExchangeName": "NasdaqGS",
+          "instrumentType": "EQUITY",
+          "firstTradeDate": 1277818200,
+          "regularMarketTime": 1726257600,
+          "hasPrePostMarketData": true,
+          "gmtoffset": -14400,
+          "timezone": "EDT",
+          "exchangeTimezoneName": "America/New_York",
+          "regularMarketPrice": 230.29,
+          "fiftyTwoWeekHigh": 232.664,
+          "fiftyTwoWeekLow": 226.32,
+          "regularMarketDayHigh": 232.664,
+          "regularMarketDayLow": 226.32,
+          "regularMarketVolume": 59096538,
+          "longName": "Tesla, Inc.",
+          "shortName": "Tesla, Inc.",
+          "chartPreviousClose": 235.223,
+          "priceHint": 2,
+          "currentTradingPeriod": {
+            "pre": {
+              "timezone": "EDT",
+              "start": 1726214400,
+              "end": 1726234200,
+              "gmtoffset": -14400
+            },
+            "regular": {
+              "timezone": "EDT",
+              "start": 1726234200,
+              "end": 1726257600,
+              "gmtoffset": -14400
+            },
+            "post": {
+              "timezone": "EDT",
+              "start": 1726257600,
+              "end": 1726272000,
+              "gmtoffset": -14400
+            }
+          },
+          "dataGranularity": "1d",
+          "range": "",
+          "validRanges": [
+            "1d",
+            "5d",
+            "1mo",
+            "3mo",
+            "6mo",
+            "1y",
+            "2y",
+            "5y",
+            "10y",
+            "ytd",
+            "max"
+          ]
+        },
+        "timestamp": [
+          1609770600,
+          1609857000,
+          1609943400,
+          1610029800,
+          1610116200
+        ],
+        "indicators": {
+          "quote": [
+            {
+              "open": [
+                239.82000732421875,
+                241.22000122070312,
+                252.8300018310547,
+                259.2099914550781,
+                285.3333435058594
+              ],
+              "close": [
+                243.2566680908203,
+                245.0366668701172,
+                251.9933319091797,
+                272.0133361816406,
+                293.3399963378906
+              ],
+              "high": [
+                248.163330078125,
+                246.94667053222656,
+                258.0,
+                272.3299865722656,
+                294.8299865722656
+              ],
+              "low": [
+                239.06333923339844,
+                239.73333740234375,
+                249.6999969482422,
+                258.3999938964844,
+                279.46331787109375
+              ],
+              "volume": [
+                145914600,
+                96735600,
+                134100000,
+                154496700,
+                225166500
+              ]
+            }
+          ],
+          "adjclose": [
+            {
+              "adjclose": [
+                243.2566680908203,
+                245.0366668701172,
+                251.9933319091797,
+                272.0133361816406,
+                293.3399963378906
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    "error": null
+  }
+}
