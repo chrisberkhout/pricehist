@@ -1,0 +1,119 @@
+{
+  "chart": {
+    "result": [
+      {
+        "meta": {
+          "currency": "INR",
+          "symbol": "INR=X",
+          "exchangeName": "CCY",
+          "fullExchangeName": "CCY",
+          "instrumentType": "CURRENCY",
+          "firstTradeDate": 1070236800,
+          "regularMarketTime": 1726284616,
+          "hasPrePostMarketData": false,
+          "gmtoffset": 3600,
+          "timezone": "BST",
+          "exchangeTimezoneName": "Europe/London",
+          "regularMarketPrice": 83.89,
+          "fiftyTwoWeekHigh": 83.89,
+          "fiftyTwoWeekLow": 83.89,
+          "regularMarketDayHigh": 83.89,
+          "regularMarketDayLow": 83.89,
+          "regularMarketVolume": 0,
+          "longName": "USD/INR",
+          "shortName": "USD/INR",
+          "chartPreviousClose": 64.6117,
+          "priceHint": 4,
+          "currentTradingPeriod": {
+            "pre": {
+              "timezone": "BST",
+              "start": 1726182000,
+              "end": 1726182000,
+              "gmtoffset": 3600
+            },
+            "regular": {
+              "timezone": "BST",
+              "start": 1726182000,
+              "end": 1726268340,
+              "gmtoffset": 3600
+            },
+            "post": {
+              "timezone": "BST",
+              "start": 1726268340,
+              "end": 1726268340,
+              "gmtoffset": 3600
+            }
+          },
+          "dataGranularity": "1d",
+          "range": "",
+          "validRanges": [
+            "1d",
+            "5d",
+            "1mo",
+            "3mo",
+            "6mo",
+            "1y",
+            "2y",
+            "5y",
+            "10y",
+            "ytd",
+            "max"
+          ]
+        },
+        "timestamp": [
+          1499641200,
+          1499727600,
+          1499814000,
+          1499900400
+        ],
+        "indicators": {
+          "quote": [
+            {
+              "open": [
+                64.6155014038086,
+                null,
+                64.55549621582031,
+                64.46800231933594
+              ],
+              "volume": [
+                0,
+                null,
+                0,
+                0
+              ],
+              "low": [
+                64.41000366210938,
+                null,
+                64.3499984741211,
+                64.33999633789062
+              ],
+              "close": [
+                64.61170196533203,
+                null,
+                64.52559661865234,
+                64.36499786376953
+              ],
+              "high": [
+                64.6155014038086,
+                null,
+                64.56999969482422,
+                64.48419952392578
+              ]
+            }
+          ],
+          "adjclose": [
+            {
+              "adjclose": [
+                64.61170196533203,
+                null,
+                64.52559661865234,
+                64.36499786376953
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    "error": null
+  }
+}
