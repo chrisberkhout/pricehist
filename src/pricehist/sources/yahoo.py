@@ -82,14 +82,14 @@ class Yahoo(BaseSource):
         prices = [
             Price(date, amount)
             for i in range(len(timestamps))
-            if (date := self._date_from_ts(timestamps[i], offset)) <= series.end
+            if (date := self._ts_to_date(timestamps[i] + offset)) <= series.end
             if (amount := self._amount(amounts, series.type, i)) is not None
         ]
 
         return dataclasses.replace(series, quote=quote, prices=prices)
 
-    def _date_from_ts(self, ts, offset) -> str:
-        return datetime.fromtimestamp(ts - offset).strftime("%Y-%m-%d")
+    def _ts_to_date(self, ts) -> str:
+        return datetime.fromtimestamp(ts, tz=timezone.utc).date().isoformat()
 
     def _amount(self, amounts, type, i):
         if type == "mid" and amounts["high"] != "null" and amounts["low"] != "null":
