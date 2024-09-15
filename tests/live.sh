@@ -75,10 +75,10 @@ name="Alpha Vantage physical currency"
 cmd="pricehist fetch alphavantage AUD/EUR -s 2021-01-11 -e 2021-01-14"
 read -r -d '' expected <<END
 date,base,quote,amount,source,type
-2021-01-11,AUD,EUR,0.63318,alphavantage,close
-2021-01-12,AUD,EUR,0.63664,alphavantage,close
-2021-01-13,AUD,EUR,0.63585,alphavantage,close
-2021-01-14,AUD,EUR,0.63960,alphavantage,close
+2021-01-11,AUD,EUR,0.63374,alphavantage,close
+2021-01-12,AUD,EUR,0.63684,alphavantage,close
+2021-01-13,AUD,EUR,0.63686,alphavantage,close
+2021-01-14,AUD,EUR,0.63984,alphavantage,close
 END
 run_test "$name" "$cmd" "$expected"
 
