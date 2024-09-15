@@ -72,6 +72,7 @@ class Yahoo(BaseSource):
 
         data = self._data(series)
         quote = data["chart"]["result"][0]["meta"]["currency"]
+        offset = data["chart"]["result"][0]["meta"]["gmtoffset"]
 
         timestamps = data["chart"]["result"][0]["timestamp"]
         adjclose_data = data["chart"]["result"][0]["indicators"]["adjclose"][0]
@@ -79,19 +80,25 @@ class Yahoo(BaseSource):
         amounts = {**adjclose_data, **rest_data}
 
         prices = [
-            Price(ts, amount)
+            Price(date, amount)
             for i in range(len(timestamps))
-            if (ts := datetime.fromtimestamp(timestamps[i]).strftime("%Y-%m-%d"))
-            <= series.end
+            if (date := self._date_from_ts(timestamps[i], offset)) <= series.end
             if (amount := self._amount(amounts, series.type, i)) is not None
         ]
 
         return dataclasses.replace(series, quote=quote, prices=prices)
 
+    def _date_from_ts(self, ts, offset) -> str:
+        return (
+            datetime.fromtimestamp(ts - offset)
+            .replace(tzinfo=timezone.utc)
+            .strftime("%Y-%m-%d")
+        )
+
     def _amount(self, amounts, type, i):
         if type == "mid" and amounts["high"] != "null" and amounts["low"] != "null":
             return sum([Decimal(amounts["high"][i]), Decimal(amounts["low"][i])]) / 2
-        elif amounts[type] != "null":
+        elif amounts[type] != "null" and amounts[type][i] is not None:
             return Decimal(amounts[type][i])
         else:
             return None

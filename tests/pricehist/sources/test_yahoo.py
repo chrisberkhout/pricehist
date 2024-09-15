@@ -54,6 +54,13 @@ def long_ok(requests_mock):
     yield requests_mock
 
 
+@pytest.fixture
+def with_null_ok(requests_mock):
+    json = (Path(os.path.splitext(__file__)[0]) / "inrx-with-null.json").read_text()
+    requests_mock.add(responses.GET, url("INR=X"), body=json, status=200)
+    yield requests_mock
+
+
 def test_normalizesymbol(src):
     assert src.normalizesymbol("tsla") == "TSLA"
 
@@ -155,6 +162,13 @@ def test_fetch_from_before_start(src, type, long_ok):
     assert series.prices[0] == Price("1962-01-02", Decimal("1.5133211612701416015625"))
     assert series.prices[-1] == Price("2021-01-08", Decimal("103.2923736572265625"))
     assert len(series.prices) > 9
+
+
+def test_fetch_skips_dates_with_nulls(src, type, with_null_ok):
+    series = src.fetch(Series("INR=X", "", type, "2017-07-10", "2017-07-12"))
+    assert series.prices[0] == Price("2017-07-10", Decimal("64.61170196533203125"))
+    assert series.prices[1] == Price("2017-07-12", Decimal("64.52559661865234375"))
+    assert len(series.prices) == 2
 
 
 def test_fetch_to_future(src, type, recent_ok):
