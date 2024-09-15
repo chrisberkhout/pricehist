@@ -89,11 +89,7 @@ class Yahoo(BaseSource):
         return dataclasses.replace(series, quote=quote, prices=prices)
 
     def _date_from_ts(self, ts, offset) -> str:
-        return (
-            datetime.fromtimestamp(ts - offset)
-            .replace(tzinfo=timezone.utc)
-            .strftime("%Y-%m-%d")
-        )
+        return datetime.fromtimestamp(ts - offset).strftime("%Y-%m-%d")
 
     def _amount(self, amounts, type, i):
         if type == "mid" and amounts["high"] != "null" and amounts["low"] != "null":
