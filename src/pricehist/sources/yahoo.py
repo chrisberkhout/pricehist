@@ -146,11 +146,10 @@ class Yahoo(BaseSource):
             raise exceptions.InvalidPair(
                 series.base, series.quote, self, "Symbol not found."
             )
-        if code == 400 and "Data doesn't exist" in text:
+        elif code == 400 and "Data doesn't exist" in text:
             raise exceptions.BadResponse(
                 "No data for the given interval. Try requesting a larger interval."
             )
-
         elif code == 404 and "Timestamp data missing" in text:
             raise exceptions.BadResponse(
                 "Data missing. The given interval may be for a gap in the data "
@@ -168,5 +167,11 @@ class Yahoo(BaseSource):
             raise exceptions.ResponseParsingError(
                 "The data couldn't be parsed. "
             ) from e
+
+        if "timestamp" not in data["chart"]["result"][0]:
+            raise exceptions.BadResponse(
+                "No data for the given interval. "
+                "There may be a problem with the symbol or the interval."
+            )
 
         return data
