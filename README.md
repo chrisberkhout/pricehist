@@ -28,6 +28,7 @@ pipx install pricehist
 - **`coindesk`**: [CoinDesk Bitcoin Price Index](https://www.coindesk.com/coindesk-api)
 - **`coinmarketcap`**: [CoinMarketCap](https://coinmarketcap.com/)
 - **`ecb`**: [European Central Bank Euro foreign exchange reference rates](https://www.ecb.europa.eu/stats/exchange/eurofxref/html/index.en.html)
+- **`unirate`**: [UniRate API](https://unirateapi.com/) (paid plan required for historical data)
 - **`yahoo`**: [Yahoo! Finance](https://finance.yahoo.com/)
 
 ## Output formats

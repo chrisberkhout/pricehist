@@ -4,6 +4,7 @@ from .coinbasepro import CoinbasePro
 from .coindesk import CoinDesk
 from .coinmarketcap import CoinMarketCap
 from .ecb import ECB
+from .unirate import UniRate
 from .yahoo import Yahoo
 
 by_id = {
@@ -15,6 +16,7 @@ by_id = {
         CoinDesk(),
         CoinMarketCap(),
         ECB(),
+        UniRate(),
         Yahoo(),
     ]
 }
