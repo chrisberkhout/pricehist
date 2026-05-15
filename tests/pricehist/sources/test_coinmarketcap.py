@@ -186,6 +186,115 @@ def test_fetch_requests_and_receives_correct_times(
     assert series.prices[-1] == Price("2021-01-07", Decimal("49369.66288590665"))
 
 
+def test_fetch_long_hist_multi_segment(src, type, crypto_ok, requests_mock):
+    requests_mock.add(
+        responses.GET,
+        fetch_url,
+        body="""{
+          "data": {
+            "id": 1,
+            "name": "Bitcoin",
+            "symbol": "BTC",
+            "quotes": [
+              {
+                "timeOpen": "2021-01-01T00:00:00.000Z",
+                "quote": {
+                  "name": "2782",
+                  "high": 4.0,
+                  "low": 2.0
+                }
+              }
+            ]
+          }
+        }""",
+    )
+    requests_mock.add(
+        responses.GET,
+        fetch_url,
+        body="""{
+          "data": {
+            "id": 1,
+            "name": "Bitcoin",
+            "symbol": "BTC",
+            "quotes": [
+              {
+                "timeOpen": "2021-01-01T00:00:00.000Z",
+                "quote": {
+                  "name": "2782",
+                  "high": 4.0,
+                  "low": 2.0
+                }
+              },
+              {
+                "timeOpen": "2022-02-05T00:00:00.000Z",
+                "quote": {
+                  "name": "2782",
+                  "high": 8.0,
+                  "low": 4.0
+                }
+              }
+            ]
+          }
+        }""",
+    )
+    series = src.fetch(Series("ID=1", "ID=2782", type, "2021-01-01", "2022-02-05"))
+    fetch_calls = [
+        c for c in requests_mock.calls if c.request.url.startswith(fetch_url)
+    ]
+
+    assert len(fetch_calls) == 2
+    assert fetch_calls[0].request.params["timeStart"] == str(timestamp("2020-12-31"))
+    assert fetch_calls[0].request.params["timeEnd"] == str(timestamp("2022-02-04"))
+    assert fetch_calls[1].request.params["timeStart"] == str(timestamp("2022-02-04"))
+    assert fetch_calls[1].request.params["timeEnd"] == str(timestamp("2022-02-05"))
+    assert series.prices == [
+        Price("2021-01-01", Decimal("3.0")),
+        Price("2022-02-05", Decimal("6.0")),
+    ]
+
+
+def test_fetch_filters_extra_returned_dates(src, type, crypto_ok, requests_mock):
+    requests_mock.add(
+        responses.GET,
+        fetch_url,
+        body="""{
+          "data": {
+            "id": 1,
+            "name": "Bitcoin",
+            "symbol": "BTC",
+            "quotes": [
+              {
+                "timeOpen": "2020-12-31T00:00:00.000Z",
+                "quote": {
+                  "name": "2782",
+                  "high": 2.0,
+                  "low": 0.0
+                }
+              },
+              {
+                "timeOpen": "2021-01-01T00:00:00.000Z",
+                "quote": {
+                  "name": "2782",
+                  "high": 4.0,
+                  "low": 2.0
+                }
+              },
+              {
+                "timeOpen": "2021-01-02T00:00:00.000Z",
+                "quote": {
+                  "name": "2782",
+                  "high": 6.0,
+                  "low": 4.0
+                }
+              }
+            ]
+          }
+        }""",
+    )
+    series = src.fetch(Series("ID=1", "ID=2782", type, "2021-01-01", "2021-01-01"))
+    assert series.prices == [Price("2021-01-01", Decimal("3.0"))]
+
+
 def test_fetch_requests_logged(src, type, crypto_ok, recent_id_id_ok, caplog):
     with caplog.at_level(logging.DEBUG):
         src.fetch(Series("BTC", "AUD", type, "2021-01-01", "2021-01-07"))
