@@ -130,7 +130,7 @@ class Yahoo(BaseSource):
             "period1": start_ts,
             "period2": end_ts,
             "interval": "1d",
-            "events": "capitalGain%7Cdiv%7Csplit",
+            "events": "capitalGain|div|split",
             "includeAdjustedClose": "true",
             "formatted": "true",
             "userYfid": "true",

@@ -98,7 +98,7 @@ def test_symbols(src, caplog):
 def test_fetch_known(src, type, recent_ok):
     series = src.fetch(Series("TSLA", "", type, "2021-01-04", "2021-01-08"))
     req = recent_ok.calls[0].request
-    assert req.params["events"] == "capitalGain%7Cdiv%7Csplit"
+    assert req.params["events"] == "capitalGain|div|split"
     assert req.params["includeAdjustedClose"] == "true"
     assert (series.base, series.quote) == ("TSLA", "USD")
     assert len(series.prices) == 5
