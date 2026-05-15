@@ -171,6 +171,13 @@ def test_fetch_skips_dates_with_nulls(src, type, with_null_ok):
     assert len(series.prices) == 2
 
 
+def test_fetch_type_mid_skips_dates_with_nulls(src, with_null_ok):
+    series = src.fetch(Series("INR=X", "", "mid", "2017-07-10", "2017-07-12"))
+    assert series.prices[0] == Price("2017-07-10", Decimal("64.51275253295899"))
+    assert series.prices[1] == Price("2017-07-12", Decimal("64.45999908447266"))
+    assert len(series.prices) == 2
+
+
 def test_fetch_to_future(src, type, recent_ok):
     series = src.fetch(Series("TSLA", "", type, "2021-01-04", "2100-01-08"))
     assert len(series.prices) > 0
