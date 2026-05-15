@@ -74,7 +74,7 @@ class ExchangeRateHost(BaseSource):
         data = self._data(series)
 
         prices = []
-        for (d, v) in data.get("bpi", {}).items():
+        for d, v in data.get("bpi", {}).items():
             prices.append(Price(d, Decimal(str(v))))
 
         return dataclasses.replace(series, prices=prices)
