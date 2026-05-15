@@ -1,6 +1,6 @@
 import dataclasses
 import json
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from decimal import Decimal
 from functools import lru_cache
 
@@ -55,24 +55,27 @@ class CoinMarketCap(BaseSource):
         if series.base == "ID=" or not series.quote or series.quote == "ID=":
             raise exceptions.InvalidPair(series.base, series.quote, self)
 
-        data = self._data(series)
-
+        params = self._params(series)
+        data = dict(params)
         prices = []
-        for item in data.get("quotes", []):
-            d = item["timeOpen"][0:10]
-            amount = self._amount(item["quote"], series.type)
-            if amount is not None:
-                prices.append(Price(d, amount))
+        for start, end in self._segments(series.start, series.end):
+            segment_data = self._data(params, start, end)
+            data.update(segment_data)
+            for item in segment_data.get("quotes", []):
+                d = item["timeOpen"][0:10]
+                if d < start or d > end:
+                    continue
+                amount = self._amount(item["quote"], series.type)
+                if amount is not None:
+                    prices.append(Price(d, amount))
 
-        output_base, output_quote = self._output_pair(series.base, series.quote, data)
+        output_base, output_quote = self._output_pair(data)
 
         return dataclasses.replace(
             series, base=output_base, quote=output_quote, prices=prices
         )
 
-    def _data(self, series):
-        url = "https://api.coinmarketcap.com/data-api/v3.1/cryptocurrency/historical"
-
+    def _params(self, series):
         params = {}
 
         if series.base.startswith("ID="):
@@ -85,9 +88,30 @@ class CoinMarketCap(BaseSource):
         else:
             params["convertId"] = self._id_from_symbol(series.quote, series)
 
+        return params
+
+    def _segments(self, start, end, length=400):
+        # The endpoint returns at most 400 daily quotes per request, anchored
+        # at timeEnd, and may include rows before timeStart.
+        start = datetime.fromisoformat(start).date()
+        end = max(datetime.fromisoformat(end).date(), start)
+
+        segments = []
+        seg_start = start
+        while seg_start <= end:
+            seg_end = min(seg_start + timedelta(days=length - 1), end)
+            segments.append((seg_start.isoformat(), seg_end.isoformat()))
+            seg_start = seg_end + timedelta(days=1)
+
+        return segments
+
+    def _data(self, params, start, end):
+        url = "https://api.coinmarketcap.com/data-api/v3.1/cryptocurrency/historical"
+        params = dict(params)
+
         params["timeStart"] = int(
             int(
-                datetime.strptime(series.start, "%Y-%m-%d")
+                datetime.strptime(start, "%Y-%m-%d")
                 .replace(tzinfo=timezone.utc)
                 .timestamp()
             )
@@ -95,9 +119,7 @@ class CoinMarketCap(BaseSource):
             # Start one period earlier since the start is exclusive.
         )
         params["timeEnd"] = int(
-            datetime.strptime(series.end, "%Y-%m-%d")
-            .replace(tzinfo=timezone.utc)
-            .timestamp()
+            datetime.strptime(end, "%Y-%m-%d").replace(tzinfo=timezone.utc).timestamp()
         )  # Don't round up since it's inclusive of the period covering the end time.
 
         params["interval"] = "daily"
@@ -112,12 +134,12 @@ class CoinMarketCap(BaseSource):
 
         if code == 400 and "No items found." in text:
             raise exceptions.InvalidPair(
-                series.base, series.quote, self, "Bad base ID."
+                f"ID={params['id']}", f"ID={params['convertId']}", self, "Bad base ID."
             )
 
         elif code == 400 and 'Invalid value for \\"convert_id\\"' in text:
             raise exceptions.InvalidPair(
-                series.base, series.quote, self, "Bad quote ID."
+                f"ID={params['id']}", f"ID={params['convertId']}", self, "Bad quote ID."
             )
 
         try:
@@ -162,23 +184,13 @@ class CoinMarketCap(BaseSource):
         else:
             return None
 
-    def _output_pair(self, base, quote, data):
-        data_base = data["symbol"]
-
+    def _output_pair(self, data):
         symbols = {i["id"]: (i["symbol"] or i["code"]) for i in self._symbol_data()}
 
-        data_quote = None
-        if len(data["quotes"]) > 0:
-            data_quote = symbols[int(data["quotes"][0]["quote"]["name"])]
+        data_base = data.get("symbol") or symbols[int(data["id"])]
+        data_quote = symbols[int(data["convertId"])]
 
-        lookup_quote = None
-        if quote.startswith("ID="):
-            lookup_quote = symbols[int(quote[3:])]
-
-        output_base = data_base
-        output_quote = data_quote or lookup_quote or quote
-
-        return (output_base, output_quote)
+        return (data_base, data_quote)
 
     def _id_from_symbol(self, symbol, series):
         for i in self._symbol_data():
