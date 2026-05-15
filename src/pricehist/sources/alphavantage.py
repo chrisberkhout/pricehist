@@ -275,7 +275,7 @@ class AlphaVantage(BaseSource):
         return normalized_data
 
     def _outputsize(self, start):
-        almost_100_days_ago = (datetime.now().date() - timedelta(days=95)).isoformat()
+        almost_100_days_ago = (datetime.now().date() - timedelta(days=99)).isoformat()
         if start < almost_100_days_ago:
             return "full"
         else:
