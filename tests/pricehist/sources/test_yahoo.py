@@ -1,3 +1,4 @@
+import json
 import logging
 import os
 from datetime import datetime, timezone
@@ -98,7 +99,7 @@ def test_symbols(src, caplog):
 def test_fetch_known(src, type, recent_ok):
     series = src.fetch(Series("TSLA", "", type, "2021-01-04", "2021-01-08"))
     req = recent_ok.calls[0].request
-    assert req.params["events"] == "capitalGain%7Cdiv%7Csplit"
+    assert req.params["events"] == "capitalGain|div|split"
     assert req.params["includeAdjustedClose"] == "true"
     assert (series.base, series.quote) == ("TSLA", "USD")
     assert len(series.prices) == 5
@@ -118,6 +119,24 @@ def test_fetch_ignores_any_extra_row(src, type, recent_ok):
     series = src.fetch(Series("TSLA", "", type, "2021-01-04", "2021-01-07"))
     assert series.prices[0] == Price("2021-01-04", Decimal("243.2566680908203"))
     assert series.prices[-1] == Price("2021-01-07", Decimal("272.0133361816406"))
+
+
+def test_fetch_keeps_first_price_for_duplicate_dates(src, type, requests_mock):
+    response = json.loads(
+        (Path(os.path.splitext(__file__)[0]) / "tsla-recent.json").read_text()
+    )
+    result = response["chart"]["result"][0]
+    result["timestamp"].append(1610130600)
+    result["indicators"]["adjclose"][0]["adjclose"].append(999)
+    quote = result["indicators"]["quote"][0]
+    for key in ["open", "high", "low", "close", "volume"]:
+        quote[key].append(999)
+
+    requests_mock.add(responses.GET, url("TSLA"), json=response, status=200)
+    series = src.fetch(Series("TSLA", "", type, "2021-01-04", "2021-01-08"))
+
+    assert series.prices[-1] == Price("2021-01-08", Decimal("293.3399963378906"))
+    assert len(series.prices) == 5
 
 
 def test_fetch_requests_logged(src, type, recent_ok, caplog):
@@ -168,6 +187,13 @@ def test_fetch_skips_dates_with_nulls(src, type, with_null_ok):
     series = src.fetch(Series("INR=X", "", type, "2017-07-10", "2017-07-12"))
     assert series.prices[0] == Price("2017-07-10", Decimal("64.61170196533203"))
     assert series.prices[1] == Price("2017-07-12", Decimal("64.52559661865234"))
+    assert len(series.prices) == 2
+
+
+def test_fetch_type_mid_skips_dates_with_nulls(src, with_null_ok):
+    series = src.fetch(Series("INR=X", "", "mid", "2017-07-10", "2017-07-12"))
+    assert series.prices[0] == Price("2017-07-10", Decimal("64.51275253295899"))
+    assert series.prices[1] == Price("2017-07-12", Decimal("64.45999908447266"))
     assert len(series.prices) == 2
 
 

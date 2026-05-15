@@ -79,12 +79,17 @@ class Yahoo(BaseSource):
         rest_data = data["chart"]["result"][0]["indicators"]["quote"][0]
         amounts = {**adjclose_data, **rest_data}
 
-        prices = [
-            Price(date, amount)
-            for i in range(len(timestamps))
-            if (date := self._ts_to_date(timestamps[i] + offset)) <= series.end
-            if (amount := self._amount(amounts, series.type, i)) is not None
-        ]
+        prices_by_date = {}
+        for i in range(len(timestamps)):
+            date = self._ts_to_date(timestamps[i] + offset)
+            if date > series.end or date in prices_by_date:
+                continue
+
+            amount = self._amount(amounts, series.type, i)
+            if amount is not None:
+                prices_by_date[date] = Price(date, amount)
+
+        prices = list(prices_by_date.values())
 
         return dataclasses.replace(series, quote=quote, prices=prices)
 
@@ -96,11 +101,13 @@ class Yahoo(BaseSource):
             type == "mid"
             and amounts["high"] != "null"
             and amounts["high"] is not None
+            and amounts["high"][i] is not None
             and amounts["low"] != "null"
             and amounts["low"] is not None
+            and amounts["low"][i] is not None
         ):
             return sum([Decimal(amounts["high"][i]), Decimal(amounts["low"][i])]) / 2
-        elif amounts[type] != "null" and amounts[type][i] is not None:
+        elif type != "mid" and amounts[type] != "null" and amounts[type][i] is not None:
             return Decimal(amounts[type][i])
         else:
             return None
@@ -128,7 +135,7 @@ class Yahoo(BaseSource):
             "period1": start_ts,
             "period2": end_ts,
             "interval": "1d",
-            "events": "capitalGain%7Cdiv%7Csplit",
+            "events": "capitalGain|div|split",
             "includeAdjustedClose": "true",
             "formatted": "true",
             "userYfid": "true",
