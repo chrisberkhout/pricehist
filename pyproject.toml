@@ -22,7 +22,10 @@ curlify = "^2.2.1"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3.2"
-black = "^22.10.0"
+black = [
+    {version = ">=24,<25", python = "<3.9"},
+    {version = ">=25,<26", python = ">=3.9"},
+]
 flake8 = "^7.1.0"
 isort = "^5.8.0"
 responses = "^0.13.3"
