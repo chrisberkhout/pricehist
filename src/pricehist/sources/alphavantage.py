@@ -3,6 +3,7 @@ import dataclasses
 import json
 import logging
 import os
+import time
 from datetime import datetime, timedelta
 from decimal import Decimal
 from typing import List, Tuple
@@ -18,6 +19,7 @@ from .basesource import BaseSource
 class AlphaVantage(BaseSource):
     QUERY_URL = "https://www.alphavantage.co/query"
     API_KEY_NAME = "ALPHAVANTAGE_API_KEY"
+    NON_PREMIUM_MAX_RPS = 1
 
     def id(self):
         return "alphavantage"
@@ -155,7 +157,7 @@ class AlphaVantage(BaseSource):
         }
 
         try:
-            response = self.log_curl(requests.get(self.QUERY_URL, params=params))
+            response = self._query(params)
         except Exception as e:
             raise exceptions.RequestError(str(e)) from e
 
@@ -198,7 +200,7 @@ class AlphaVantage(BaseSource):
         }
 
         try:
-            response = self.log_curl(requests.get(self.QUERY_URL, params=params))
+            response = self._query(params)
         except Exception as e:
             raise exceptions.RequestError(str(e)) from e
 
@@ -249,7 +251,7 @@ class AlphaVantage(BaseSource):
         }
 
         try:
-            response = self.log_curl(requests.get(self.QUERY_URL, params=params))
+            response = self._query(params)
         except Exception as e:
             raise exceptions.RequestError(str(e)) from e
 
@@ -290,7 +292,7 @@ class AlphaVantage(BaseSource):
         }
 
         try:
-            response = self.log_curl(requests.get(self.QUERY_URL, params=params))
+            response = self._query(params)
         except Exception as e:
             raise exceptions.RequestError(str(e)) from e
 
@@ -321,6 +323,27 @@ class AlphaVantage(BaseSource):
             )
         }
         return normalized_data
+
+    def _query(self, params):
+        if self._using_non_premium_account():
+            self._non_premium_api_rate_limit()
+        response = self.log_curl(requests.get(self.QUERY_URL, params=params))
+        if self._using_non_premium_account():
+            self._last_non_premium_api_request = time.monotonic()
+        return response
+
+    def _using_non_premium_account(self):
+        return not self._apikey(require=False)
+
+    def _non_premium_api_rate_limit(self):
+        last_request = getattr(self, "_last_non_premium_api_request", None)
+        if last_request is None:
+            return
+
+        min_interval = 1 / self.NON_PREMIUM_MAX_RPS
+        delay = min_interval - (time.monotonic() - last_request)
+        if delay > 0:
+            time.sleep(delay)
 
     def _apikey(self, require=True):
         key = os.getenv(self.API_KEY_NAME)
